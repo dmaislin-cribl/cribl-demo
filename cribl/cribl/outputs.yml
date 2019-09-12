@@ -57,19 +57,11 @@ outputs:
     mtu: 512
     flushPeriodSec: 1
     onBackpressure: drop
-  splunk:
-    type: splunk
-    host: splunk
-    port: 9997
-    onBackpressure: queue
-    nestedFields: none
-    tls:
-      disabled: true
   statsd:
     type: router
     rules:
       - filter: "true"
-        output: splunk
+        output: splunk-metrics
         final: false
       - filter: "true"
         output: graphite
@@ -84,3 +76,26 @@ outputs:
       - filter: "true"
         output: s3
         final: true
+  splunk-metrics:
+    type: splunk
+    host: splunk
+    port: 9998
+    nestedFields: none
+    tls:
+      disabled: true
+    connectionTimeout: 5000
+    writeTimeout: 10000
+    onBackpressure: block
+  splunk:
+    type: splunk
+    host: splunk
+    port: 9997
+    nestedFields: none
+    tls:
+      disabled: true
+    connectionTimeout: 5000
+    writeTimeout: 10000
+    onBackpressure: queue
+    pqMaxFileSize: 1 MB
+    pqPath: $CRIBL_HOME/state/queues
+    pqCompress: none
