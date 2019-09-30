@@ -65,7 +65,7 @@ functions:
           value: "'cribl-metrics'"
   - id: demo_cardinalityGuard
     filter: "true"
-    disabled: false
+    disabled: true
     conf:
       ignoreFields:
         - _*
