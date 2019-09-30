@@ -8,24 +8,38 @@ functions:
     conf:
       add:
         - name: _raw
-          value: message
+          value: __e.asJSON()
         - name: sourcetype
           value: "sourcetype ? sourcetype : input.type"
         - name: host
           value: "typeof(host) == 'object' ? host.name : host"
+        - name: index
+          value: "index ? index : 'elastic'"
+      keep:
+        - _raw
+        - cribl_pipe
+        - host
+        - index
+        - source
+        - sourcetype
+        - _time
       remove:
+        - __e['@timestamp']
         - beat
         - input
         - message
         - offset
         - prospector
-        - __e['@timestamp']
+        - stream
+        - log
   - id: auto_timestamp
     filter: "true"
-    disabled: null
+    disabled: false
     conf:
-      srcField: message
+      srcField: _raw
       dstField: _time
       defaultTimezone: local
       timeExpression: time.getTime() / 1000
+      offset: 0
       maxLen: 150
+      defaultTime: now

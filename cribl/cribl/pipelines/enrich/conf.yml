@@ -1,4 +1,4 @@
-asyncFuncTimeout: 1000
+asyncFuncTimeout: 10000
 functions:
   - id: comment
     filter: "true"
@@ -108,6 +108,8 @@ functions:
       urlExpression: "`http://apiserver:3000/users/${userName}`"
       eventField: customer
       maxConcurrentRequests: 1
+      retryOnError: true
+      flatten: true
   - id: eval
     filter: "true"
     disabled: null
