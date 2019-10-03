@@ -2,7 +2,7 @@
 
 This repo is used for building and running Cribl demos. All demos contained within utilize [Docker](https://docs.docker.com/install/). To get started, all you need to do is:
 
-    git clone https://https://github.com/criblio/cribl-demo.git
+    git clone https://github.com/criblio/cribl-demo.git
     cd cribl-demo
     docker-compose up -d
 
