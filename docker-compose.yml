@@ -13,20 +13,36 @@ services:
     build:
       context: cribl
     ports:
+      - "9000:9000"
+    volumes:
+      - "./cribl/master/groups:/opt/cribl/groups"
+      - "./cribl/master/local:/opt/cribl/local"
+  cribl-w0:
+    build:
+      context: cribl
+    ports:
+      - "9002:9000"
       - "10200:10200"
       - "10088:10088"
       - "10080:10080"
       - "10001:10001"
       - "9999:9999"
-      - "9000:9000"
+      - "5140:5140"
+    # volumes:
+    #   - "./cribl/w0:/opt/cribl/local/_system"
+    environment:
+      - CRIBL_DIST_MASTER_URL=tcp://criblmaster@cribl:4200
+  cribl-w1:
+    build:
+      context: cribl
+    ports:
+      - "9003:9000"
       - "8125:8125"
       - "8125:8125/udp"
-      - "5140:5140"
-    volumes:
-      - "./cribl/cribl:/opt/cribl/local/cribl"
-    cap_add:
-      - NET_ADMIN
-    privileged: true
+    # volumes:
+    #   - "./cribl/w0:/opt/cribl/local/_system"
+    environment:
+      - CRIBL_DIST_MASTER_URL=tcp://criblmaster@cribl:4200?tag=metrics
   splunk:
     build:
       context: splunk
@@ -152,6 +168,8 @@ services:
       timeout: 10s
       retries: 3
     privileged: true
+    environment:
+      - DISABLE_ACCESS_COUNT=1
   redis:
     build:
       context: redis
