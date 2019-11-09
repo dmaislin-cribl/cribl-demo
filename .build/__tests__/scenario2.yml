@@ -1,0 +1,8 @@
+sources:
+  - mergeorig
+  - mergeinput
+destination: mergeoutput
+mergeconfig:
+  - pattern: \.txt$
+    opts:
+      op: copy

@@ -1,9 +1,75 @@
 import * as YAML from 'yaml';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as chalk from 'chalk';
 const pLimit = require('p-limit');
 
-const limit = pLimit(3);
+export type scenarioType = {
+  sources: string[],
+  destination: string,
+  mergeconfig: any[],
+  maxThreads: number,
+}
+
+export class Scenario {
+  private scenario: scenarioType;
+  private sources: string[];
+  private destination: string;
+  private maxThreads: number;
+  private mc: MergeConfig;
+  constructor(confPath: string) {
+    this.scenario = readYamlFile(confPath);
+    if (!this.scenario.sources) {
+      throw new Error('sources missing from scenario');
+    }
+    if (!Array.isArray(this.scenario.sources)) {
+      throw new Error('sources is not an array');
+    }
+    if (!this.scenario.destination) {
+      throw new Error('destination is missing');
+    }
+    this.sources = this.scenario.sources;
+    // Check to see if files exist in sources, if not, try
+    // relative path from where the conf file is located
+    const relativeIfFail = (s) => {
+      let stat;
+      try {
+        stat = fs.statSync(s);
+      } catch (err) {
+        if (err.toString().match(/ENOENT/)) {
+          s = path.join(path.dirname(path.resolve(confPath)), s)
+          stat = fs.statSync(s);
+        } else {
+          throw err;
+        }
+      }
+      if (!stat.isDirectory()) {
+        throw new Error(`${s} is not a directory`);
+      }
+      return s;
+    }
+    this.sources = this.sources.map(s => (relativeIfFail(s)));
+    this.destination = relativeIfFail(this.scenario.destination);
+    if (!this.scenario.mergeconfig || !Array.isArray(this.scenario.mergeconfig)) {
+      this.scenario.mergeconfig = [];
+    }
+    this.scenario.mergeconfig.push(
+      {
+        pattern: '\.yml$',
+        opts: { op: opcode.mergeYaml }
+      }
+    );
+    this.mc = new MergeConfig(this.scenario.mergeconfig);
+    this.maxThreads = this.scenario.maxThreads || 3;
+  }
+
+  async run() {
+    this.sources.forEach(async s => {
+      const ol = buildOpList(this.destination, s, this.destination, this.mc);
+      await execOpList(ol, this.maxThreads);
+    });
+  }
+}
 
 export type opOpts = {
   arrayMerge?: arrayMergeType,
@@ -19,11 +85,15 @@ export enum arrayMergeType {
   atPos,
 }
 
+export type arrayMergeTypeString = keyof typeof arrayMergeType;
+
 export enum opcode {
   copy,
   mergeYaml,
   skip
 }
+
+export type opcodeString = keyof typeof opcode;
 
 export type opType = {
   inputDir: string,
@@ -50,10 +120,25 @@ export class MergeConfig {
       if (!c.opts) {
         throw new Error(`opOpts missing from item ${idx}, '${JSON.stringify(c)}'`);
       }
-      this.c.push({ 
+      const mc = {
         pattern: new RegExp(c.pattern),
         opts: c.opts as opOpts,
-      } as matchOpts);
+      } as matchOpts;
+      if (typeof mc.opts.op === 'string') {
+        const ocstr = mc.opts.op as opcodeString;
+        mc.opts.op = opcode[ocstr];
+        if (mc.opts.op === undefined) {
+          throw new Error(`invalid opcode ${ocstr}`)
+        }
+      }
+      if (typeof mc.opts.arrayMerge === 'string') {
+        const amstr = mc.opts.arrayMerge as arrayMergeTypeString;
+        mc.opts.arrayMerge = arrayMergeType[amstr];
+        if (mc.opts.arrayMerge === undefined) {
+          throw new Error(`invalid arrayMergeType ${amstr}`);
+        }
+      }
+      this.c.push(mc);
     });
   }
   match(file: string): opOpts {
@@ -137,6 +222,7 @@ export function mergeYamlFiles(orig: string, input: string, outpath: string, opO
 /**
  * Reads a YAML file into an object
  * @param filePath 
+ * @returns - Object with contents of the YAML
  */
 export function readYamlFile(filePath: string): any {
   const contents = fs.readFileSync(filePath, 'utf8');
@@ -164,6 +250,7 @@ export function walkDir(dir: string, callback: Function) {
 /**
  * Returns a recusrive list of files starting at dir
  * @param dir - Base directory to walk
+ * @returns - List of files found from walking the path.
  */
 export function buildFileList(dir: string): string[] {
   const ret = [];
@@ -184,6 +271,7 @@ export function buildFileList(dir: string): string[] {
  * @param inputDir - Directory to merge into outDir
  * @param outDir - Destination directory
  * @param config - MergeConfig specifying how to merge files
+ * @returns - List of operations to execute
  */
 export function buildOpList(origDir: string, inputDir: string, outDir: string, config: MergeConfig): opType[] {
   const origFiles = buildFileList(origDir).sort();
@@ -207,12 +295,19 @@ export function buildOpList(origDir: string, inputDir: string, outDir: string, c
   ] as opType[];
 }
 
-export function execOpList(ol: opType[]): Promise<opType[]> {
+/**
+ * Executes an op list from `buildOpList`. Returns a promise which resolves after all operations are complete.
+ * @param ol - Oplist returned from `buildOpList`
+ * @param maxThreads - Maximum simultaneous operations.
+ * @returns - Promise with contents of all the operations.
+ */
+export async function execOpList(ol: opType[], maxThreads: number): Promise<opType[]> {
   const promises = ol.map(op => {
-    return limit(() => (new Promise((resolve, reject) => {
+    return pLimit(maxThreads)(() => (new Promise((resolve, reject) => {
+      logOp(op);
       const inputFile = `${op.inputDir}${op.filePath}`;
       const outFile = `${op.outDir}${op.filePath}`;
-      if (op.opts.op === opcode.copy) {
+      const copyFile = () => {
         fs.mkdirSync(path.dirname(inputFile), { recursive: true });
         fs.mkdirSync(path.dirname(outFile), { recursive: true });
         fs.copyFile(inputFile, outFile, (err) => {
@@ -221,12 +316,20 @@ export function execOpList(ol: opType[]): Promise<opType[]> {
           };
           resolve(op);
         })
+      };
+      if (op.opts.op === opcode.copy) {
+        copyFile();
       } else if (op.opts.op === opcode.mergeYaml) {
         // Merge should merge the file already there with the new file coming in
         try {
           mergeYamlFiles(outFile, inputFile, outFile, op.opts)
         } catch (err) {
-          return reject(err);
+          // If the file doesn't exist to merge, copy instead
+          if (err.toString().match(/ENOENT/)) {
+            copyFile();
+          } else {
+            return reject(err);
+          }
         };
         return resolve(op);
       } else {
@@ -237,20 +340,38 @@ export function execOpList(ol: opType[]): Promise<opType[]> {
   return Promise.all(promises) as Promise<opType[]>;
 }
 
+/**
+ * Simple function to log an operation to the console.
+ * @param op - Operation to log.
+ */
+exports.logOps = false;
 export function logOp(op: opType) {
-  let opStr;
-  switch (op.opts.op) {
-    case opcode.copy:
-      opStr = 'copy';
-      break;
-    case opcode.mergeYaml:
-      opStr = 'mergeYaml';
-      break;
-    case opcode.skip:
-      opStr = 'skip';
-      break;
+  if (exports.logOps) {
+    const idIdx = op.inputDir.indexOf(__dirname);
+    const inDir = idIdx > -1 ? `.${op.inputDir.substr(idIdx + __dirname.length)}` : op.inputDir;
+    const odIdx = op.outDir.indexOf(__dirname);
+    const outDir = odIdx > -1 ? `.${op.outDir.substr(odIdx + __dirname.length)}` : op.outDir;
+    console.log(`${chalk.grey('[ ')}${chalk.greenBright(opcode[op.opts.op].padEnd(9))}${chalk.grey(' ]')}  ${op.filePath.padEnd(40)} ${chalk.cyanBright('->')} from '${inDir}' to '${outDir}`);
   }
-  console.log(`${op.filePath} -> ${opStr} from '${op.inputDir}' to '${op.outDir}`);
 }
 
-console.log('main!');
+async function main() {
+  if (process.argv.length < 2 || !process.argv[2] || process.argv[2].length === 0) {
+    console.log('usage: merge <path/to/scenario.yml>');
+    process.exit(1);
+  }
+
+  console.log(`${chalk.magentaBright('Creating')} scenario ${process.argv[2]}`);
+  let s;
+  try {
+    s = new Scenario(process.argv[2]);
+  } catch (err) {
+    console.log(`Error creating scenario: ${err.message}`);
+    process.exit(1);
+  }
+  console.log(`${chalk.blueBright('Starting')} scenario ${process.argv[2]}`);
+  exports.logOps = true;
+  await s.run();
+}
+
+main();

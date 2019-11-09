@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { mergeObjs, opOpts, arrayMergeType, readYamlFile, mergeYamlFiles, walkDir, buildFileList, MergeConfig, buildOpList, execOpList, opcode, logOp, opType } from '../merge';
+import { mergeObjs, opOpts, arrayMergeType, readYamlFile, mergeYamlFiles, walkDir, buildFileList, MergeConfig, buildOpList, execOpList, opcode, logOp, opType, Scenario } from '../merge';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as md5File from 'md5-file';
@@ -307,6 +307,26 @@ describe('MergeConfig', () => {
       ]);
     }).to.throw(/Invalid regular expression/);
   });
+  it('should error with invalid operation', () => {
+    expect(() => {
+      new MergeConfig([
+        {
+          pattern: '.*',
+          opts: { op: 'invalid' },
+        }
+      ]);
+    }).to.throw(/invalid opcode/);
+  });
+  it('should error with invalid arrayMergeType', () => {
+    expect(() => {
+      new MergeConfig([
+        {
+          pattern: '.*',
+          opts: { arrayMerge: 'invalid' },
+        }
+      ]);
+    }).to.throw(/invalid arrayMergeType/);
+  });
   it('should get the correct config', () => {
     const mc = new MergeConfig([
       {
@@ -327,7 +347,7 @@ describe('MergeConfig', () => {
       {
         pattern: '\.yml$',
         opts: {
-          op: 1 // mergeYaml
+          op: 'mergeYaml' // mergeYaml
         }
       }
     ]);
@@ -415,43 +435,50 @@ const compareFiles = (file1: string, file2: string): boolean => {
   return hash1 === hash2;
 }
 
+let execOpList1;
+
 describe('execOpList', () => {
   before(() => {
     const ol = buildOpList(origDir, inputDir, outDir, defaultMergeConfig);
-    const promises = execOpList(ol);
+    const promises = execOpList(ol, 3);
     return promises.catch((err) => console.error(err))
       // .then((ops) => { (ops || [] as opType[]).forEach(op => logOp(op)) });
   });
-  it('merged yaml right', () => {
-    const expected = { 'a': 'z', 'b': [1, 2, 3, 4] };
-    const out = readYamlFile(outYaml);
-    expect(expected).to.eql(out);
-  });
-  it('merged deep yaml right', () => {
-    const expected = { foo: 'bar', baz: [4, 5, 6], anotherkey: 'anothervalue', bar: [1, 2, 3] };
-    const out = readYamlFile(`${outDir}/dir2/deepconf.yml`);
-    expect(expected).to.eql(out);
-  });
-  it('copies the right files', () => {
-    [
-      [`${origDir}/dir1/justhere.txt`, `${outDir}/dir1/justhere.txt`],
-      [`${origDir}/dir1/notpresent/onlyinorig.txt`, `${outDir}/dir1/notpresent/onlyinorig.txt`],
-      [`${origDir}/dir1/nested/we support files with spaces.txt`, `${outDir}/dir1/nested/we support files with spaces.txt`],
-      [`${origDir}/dir2/origonly.txt`, `${outDir}/dir2/origonly.txt`],
-      [`${inputDir}/dir1/file.txt`, `${outDir}/dir1/file.txt`],
-      [`${inputDir}/dir1/nested/frominput.txt`, `${outDir}/dir1/nested/frominput.txt`],
-      [`${inputDir}/dir2/bothpresent.txt`, `${outDir}/dir2/bothpresent.txt`],
-    ].forEach(tuple => {
-      expect(compareFiles(tuple[0], tuple[1]), 
-        `${tuple[0]} is not the same as ${tuple[1]}`
-      ).to.be.true;
+  execOpList1 = () => {
+    it('merged yaml right', () => {
+      const expected = { 'a': 'z', 'b': [1, 2, 3, 4] };
+      const out = readYamlFile(outYaml);
+      expect(expected).to.eql(out);
     });
-  });
+    it('merged deep yaml right', () => {
+      const expected = { foo: 'bar', baz: [4, 5, 6], anotherkey: 'anothervalue', bar: [1, 2, 3] };
+      const out = readYamlFile(`${outDir}/dir2/deepconf.yml`);
+      expect(expected).to.eql(out);
+    });
+    it('copies the right files', () => {
+      [
+        [`${origDir}/dir1/justhere.txt`, `${outDir}/dir1/justhere.txt`],
+        [`${origDir}/dir1/notpresent/onlyinorig.txt`, `${outDir}/dir1/notpresent/onlyinorig.txt`],
+        [`${origDir}/dir1/nested/we support files with spaces.txt`, `${outDir}/dir1/nested/we support files with spaces.txt`],
+        [`${origDir}/dir2/origonly.txt`, `${outDir}/dir2/origonly.txt`],
+        [`${inputDir}/dir1/file.txt`, `${outDir}/dir1/file.txt`],
+        [`${inputDir}/dir1/nested/frominput.txt`, `${outDir}/dir1/nested/frominput.txt`],
+        [`${inputDir}/dir2/bothpresent.txt`, `${outDir}/dir2/bothpresent.txt`],
+      ].forEach(tuple => {
+        expect(compareFiles(tuple[0], tuple[1]),
+          `${tuple[0]} is not the same as ${tuple[1]}`
+        ).to.be.true;
+      });
+    });
+  }
+  execOpList1();
   after(() => {
     console.log('this should execute after all operations');
     cleanOutDir();
   })
 });
+
+let execOpList2;
 
 describe('execOpList skip txt', () => {
   before(() => {
@@ -466,42 +493,47 @@ describe('execOpList skip txt', () => {
       },
     ])
     const ol = buildOpList(origDir, inputDir, outDir, mc);
-    const promises = execOpList(ol);
+    const promises = execOpList(ol, 3);
     return promises.catch((err) => console.error(err))
       // .then((ops) => { (ops || [] as opType[]).forEach(op => logOp(op)) });
   });
-  it('merged yaml right', () => {
-    const expected = { 'a': 'z', 'b': [1, 2, 3, 4] };
-    const out = readYamlFile(outYaml);
-    expect(expected).to.eql(out);
-  });
-  it('merged deep yaml right', () => {
-    const expected = { foo: 'bar', baz: [4, 5, 6], anotherkey: 'anothervalue', bar: [1, 2, 3] };
-    const out = readYamlFile(`${outDir}/dir2/deepconf.yml`);
-    expect(expected).to.eql(out);
-  });
-  it('copies the right files', () => {
-    [
-      [`${origDir}/dir1/justhere.txt`, `${outDir}/dir1/justhere.txt`],
-      [`${origDir}/dir1/notpresent/onlyinorig.txt`, `${outDir}/dir1/notpresent/onlyinorig.txt`],
-      [`${origDir}/dir1/nested/we support files with spaces.txt`, `${outDir}/dir1/nested/we support files with spaces.txt`],
-      [`${origDir}/dir2/origonly.txt`, `${outDir}/dir2/origonly.txt`],
-      [`${origDir}/dir2/bothpresent.txt`, `${outDir}/dir2/bothpresent.txt`],
-    ].forEach(tuple => {
-      expect(compareFiles(tuple[0], tuple[1]),
-        `${tuple[0]} is not the same as ${tuple[1]}`
-      ).to.be.true;
+  execOpList2 = () => {
+    it('merged yaml right', () => {
+      const expected = { 'a': 'z', 'b': [1, 2, 3, 4] };
+      const out = readYamlFile(outYaml);
+      expect(expected).to.eql(out);
     });
-    [`${outDir}/dir1/file.txt`,
+    it('merged deep yaml right', () => {
+      const expected = { foo: 'bar', baz: [4, 5, 6], anotherkey: 'anothervalue', bar: [1, 2, 3] };
+      const out = readYamlFile(`${outDir}/dir2/deepconf.yml`);
+      expect(expected).to.eql(out);
+    });
+    it('copies the right files', () => {
+      [
+        [`${origDir}/dir1/justhere.txt`, `${outDir}/dir1/justhere.txt`],
+        [`${origDir}/dir1/notpresent/onlyinorig.txt`, `${outDir}/dir1/notpresent/onlyinorig.txt`],
+        [`${origDir}/dir1/nested/we support files with spaces.txt`, `${outDir}/dir1/nested/we support files with spaces.txt`],
+        [`${origDir}/dir2/origonly.txt`, `${outDir}/dir2/origonly.txt`],
+        [`${origDir}/dir2/bothpresent.txt`, `${outDir}/dir2/bothpresent.txt`],
+      ].forEach(tuple => {
+        expect(compareFiles(tuple[0], tuple[1]),
+          `${tuple[0]} is not the same as ${tuple[1]}`
+        ).to.be.true;
+      });
+      [`${outDir}/dir1/file.txt`,
       `${outDir}/dir1/nested/frominput.txt`,
-    ].forEach(f => {
-      expect(fs.existsSync(f), `${f} exists`).to.be.false;
+      ].forEach(f => {
+        expect(fs.existsSync(f), `${f} exists`).to.be.false;
+      });
     });
-  });
+  }
+  execOpList2();
   after(() => {
     cleanOutDir();
   })
 });
+
+let execOpList3;
 
 describe('execOpList change merge', () => {
   before(() => {
@@ -509,43 +541,110 @@ describe('execOpList change merge', () => {
       {
         pattern: '\.yml$',
         opts: { 
-          op: opcode.mergeYaml,
-          arrayMerge: arrayMergeType.atPos,
+          op: 'mergeYaml',
+          arrayMerge: 'atPos',
           arrayMergePos: 1,
         },
       }
     ])
     const ol = buildOpList(origDir, inputDir, outDir, mc);
-    const promises = execOpList(ol);
+    const promises = execOpList(ol, 3);
     return promises.catch((err) => console.error(err))
     // .then((ops) => { (ops || [] as opType[]).forEach(op => logOp(op)) });
   });
-  it('merged yaml right', () => {
-    const expected = { 'a': 'z', 'b': [1, 4, 2, 3] };
-    const out = readYamlFile(outYaml);
-    expect(expected).to.eql(out);
-  });
-  it('merged deep yaml right', () => {
-    const expected = { foo: 'bar', baz: [4, 5, 6], anotherkey: 'anothervalue', bar: [1, 2, 3] };
-    const out = readYamlFile(`${outDir}/dir2/deepconf.yml`);
-    expect(expected).to.eql(out);
-  });
-  it('copies the right files', () => {
-    [
-      [`${origDir}/dir1/justhere.txt`, `${outDir}/dir1/justhere.txt`],
-      [`${origDir}/dir1/notpresent/onlyinorig.txt`, `${outDir}/dir1/notpresent/onlyinorig.txt`],
-      [`${origDir}/dir1/nested/we support files with spaces.txt`, `${outDir}/dir1/nested/we support files with spaces.txt`],
-      [`${origDir}/dir2/origonly.txt`, `${outDir}/dir2/origonly.txt`],
-      [`${inputDir}/dir1/file.txt`, `${outDir}/dir1/file.txt`],
-      [`${inputDir}/dir1/nested/frominput.txt`, `${outDir}/dir1/nested/frominput.txt`],
-      [`${inputDir}/dir2/bothpresent.txt`, `${outDir}/dir2/bothpresent.txt`],
-    ].forEach(tuple => {
-      expect(compareFiles(tuple[0], tuple[1]),
-        `${tuple[0]} is not the same as ${tuple[1]}`
-      ).to.be.true;
+  execOpList3 = () => {
+    it('merged yaml right', () => {
+      const expected = { 'a': 'z', 'b': [1, 4, 2, 3] };
+      const out = readYamlFile(outYaml);
+      expect(expected).to.eql(out);
     });
-  });
+    it('merged deep yaml right', () => {
+      const expected = { foo: 'bar', baz: [4, 5, 6], anotherkey: 'anothervalue', bar: [1, 2, 3] };
+      const out = readYamlFile(`${outDir}/dir2/deepconf.yml`);
+      expect(expected).to.eql(out);
+    });
+    it('copies the right files', () => {
+      [
+        [`${origDir}/dir1/justhere.txt`, `${outDir}/dir1/justhere.txt`],
+        [`${origDir}/dir1/notpresent/onlyinorig.txt`, `${outDir}/dir1/notpresent/onlyinorig.txt`],
+        [`${origDir}/dir1/nested/we support files with spaces.txt`, `${outDir}/dir1/nested/we support files with spaces.txt`],
+        [`${origDir}/dir2/origonly.txt`, `${outDir}/dir2/origonly.txt`],
+        [`${inputDir}/dir1/file.txt`, `${outDir}/dir1/file.txt`],
+        [`${inputDir}/dir1/nested/frominput.txt`, `${outDir}/dir1/nested/frominput.txt`],
+        [`${inputDir}/dir2/bothpresent.txt`, `${outDir}/dir2/bothpresent.txt`],
+      ].forEach(tuple => {
+        expect(compareFiles(tuple[0], tuple[1]),
+          `${tuple[0]} is not the same as ${tuple[1]}`
+        ).to.be.true;
+      });
+    });
+  }
+  execOpList3();
   after(() => {
+    cleanOutDir();
+  });
+});
+
+describe('scenario', () => {
+  it('errors on invalid path', () => {
+    expect(() => {
+      new Scenario('invalidpath.yml')
+    }).to.throw(/ENOENT/);
+  });
+  it('errors on missing sources', () => {
+    expect(() => {
+      new Scenario(path.join(__dirname, 'badscenario.yml'))
+    }).to.throw(/sources missing/);
+  });
+  it('errors on wrong sources shape', () => {
+    expect(() => {
+      new Scenario(path.join(__dirname, 'badscenario1.yml'))
+    }).to.throw(/sources is not an array/);
+  });
+  it('errors on missing destination', () => {
+    expect(() => {
+      new Scenario(path.join(__dirname, 'badscenario2.yml'))
+    }).to.throw(/destination is missing/);
+  });
+  it('errors on invalid source directory', () => {
+    expect(() => {
+      new Scenario(path.join(__dirname, 'badscenario3.yml'))
+    }).to.throw(/ENOENT/);
+  });
+  it('errors on invalid destination directory', () => {
+    expect(() => {
+      new Scenario(path.join(__dirname, 'badscenario4.yml'))
+    }).to.throw(/ENOENT/);
+  });
+  it('errors on bad source directory', () => {
+    expect(() => {
+      new Scenario(path.join(__dirname, 'badscenario5.yml'))
+    }).to.throw(/\S+ is not a directory/);
+  });
+  it('errors on bad source directory', () => {
+    expect(() => {
+      new Scenario(path.join(__dirname, 'badscenario6.yml'))
+    }).to.throw(/\S+ is not a directory/);
+  });
+
+  it('should work the same as execOpList1', async () => {
+    const s = new Scenario(path.join(__dirname, 'scenario1.yml'))
+    await s.run();
+    execOpList1();
+    cleanOutDir();
+  });
+
+  it('should work the same as execOpList2', async () => {
+    const s = new Scenario(path.join(__dirname, 'scenario2.yml'))
+    await s.run();
+    execOpList2();
+    cleanOutDir();
+  });
+
+  it('should work the same as execOpList2', async () => {
+    const s = new Scenario(path.join(__dirname, 'scenario3.yml'))
+    await s.run();
+    execOpList3();
     cleanOutDir();
   });
 });

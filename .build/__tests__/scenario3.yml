@@ -1,0 +1,10 @@
+sources:
+  - mergeorig
+  - mergeinput
+destination: mergeoutput
+mergeconfig:
+  - pattern: \.yml$
+    opts:
+      op: mergeYaml
+      arrayMerge: atPos
+      arrayMergePos: 1

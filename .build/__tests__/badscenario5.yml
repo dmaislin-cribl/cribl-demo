@@ -1,0 +1,4 @@
+sources:
+  - badscenario.yml
+  - badscenario1.yml
+destination: foo
