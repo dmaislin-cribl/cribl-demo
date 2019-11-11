@@ -1,0 +1,6 @@
+version: "3.5"
+services:
+  gogen-businessevent-hec:
+    build:
+      context: gogen-businessevent-hec
+    command: start

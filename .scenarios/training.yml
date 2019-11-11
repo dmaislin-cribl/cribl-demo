@@ -1,0 +1,7 @@
+sources:
+  - training
+  - gogen-businessevent-hec
+  - gogen-accesscombined-forwarder
+  - gogen-authfailed-filebeat
+  - splunk
+destination: ../.run

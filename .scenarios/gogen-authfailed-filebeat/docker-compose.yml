@@ -1,0 +1,11 @@
+version: '3.5'
+services:
+  gogen-authfailed-filebeat:
+    build:
+      context: filebeat
+    volumes:
+      - "${DOCKER_LIB_CONTAINERS:-/var/lib/docker/containers}:/var/lib/docker/containers"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - CRIBL_ELASTIC
+  

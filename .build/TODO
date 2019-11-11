@@ -1,0 +1,6 @@
+* Append/Prepend operations for text files
+    Use Case: .env file, want to have come from multiple projects
+* INI Merging
+    Use Case: flatten Splunk apps
+* sed support
+    Use Case: templating things in any file, can replace tokens

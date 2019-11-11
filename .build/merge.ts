@@ -64,10 +64,15 @@ export class Scenario {
   }
 
   async run() {
-    this.sources.forEach(async s => {
+    for (let i =0; i < this.sources.length; i++) {
+      const s = this.sources[i];
       const ol = buildOpList(this.destination, s, this.destination, this.mc);
-      await execOpList(ol, this.maxThreads);
-    });
+      try {
+        await execOpList(ol, this.maxThreads);
+      } catch (err) {
+        throw err;
+      }
+    }
   }
 }
 
@@ -160,11 +165,11 @@ export class MergeConfig {
  */
 export function mergeObjs(orig: any, input: any, opOpts: opOpts): any {
   let ret: any;
-  if (typeof(orig) !== 'object') {
-    throw new TypeError(`orig is not type object at '${opOpts.current || ''}'`);
+  if (typeof(orig) !== 'object' || orig === undefined || orig === null) {
+    throw new TypeError(`orig is not type object or undefined/null at '${opOpts.current || ''}'`);
   }
-  if (typeof input !== 'object') {
-    throw new TypeError(`input is not type object at '${opOpts.current || ''}'`);
+  if (typeof input !== 'object' || input === undefined || input === null) {
+    throw new TypeError(`input is not type object or undefined/null at '${opOpts.current || ''}'`);
   }
   if (Array.isArray(orig)) {
     if (!Array.isArray(input)) {
@@ -187,6 +192,9 @@ export function mergeObjs(orig: any, input: any, opOpts: opOpts): any {
     }
   } else {
     ret = { ...orig }; // shallow copy orig
+    if (input === undefined || input === null) {
+      console.log('holy fuck!!');
+    }
     Object.keys(input).forEach(k => {
       const typeOfInput = typeof(input[k]);
       if (typeOfInput === 'object') {
@@ -213,8 +221,24 @@ export function mergeObjs(orig: any, input: any, opOpts: opOpts): any {
  * @param outpath - Where to write the output file
  */
 export function mergeYamlFiles(orig: string, input: string, outpath: string, opOpts: opOpts) {
-  const origObj = readYamlFile(orig);
-  const inputObj = readYamlFile(input);
+  let origObj;
+  let inputObj;
+  try {
+    origObj = readYamlFile(orig);
+    if (origObj === undefined || origObj === null) {
+      throw new Error(`${orig} returned undefined or null`);
+    }
+  } catch (err) {
+    throw new Error(`error reading YAML file ${orig}: ${err.message}`);
+  }
+  try {
+    inputObj = readYamlFile(input);
+    if (inputObj === undefined || inputObj === null) {
+      throw new Error(`${input} returned undefined or null`);
+    }
+  } catch (err) {
+    throw new Error(`error reading YAML file ${input}: ${err.message}`);
+  }
   const out = mergeObjs(origObj, inputObj, opOpts);
   fs.writeFileSync(outpath, YAML.stringify(out));
 }
@@ -226,7 +250,7 @@ export function mergeYamlFiles(orig: string, input: string, outpath: string, opO
  */
 export function readYamlFile(filePath: string): any {
   const contents = fs.readFileSync(filePath, 'utf8');
-  return YAML.parse(contents);
+  return YAML.parse(contents, { merge: true });
 }
 
 /**
@@ -371,7 +395,13 @@ async function main() {
   }
   console.log(`${chalk.blueBright('Starting')} scenario ${process.argv[2]}`);
   exports.logOps = true;
-  await s.run();
+  try {
+    await s.run();
+  } catch (err) {
+    console.log(`Error running scenario: `);
+    console.error(err);
+    process.exit(1);
+  }
 }
 
 main();

@@ -1,0 +1,10 @@
+version: "3.5"
+services:
+  gogen-accesscombined-forwarder:
+    build:
+      context: universalforwarder
+    environment:
+      - SPLUNK_CMD=cmd mkdir -p /var/log/httpd
+      - SPLUNK_CMD_1=cmd gogen -v -cd /etc/gogen -o file --filename /var/log/httpd/access_log -lj gen -s shoppingapache 2>/var/log/gogen.log &
+      - SPLUNK_CMD_2=add monitor /var/log/httpd/access_log -auth admin:cribldemo -sourcetype access_combined -index cribl
+      - SPLUNK_CMD_3=add forward-server ${CRIBL_SPLUNK} -auth admin:cribldemo ${CRIBL_SPLUNK_ARGS}
