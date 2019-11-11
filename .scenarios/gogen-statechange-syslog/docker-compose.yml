@@ -1,0 +1,9 @@
+version: "3.5"
+services:
+  gogen-statechange-syslog:
+    build:
+      context: gogen-statechange-syslog
+    command: start
+    environment:
+      - CRIBL_SYSLOG
+      - CRIBL_GOGEN_NC_LOG

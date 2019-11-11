@@ -1,6 +1,6 @@
 #!/bin/sh
 if [ "$1" = "start" ]; then
-    gogen -v -cd /etc/gogen -o http --url http://cribl:10088/services/collector/event -ot splunkhec -at -lj gen -s businessevent 2>| nc cribl 10001
+    gogen -v -cd /etc/gogen -o http --url ${CRIBL_HEC} -ot splunkhec -at -lj gen -s businessevent 2>&1 ${CRIBL_GOGEN_NC_LOG}
 fi
 
 exec "$@"

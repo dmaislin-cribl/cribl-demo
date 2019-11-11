@@ -3,5 +3,6 @@ sources:
   - gogen-businessevent-hec
   - gogen-accesscombined-forwarder
   - gogen-authfailed-filebeat
+  - gogen-statechange-syslog
   - splunk
 destination: ../.run
