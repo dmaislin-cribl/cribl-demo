@@ -4,6 +4,7 @@ sources:
   # - gogen-accesscombined-forwarder
   # - gogen-authfailed-filebeat
   # - gogen-statechange-syslog
-  - gogen-bigjson-kafka
+  # - gogen-bigjson-kafka
+  - gogen-metrics-dogstatsd
   - splunk
 destination: ../.run
