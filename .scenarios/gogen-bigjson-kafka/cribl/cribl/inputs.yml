@@ -1,0 +1,16 @@
+inputs:
+  kafka:
+    type: kafka
+    disabled: false
+    brokers:
+      - kafka:29092
+    topics:
+      - cribl
+    groupId: Cribl
+    fromBeginning: true
+    kafkaSchemaRegistry:
+      disabled: true
+    sasl:
+      disabled: true
+    tls:
+      disabled: true
