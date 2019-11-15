@@ -200,10 +200,10 @@ describe('readYamlFile', () => {
 
 describe('mergeYamlFiles', () => {
   it('should error on invalid path', () => {
-    expect(() => mergeYamlFiles('./nonexistant.yml', './nonexistant2.yml', './nonexistantout.yml', {} as opOpts)).to.throw(/^ENOENT: no such file or directory/);
+    expect(() => mergeYamlFiles('./nonexistant.yml', './nonexistant2.yml', './nonexistantout.yml', {} as opOpts)).to.throw(/ENOENT: no such file or directory/);
   });
   it('should error on not a yaml file', () => {
-    expect(() => mergeYamlFiles(path.join(__dirname, 'notyaml.txt'), 'dontmatter.yml', 'alsodontmatter..yml', {} as opOpts)).to.throw(/^Implicit map keys need to be on a single line/);
+    expect(() => mergeYamlFiles(path.join(__dirname, 'notyaml.txt'), 'dontmatter.yml', 'alsodontmatter..yml', {} as opOpts)).to.throw(/Implicit map keys need to be on a single line/);
   });
   it('should mergeObjs nested arrays the way we want', () => {
     const orig = { 'a': 'z', 'b': [1, 2, 3] };
@@ -336,7 +336,7 @@ describe('MergeConfig', () => {
         }
       }
     ]);
-    expect(mc.match('/asdf/foo.yml')).to.eql({ op: 1 });
+    expect(mc.match('/asdf/foo.yml')).to.eql({ op: 1, replaceOffset: 9, replaceLength: 4 });
   });
   it('early boom regexes work', () => {
     const mc = new MergeConfig([
@@ -352,7 +352,7 @@ describe('MergeConfig', () => {
       }
     ]);
     expect(mc.match('/asdf/foo.yml')).to.not.eql({ op: 1 });
-    expect(mc.match('/asdf/foo.yml')).to.eql({});
+    expect(mc.match('/asdf/foo.yml')).to.eql({ replaceOffset: 0, replaceLength: 13});
   });
 });
 
@@ -440,7 +440,7 @@ let execOpList1;
 describe('execOpList', () => {
   before(() => {
     const ol = buildOpList(origDir, inputDir, outDir, defaultMergeConfig);
-    const promises = execOpList(ol, 3);
+    const promises = execOpList(ol, 3, defaultMergeConfig);
     return promises.catch((err) => console.error(err))
       // .then((ops) => { (ops || [] as opType[]).forEach(op => logOp(op)) });
   });
@@ -493,7 +493,7 @@ describe('execOpList skip txt', () => {
       },
     ])
     const ol = buildOpList(origDir, inputDir, outDir, mc);
-    const promises = execOpList(ol, 3);
+    const promises = execOpList(ol, 3, mc);
     return promises.catch((err) => console.error(err))
       // .then((ops) => { (ops || [] as opType[]).forEach(op => logOp(op)) });
   });
@@ -545,10 +545,16 @@ describe('execOpList change merge', () => {
           arrayMerge: 'atPos',
           arrayMergePos: 1,
         },
-      }
+      },
+      { 
+        pattern: 'nested',
+        opts: {
+          filePathReplace: 'notnested',
+        },
+      },
     ])
     const ol = buildOpList(origDir, inputDir, outDir, mc);
-    const promises = execOpList(ol, 3);
+    const promises = execOpList(ol, 3, mc);
     return promises.catch((err) => console.error(err))
     // .then((ops) => { (ops || [] as opType[]).forEach(op => logOp(op)) });
   });
@@ -567,10 +573,10 @@ describe('execOpList change merge', () => {
       [
         [`${origDir}/dir1/justhere.txt`, `${outDir}/dir1/justhere.txt`],
         [`${origDir}/dir1/notpresent/onlyinorig.txt`, `${outDir}/dir1/notpresent/onlyinorig.txt`],
-        [`${origDir}/dir1/nested/we support files with spaces.txt`, `${outDir}/dir1/nested/we support files with spaces.txt`],
+        [`${origDir}/dir1/nested/we support files with spaces.txt`, `${outDir}/dir1/notnested/we support files with spaces.txt`],
         [`${origDir}/dir2/origonly.txt`, `${outDir}/dir2/origonly.txt`],
         [`${inputDir}/dir1/file.txt`, `${outDir}/dir1/file.txt`],
-        [`${inputDir}/dir1/nested/frominput.txt`, `${outDir}/dir1/nested/frominput.txt`],
+        [`${inputDir}/dir1/nested/frominput.txt`, `${outDir}/dir1/notnested/frominput.txt`],
         [`${inputDir}/dir2/bothpresent.txt`, `${outDir}/dir2/bothpresent.txt`],
       ].forEach(tuple => {
         expect(compareFiles(tuple[0], tuple[1]),

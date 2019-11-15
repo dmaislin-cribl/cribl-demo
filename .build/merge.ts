@@ -68,7 +68,7 @@ export class Scenario {
       const s = this.sources[i];
       const ol = buildOpList(this.destination, s, this.destination, this.mc);
       try {
-        await execOpList(ol, this.maxThreads);
+        await execOpList(ol, this.maxThreads, this.mc);
       } catch (err) {
         throw err;
       }
@@ -82,6 +82,9 @@ export type opOpts = {
   current?: string,
   noOverwrite?: boolean,
   op?: opcode,
+  filePathReplace?: string,
+  replaceOffset?: number,
+  replaceLength?: number,
 }
 
 export enum arrayMergeType {
@@ -148,8 +151,12 @@ export class MergeConfig {
   }
   match(file: string): opOpts {
     for (let i = 0; i < this.c.length; i++) {
-      if (this.c[i].pattern.test(file)) {
-        return this.c[i].opts;
+      const m = this.c[i].pattern.exec(file);
+      if (m) {
+        const ret = this.c[i].opts;
+        ret.replaceOffset = m.index;
+        ret.replaceLength = m[0].length;
+        return ret;
       }
     }
   }
@@ -303,7 +310,10 @@ export function buildOpList(origDir: string, inputDir: string, outDir: string, c
   const inputFiles = buildFileList(inputDir).sort();
   const _buildOpList = (fList: string[], inputDir: string, config: MergeConfig): opType[] => {
     return fList.map(f => {
-      const opts = config.match(f) || { op: opcode.copy };
+      const opts = config.match(f) || {};
+      if (opts.op === undefined) {
+         opts.op = opcode.copy;
+      }
       if (inputDir === outDir) opts.op = opcode.skip;
       if (origHash[f] && opts.noOverwrite) opts.op = opcode.skip; // Do not overwrite
       return {
@@ -323,14 +333,18 @@ export function buildOpList(origDir: string, inputDir: string, outDir: string, c
  * Executes an op list from `buildOpList`. Returns a promise which resolves after all operations are complete.
  * @param ol - Oplist returned from `buildOpList`
  * @param maxThreads - Maximum simultaneous operations.
+ * @param config - MergeConfig specifying how to merge
  * @returns - Promise with contents of all the operations.
  */
-export async function execOpList(ol: opType[], maxThreads: number): Promise<opType[]> {
+export async function execOpList(ol: opType[], maxThreads: number, config: MergeConfig): Promise<opType[]> {
   const promises = ol.map(op => {
     return pLimit(maxThreads)(() => (new Promise((resolve, reject) => {
-      logOp(op);
-      const inputFile = `${op.inputDir}${op.filePath}`;
-      const outFile = `${op.outDir}${op.filePath}`;
+      let f = op.filePath;
+      const inputFile = `${op.inputDir}${f}`;
+      const { filePathReplace = undefined, replaceOffset = undefined, replaceLength = undefined } = config.match(f) || {};
+      if (filePathReplace) f = `${f.substr(0, replaceOffset)}${filePathReplace}${f.substr(replaceOffset + replaceLength)}`;
+      const outFile = `${op.outDir}${f}`;
+      logOp({ ...op, filePath: f });
       const copyFile = () => {
         fs.mkdirSync(path.dirname(inputFile), { recursive: true });
         fs.mkdirSync(path.dirname(outFile), { recursive: true });
@@ -404,4 +418,5 @@ async function main() {
   }
 }
 
-main();
+// Only call main if we're the command
+if (process.argv[1].indexOf('merge') > -1) main();

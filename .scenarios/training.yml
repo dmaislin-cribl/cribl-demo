@@ -1,10 +1,15 @@
 sources:
   - training
   # - gogen-businessevent-hec
-  # - gogen-accesscombined-forwarder
+  - gogen-accesscombined-forwarder
   # - gogen-authfailed-filebeat
   # - gogen-statechange-syslog
   # - gogen-bigjson-kafka
-  - gogen-metrics-dogstatsd
-  - splunk
+  # - gogen-metrics-dogstatsd
+  # - splunk
+  - elasticsearch
 destination: ../.run
+mergeconfig:
+  - pattern: /cribl/master/groups/default/local/cribl
+    opts:
+      filePathReplace: /cribl/cribl
