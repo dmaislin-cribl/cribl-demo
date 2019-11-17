@@ -1,0 +1,15 @@
+id: default
+routes:
+  - id: 0nJxAA
+    name: Sample and Filter
+    final: false
+    disabled: false
+    pipeline: sample_and_filter
+    description: Clean up voluminous weblog data for our needs
+    clones:
+      - index: cribl-modified
+        source: smart_sample
+      - index: cribl-modified
+        source: filter
+    filter: index=='cribl' && sourcetype=='access_combined'
+    output: default

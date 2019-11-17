@@ -1,0 +1,12 @@
+id: default
+routes:
+  - id: q5s3to
+    name: Suppression
+    final: false
+    disabled: false
+    pipeline: suppress
+    description: Suppress Duplicate Events
+    clones:
+      - index: cribl-modified
+    filter: index=='cribl' && sourcetype=='nagios'
+    output: default

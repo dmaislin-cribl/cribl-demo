@@ -6,4 +6,3 @@ services:
     command: start
     environment:
       - CRIBL_SYSLOG
-      - CRIBL_GOGEN_NC_LOG

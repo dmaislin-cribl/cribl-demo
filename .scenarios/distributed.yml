@@ -1,0 +1,25 @@
+sources:
+  - distributed
+  - gogen-businessevent-hec
+  # - gogen-accesscombined-forwarder
+  # - gogen-authfailed-filebeat
+  # - gogen-statechange-syslog
+  # - gogen-bigjson-kafka
+  # - gogen-metrics-dogstatsd
+  # - elasticsearch
+  - splunk
+  # - s3
+  # - sample-and-filter
+  # - suppress
+  # - masking
+  # - jwt2json
+  - kv2json
+  # - enrich
+  # - metrics
+  # - trim-json
+destination: ../.run
+mergeconfig:
+  - pattern: route.yml$
+    opts:
+      arrayMerge: prepend
+      op: mergeYaml

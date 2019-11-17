@@ -1,0 +1,13 @@
+id: default
+routes:
+  - id: be12ct
+    name: KV to JSON
+    final: false
+    disabled: false
+    pipeline: kv2json
+    description: Convert KV Events to JSON
+    clones:
+      - index: cribl-modified
+        source: pretty_autokv
+    filter: index=='cribl' && sourcetype=='business_event'
+    output: default

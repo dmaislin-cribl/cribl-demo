@@ -1,0 +1,13 @@
+id: default
+routes:
+  - id: KM9Pf6
+    name: Sensitive Data
+    final: false
+    disabled: false
+    pipeline: masking
+    description: Mask Sensitive Data
+    clones:
+      - index: cribl-modified
+        redacted: "true"
+    filter: index=='cribl' && sourcetype=='business_event'
+    output: default

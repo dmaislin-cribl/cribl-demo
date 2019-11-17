@@ -1,0 +1,12 @@
+id: default
+routes:
+  - id: mQEq5u
+    name: JWT Decode
+    final: false
+    disabled: false
+    pipeline: jwt_to_json
+    description: Send auth failures with JWT to decode JWT
+    clones:
+      - index: cribl-modified
+    filter: index=='cribl' && sourcetype=='authfailed'
+    output: default

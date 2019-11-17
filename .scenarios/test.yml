@@ -1,0 +1,10 @@
+sources:
+  - distributed
+  - splunk
+  - elasticsearch
+destination: ../.run
+mergeconfig:
+  - pattern: route.yml$
+    opts:
+      arrayMerge: prepend
+      op: mergeYaml
