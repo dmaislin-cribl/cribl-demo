@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   cribl:
-    image: cribl/cribl:latest
+    image: cribl/cribl:2.0.2-RC1
     ports:
     - 10200:10200
     - 10088:10088
@@ -14,3 +14,4 @@ services:
     - 5140:5140
     volumes:
     - ./cribl/cribl:/opt/cribl/local/cribl
+    - ./cribl/data:/opt/cribl/data

@@ -8,6 +8,7 @@ export type scenarioType = {
   sources: string[],
   destination: string,
   mergeconfig: any[],
+  replaceconfig: any[],
   maxThreads: number,
 }
 
@@ -17,6 +18,7 @@ export class Scenario {
   private destination: string;
   private maxThreads: number;
   private mc: MergeConfig;
+  private rc: ReplaceConfig;
   constructor(confPath: string) {
     this.scenario = readYamlFile(confPath);
     if (!this.scenario.sources) {
@@ -60,6 +62,7 @@ export class Scenario {
       }
     );
     this.mc = new MergeConfig(this.scenario.mergeconfig);
+    this.rc = new ReplaceConfig(this.scenario.replaceconfig);
     this.maxThreads = this.scenario.maxThreads || 3;
   }
 
@@ -68,7 +71,7 @@ export class Scenario {
       const s = this.sources[i];
       const ol = buildOpList(this.destination, s, this.destination, this.mc);
       try {
-        await execOpList(ol, this.maxThreads, this.mc);
+        await execOpList(ol, this.maxThreads, this.rc);
       } catch (err) {
         throw err;
       }
@@ -154,11 +157,45 @@ export class MergeConfig {
       const m = this.c[i].pattern.exec(file);
       if (m) {
         const ret = this.c[i].opts;
-        ret.replaceOffset = m.index;
-        ret.replaceLength = m[0].length;
         return ret;
       }
     }
+  }
+}
+
+export type replaceMatch = {
+  pattern: RegExp,
+  filePathReplace: string,
+}
+
+export class ReplaceConfig {
+  private c: replaceMatch[];
+  constructor(config: Array<any>) {
+    if (!this.c) {
+      this.c = [] as replaceMatch[];
+    }
+    (config || []).forEach((c, idx) => {
+      if (!c.pattern) {
+        throw new Error(`pattern missing from item ${idx}, '${JSON.stringify(c)}'`);
+      }
+      if (!c.filePathReplace) {
+        throw new Error(`filePathReplace missing from item ${idx}, '${JSON.stringify(c)}'`);
+      }
+      const rm = {
+        pattern: new RegExp(c.pattern),
+        filePathReplace: c.filePathReplace,
+      } as replaceMatch;
+      this.c.push(rm);
+    });
+  }
+  replace(file: string): string {
+    for (let i = 0; i < this.c.length; i++) {
+      const m = this.c[i].pattern.exec(file);
+      if (m) {
+        return `${file.substr(0, m.index)}${this.c[i].filePathReplace}${file.substr(m.index + m[0].length)}`;
+      }
+    }
+    return file;
   }
 }
 
@@ -333,16 +370,15 @@ export function buildOpList(origDir: string, inputDir: string, outDir: string, c
  * Executes an op list from `buildOpList`. Returns a promise which resolves after all operations are complete.
  * @param ol - Oplist returned from `buildOpList`
  * @param maxThreads - Maximum simultaneous operations.
- * @param config - MergeConfig specifying how to merge
+ * @param config - ReplaceConfig specifying how replace filepaths
  * @returns - Promise with contents of all the operations.
  */
-export async function execOpList(ol: opType[], maxThreads: number, config: MergeConfig): Promise<opType[]> {
+export async function execOpList(ol: opType[], maxThreads: number, config: ReplaceConfig): Promise<opType[]> {
   const promises = ol.map(op => {
     return pLimit(maxThreads)(() => (new Promise((resolve, reject) => {
       let f = op.filePath;
       const inputFile = `${op.inputDir}${f}`;
-      const { filePathReplace = undefined, replaceOffset = undefined, replaceLength = undefined } = config.match(f) || {};
-      if (filePathReplace) f = `${f.substr(0, replaceOffset)}${filePathReplace}${f.substr(replaceOffset + replaceLength)}`;
+      f = config.replace(f);
       const outFile = `${op.outDir}${f}`;
       logOp({ ...op, filePath: f });
       const copyFile = () => {

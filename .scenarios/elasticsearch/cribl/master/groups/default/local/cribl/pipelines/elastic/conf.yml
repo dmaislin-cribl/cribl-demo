@@ -10,7 +10,6 @@ functions:
           value: _raw
       remove:
         - _raw
-        - _time
   - id: eval
     filter: /^{.+}$/.test(message)
     disabled: false

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { mergeObjs, opOpts, arrayMergeType, readYamlFile, mergeYamlFiles, walkDir, buildFileList, MergeConfig, buildOpList, execOpList, opcode, logOp, opType, Scenario } from '../merge';
+import { mergeObjs, opOpts, arrayMergeType, readYamlFile, mergeYamlFiles, walkDir, buildFileList, MergeConfig, buildOpList, execOpList, opcode, logOp, opType, Scenario, ReplaceConfig } from '../merge';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as md5File from 'md5-file';
@@ -22,6 +22,7 @@ const defaultMergeConfig = new MergeConfig([
     opts: { op: opcode.mergeYaml }
   }
 ])
+const defaultReplaceConfig = new ReplaceConfig([]);
 
 const cleanOutDir = () => {
   walkDir(outDir, (f, stat) => {
@@ -336,7 +337,7 @@ describe('MergeConfig', () => {
         }
       }
     ]);
-    expect(mc.match('/asdf/foo.yml')).to.eql({ op: 1, replaceOffset: 9, replaceLength: 4 });
+    expect(mc.match('/asdf/foo.yml')).to.eql({ op: 1 });
   });
   it('early boom regexes work', () => {
     const mc = new MergeConfig([
@@ -352,7 +353,39 @@ describe('MergeConfig', () => {
       }
     ]);
     expect(mc.match('/asdf/foo.yml')).to.not.eql({ op: 1 });
-    expect(mc.match('/asdf/foo.yml')).to.eql({ replaceOffset: 0, replaceLength: 13});
+    expect(mc.match('/asdf/foo.yml')).to.eql({});
+  });
+});
+
+describe('ReplaceConfig', () => {
+  it('should do nothing with no config input', () => {
+    const rc = new ReplaceConfig([]);
+    expect(rc['c'].length).to.equal(0);
+  });
+  it('should error with missing pattern', () => {
+    expect(() => { new ReplaceConfig([{}]); }).to.throw(/pattern missing/);
+  });
+  it('should error with missing filePathReplace', () => {
+    expect(() => { new ReplaceConfig([{ pattern: 'foo' }]); }).to.throw(/filePathReplace missing/);
+  });
+  it('should error with invalid regexp', () => {
+    expect(() => {
+      new ReplaceConfig([
+        {
+          pattern: '[',
+          filePathReplace: '/foo',
+        }
+      ]);
+    }).to.throw(/Invalid regular expression/);
+  });
+  it('should get the correct config', () => {
+    const rc = new ReplaceConfig([
+      {
+        pattern: '/bar',
+        filePathReplace: '/baz',
+      }
+    ]);
+    expect(rc.replace('/asdf/bar/foo.yml')).to.eql('/asdf/baz/foo.yml');
   });
 });
 
@@ -440,7 +473,7 @@ let execOpList1;
 describe('execOpList', () => {
   before(() => {
     const ol = buildOpList(origDir, inputDir, outDir, defaultMergeConfig);
-    const promises = execOpList(ol, 3, defaultMergeConfig);
+    const promises = execOpList(ol, 3, defaultReplaceConfig);
     return promises.catch((err) => console.error(err))
       // .then((ops) => { (ops || [] as opType[]).forEach(op => logOp(op)) });
   });
@@ -493,7 +526,7 @@ describe('execOpList skip txt', () => {
       },
     ])
     const ol = buildOpList(origDir, inputDir, outDir, mc);
-    const promises = execOpList(ol, 3, mc);
+    const promises = execOpList(ol, 3, defaultReplaceConfig);
     return promises.catch((err) => console.error(err))
       // .then((ops) => { (ops || [] as opType[]).forEach(op => logOp(op)) });
   });
@@ -546,15 +579,15 @@ describe('execOpList change merge', () => {
           arrayMergePos: 1,
         },
       },
-      { 
+    ]);
+    const rc = new ReplaceConfig([
+      {
         pattern: 'nested',
-        opts: {
-          filePathReplace: 'notnested',
-        },
+        filePathReplace: 'notnested',
       },
-    ])
+    ]);
     const ol = buildOpList(origDir, inputDir, outDir, mc);
-    const promises = execOpList(ol, 3, mc);
+    const promises = execOpList(ol, 3, rc);
     return promises.catch((err) => console.error(err))
     // .then((ops) => { (ops || [] as opType[]).forEach(op => logOp(op)) });
   });

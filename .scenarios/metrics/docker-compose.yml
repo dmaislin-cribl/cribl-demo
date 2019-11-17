@@ -1,0 +1,28 @@
+version: '3.5'
+services:
+  influxdb:
+    image: influxdb:1.7
+    environment:
+      - INFLUX_DB=cribl
+      - INFLUX_ADMIN_USER=admin
+      - INFLUX_ADMIN_PASSWORD=admin
+    ports:
+      - '8086:8086'
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 8200:3000
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+
+  telegraf:
+    image: telegraf:latest
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  cribl-influxdb:
+    image: telegraf:latest
+    volumes:
+      - ./telegraf/cribl-influx.conf:/etc/telegraf/telegraf.conf:ro

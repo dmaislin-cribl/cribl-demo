@@ -1,0 +1,12 @@
+id: default
+routes:
+  - id: py0d5r
+    name: Logs to Metrics
+    final: false
+    disabled: false
+    pipeline: logs_to_metrics
+    description: Convert Access Combined Logs to Splunk Metrics
+    clones:
+      - index: cribl-metrics
+    filter: index=='cribl' && sourcetype=='access_combined'
+    output: statsd

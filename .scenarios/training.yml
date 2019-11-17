@@ -7,9 +7,19 @@ sources:
   # - gogen-bigjson-kafka
   # - gogen-metrics-dogstatsd
   # - splunk
+  - enrich
+  - metrics
   - elasticsearch
 destination: ../.run
 mergeconfig:
-  - pattern: /cribl/master/groups/default/local/cribl
+  - pattern: route.yml$
     opts:
-      filePathReplace: /cribl/cribl
+      arrayMerge: prepend
+      op: mergeYaml
+replaceconfig:
+  - pattern: /cribl/master/groups/default/local/cribl
+    filePathReplace: /cribl/cribl
+  - pattern: /cribl/master/groups/metrics/local/cribl
+    filePathReplace: /cribl/cribl
+  - pattern: /cribl/master/groups/default/data
+    filePathReplace: /cribl/data
