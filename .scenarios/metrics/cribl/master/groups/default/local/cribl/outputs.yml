@@ -6,9 +6,6 @@ outputs:
         output: localhost
         final: false
       - filter: "true"
-        output: splunk-metrics
-        final: false
-      - filter: "true"
         output: influxdb
         final: true
     onBackpressure: drop
@@ -30,14 +27,3 @@ outputs:
     flushPeriodSec: 1
     connectionTimeout: 5000
     writeTimeout: 10000
-  splunk-metrics:
-    type: splunk
-    pipeline: metrics_to_logs
-    host: splunk
-    port: 9998
-    nestedFields: none
-    tls:
-      disabled: true
-    connectionTimeout: 5000
-    writeTimeout: 10000
-    onBackpressure: queue

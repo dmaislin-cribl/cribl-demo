@@ -8,7 +8,6 @@
 
 Demo Todo:
 
-* Make metrics output layer (remove splunk-metrics)
 * Figure out how to stand up Grafana without needing the DB
 * Add Drop Access Combined Scenario
 

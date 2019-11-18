@@ -1,17 +1,7 @@
 outputs:
   default:
-    defaultId: splunk-metrics
+    defaultId: influxdb
     type: default
-  elastic:
-    type: elastic
-    pipeline: elastic
-    url: http://elasticsearch:9200/_bulk
-    index: cribl
-    docType: cribl
-    concurrency: 5
-    maxPayloadSizeKB: 4096
-    flushPeriodSec: 1
-    onBackpressure: drop
   statsd:
     type: router
     rules:
@@ -19,11 +9,8 @@ outputs:
         output: localhost
         final: false
       - filter: "true"
-        output: splunk-metrics
-        final: false
-      - filter: "true"
         output: influxdb
-        final: true
+        final: false
     onBackpressure: drop
   localhost:
     type: statsd_ext
@@ -44,14 +31,3 @@ outputs:
     connectionTimeout: 5000
     writeTimeout: 10000
     pipeline: remove_splunk_metadata
-  splunk-metrics:
-    type: splunk
-    pipeline: metrics_to_logs
-    host: splunk
-    port: 9998
-    nestedFields: none
-    tls:
-      disabled: true
-    connectionTimeout: 5000
-    writeTimeout: 10000
-    onBackpressure: queue
