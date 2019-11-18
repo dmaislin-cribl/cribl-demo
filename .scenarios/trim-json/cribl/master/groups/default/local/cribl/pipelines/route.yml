@@ -1,15 +1,5 @@
 id: default
 routes:
-  - id: semK5P
-    name: Unmodified BigJSON
-    final: false
-    disabled: false
-    pipeline: passthru
-    description: Unmodified JSON
-    clones:
-      - __index: bigjson
-    filter: index=='cribl' && sourcetype=='lambda'
-    output: s3
   - id: VAGP6z
     name: Trim BigJSON
     final: false

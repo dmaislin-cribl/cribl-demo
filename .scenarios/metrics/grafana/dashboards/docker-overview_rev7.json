@@ -85,7 +85,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "${DS_TELEGRAF}",
+      "datasource": "InfluxDB",
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -203,7 +203,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "${DS_TELEGRAF}",
+      "datasource": "InfluxDB",
       "format": "decbytes",
       "gauge": {
         "maxValue": 100,
@@ -321,7 +321,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "${DS_TELEGRAF}",
+      "datasource": "InfluxDB",
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -432,7 +432,7 @@
     },
     {
       "columns": [],
-      "datasource": "${DS_TELEGRAF}",
+      "datasource": "InfluxDB",
       "fontSize": "100%",
       "gridPos": {
         "h": 7,
@@ -606,7 +606,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_TELEGRAF}",
+      "datasource": "InfluxDB",
       "fill": 1,
       "gridPos": {
         "h": 7,
@@ -859,7 +859,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_TELEGRAF}",
+      "datasource": "InfluxDB",
       "fill": 1,
       "gridPos": {
         "h": 6,
@@ -1038,7 +1038,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_TELEGRAF}",
+      "datasource": "InfluxDB",
       "fill": 1,
       "gridPos": {
         "h": 7,
@@ -1166,7 +1166,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_TELEGRAF}",
+      "datasource": "InfluxDB",
       "fill": 1,
       "gridPos": {
         "h": 7,
@@ -1344,7 +1344,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_TELEGRAF}",
+      "datasource": "InfluxDB",
       "fill": 1,
       "gridPos": {
         "h": 7,
@@ -1472,7 +1472,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_TELEGRAF}",
+      "datasource": "InfluxDB",
       "fill": 1,
       "gridPos": {
         "h": 7,

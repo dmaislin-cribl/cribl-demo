@@ -4,11 +4,11 @@ sources:
   - gogen-accesscombined-forwarder
   - gogen-bigjson-kafka
   - elasticsearch
-  - s3
   - kv2json
   - enrich
   - metrics
   - trim-json
+  - s3
 destination: ../.run
 mergeconfig:
   - pattern: route.yml$

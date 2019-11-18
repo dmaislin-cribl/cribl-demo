@@ -1,0 +1,12 @@
+id: default
+routes:
+  - id: semK5P
+    name: Firehose
+    final: false
+    disabled: false
+    pipeline: passthru
+    description: Copy the full firehose to S3
+    clones:
+      - __index: bigjson
+    filter: "true"
+    output: s3
