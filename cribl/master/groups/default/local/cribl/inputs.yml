@@ -2,7 +2,6 @@ inputs:
   http:
     type: http
     disabled: false
-    pipeline: beats-conditioning
     host: 0.0.0.0
     port: 10080
     criblAPI: /cribl
@@ -20,6 +19,36 @@ inputs:
       disabled: true
     ipWhitelistRegex: /.*/
     authToken: ""
+  hec:
+    type: http
+    disabled: false
+    host: 0.0.0.0
+    port: 10088
+    elasticAPI: /elastic
+    criblAPI: /cribl
+    splunkHecAPI: /services/collector
+    tls:
+      disabled: true
+  splunk:
+    type: splunk
+    disabled: false
+    host: 0.0.0.0
+    port: 9999
+    tls:
+      disabled: true
+    ipWhitelistRegex: /.*/
+    staleChannelFlushMs: 10000
+  elastic:
+    type: http
+    disabled: false
+    pipeline: beats-conditioning
+    host: 0.0.0.0
+    port: 10200
+    elasticAPI: /
+    tls:
+      disabled: true
+    authToken: ""
+    splunkHecAPI: ""
   syslog:
     type: syslog
     disabled: false
@@ -44,41 +73,3 @@ inputs:
       disabled: true
     tls:
       disabled: true
-  splunk:
-    type: splunk
-    disabled: false
-    host: 0.0.0.0
-    port: 9999
-    tls:
-      disabled: true
-    ipWhitelistRegex: /.*/
-    staleChannelFlushMs: 10000
-  elastic:
-    type: http
-    disabled: false
-    host: 0.0.0.0
-    port: 10200
-    elasticAPI: /
-    criblAPI: /cribl
-    splunkHecAPI: ""
-    tls:
-      disabled: true
-    authToken: ""
-  hec:
-    type: http
-    disabled: false
-    host: 0.0.0.0
-    port: 10088
-    elasticAPI: /elastic
-    criblAPI: /cribl
-    splunkHecAPI: /services/collector
-    tls:
-      disabled: true
-  metrics:
-    type: metrics
-    disabled: false
-    host: 0.0.0.0
-    udpPort: 8125
-    tcpPort: 8125
-    maxBufferSize: 1000
-    ipWhitelistRegex: /.*/

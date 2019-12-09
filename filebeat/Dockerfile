@@ -9,6 +9,9 @@ RUN curl -Lso /tmp/filebeat.tgz https://artifacts.elastic.co/downloads/beats/fil
     tar zxf /tmp/filebeat.tgz -C /tmp/filebeat --strip=1 && \
     mv /tmp/filebeat/filebeat /usr/bin/filebeat && \
     rm -rf /tmp/filebeat*
+ADD gogen /etc/gogen
+ADD https://api.gogen.io/linux/gogen /usr/bin/gogen
+RUN chmod 755 /usr/bin/gogen
 ADD entrypoint.sh /sbin/entrypoint.sh
 ADD filebeat*.yml /etc/filebeat/
 RUN chmod 600 /etc/filebeat/*.yml && chown root:root /etc/filebeat/*.yml

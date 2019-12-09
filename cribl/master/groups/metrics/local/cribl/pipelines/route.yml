@@ -10,13 +10,3 @@ routes:
     clones: []
     filter: sourcetype=='statsd_ext' || sourcetype=='graphite' || sourcetype=='statsd'
     output: statsd
-  - id: OsuFhD
-    name: Main Route
-    final: true
-    disabled: false
-    pipeline: main
-    description: Catchall for routing data through main pipeline
-    clones:
-      - {}
-    filter: "true"
-    output: default

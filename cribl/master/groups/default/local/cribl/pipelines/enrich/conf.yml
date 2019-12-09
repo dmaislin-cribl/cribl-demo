@@ -109,7 +109,6 @@ functions:
       eventField: customer
       maxConcurrentRequests: 1
       retryOnError: true
-      flatten: true
   - id: eval
     filter: "true"
     disabled: null

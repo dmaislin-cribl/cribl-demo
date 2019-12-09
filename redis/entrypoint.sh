@@ -3,7 +3,7 @@ mkdir -p /var/log/gogen
 mkdir /var/log/beats
 
 if [ "$1" = "start" ]; then
-    sh /sbin/loaddata.sh &
+    sleep 5 && sh /sbin/loaddata.sh &
     redis-server
 fi
 

@@ -1,120 +1,80 @@
-version: '3.5'
+version: "3.5"
 services:
-  gogen:
-    build:
-      context: gogen
-  filebeat:
-    build:
-      context: filebeat
-    volumes:
-      - "${DOCKER_LIB_CONTAINERS:-/var/lib/docker/containers}:/var/lib/docker/containers"
-      - "/var/run/docker.sock:/var/run/docker.sock"
   cribl:
     build:
       context: cribl
     ports:
-      - "9000:9000"
+      - 9000:9000
     volumes:
-      - "./cribl/master/groups:/opt/cribl/groups"
-      - "./cribl/master/local:/opt/cribl/local"
+      - ./cribl/master/groups:/opt/cribl/groups
+      - ./cribl/master/local:/opt/cribl/local
+      - ./cribl/scripts:/opt/cribl/scripts
   cribl-w0:
     build:
       context: cribl
     ports:
-      - "9002:9000"
-      - "10200:10200"
-      - "10088:10088"
-      - "10080:10080"
-      - "10001:10001"
-      - "9999:9999"
-      - "5140:5140"
-    # volumes:
-    #   - "./cribl/w0:/opt/cribl/local/_system"
+      - 9002:9000
+      - 10200:10200
+      - 10088:10088
+      - 10080:10080
+      - 10001:10001
+      - 9999:9999
+      - 5140:5140
     environment:
       - CRIBL_DIST_MASTER_URL=tcp://criblmaster@cribl:4200
   cribl-w1:
     build:
       context: cribl
     ports:
-      - "9003:9000"
-      - "8125:8125"
-      - "8125:8125/udp"
-    # volumes:
-    #   - "./cribl/w0:/opt/cribl/local/_system"
+      - 9003:9000
+      - 8125:8125
+      - 8125:8125/udp
     environment:
       - CRIBL_DIST_MASTER_URL=tcp://criblmaster@cribl:4200?tag=metrics
-  splunk:
+  gogen-businessevent-hec:
     build:
-      context: splunk
-    ports:
-      - "8000:8000"
-      - "8088:8088"
-      - "8089:8089"
-      - "9997:9997"
+      context: gogen-businessevent-hec
+    command: start
     environment:
-      - "DONT_TIMEOUT=1"
-      - "CRIBL_ROUTING_DEMO=1"
-  minio:
-    image: minio/minio:latest
-    environment:
-      - "MINIO_ACCESS_KEY=ACCESSKEY"
-      - "MINIO_SECRET_KEY=SECRETKEY"
-    ports:
-      - "9001:9000"
-    volumes:
-      - "./data/minio:/data"
-    command: server /data
-
-  elasticsearch:
+      - CRIBL_HEC
+  gogen-accesscombined-forwarder:
     build:
-      context: elasticsearch/
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-    ports:
-      - "9200:9200"
-      - "9300:9300"
+      context: universalforwarder
     environment:
-      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-
-  kibana:
+      - SPLUNK_CMD=cmd mkdir -p /var/log/httpd
+      - SPLUNK_CMD_1=cmd gogen -v -cd /etc/gogen -o file --filename
+        /var/log/httpd/access_log -lj gen -s shoppingapache 2>/var/log/gogen.log
+        &
+      - SPLUNK_CMD_2=add monitor /var/log/httpd/access_log -auth admin:cribldemo
+        -sourcetype access_combined -index cribl
+      - SPLUNK_CMD_3=add forward-server ${CRIBL_SPLUNK} -auth admin:cribldemo
+        ${CRIBL_SPLUNK_ARGS}
+  gogen-authfailed-filebeat:
     build:
-      context: kibana
-      args:
-        ELK_VERSION: $ELK_VERSION
+      context: filebeat
     volumes:
-      - ./kibana/config/:/usr/share/kibana/config:ro
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-
-  # from: https://github.com/confluentinc/cp-docker-images/blob/5.0.1-post/examples/kafka-single-node/docker-compose.yml
+      - ${DOCKER_LIB_CONTAINERS:-/var/lib/docker/containers}:/var/lib/docker/containers
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CRIBL_ELASTIC
+  gogen-statechange-syslog:
+    build:
+      context: gogen-statechange-syslog
+    command: start
+    environment:
+      - CRIBL_SYSLOG
+  gogen-bigjson-kafka:
+    build:
+      context: gogen-bigjson-kafka
+    command: start
+    environment:
+      - CRIBL_KAFKA
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-
   kafka:
-    # "`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-
-    # An important note about accessing Kafka from clients on other machines: 
-    # -----------------------------------------------------------------------
-    #
-    # The config used here exposes port 9092 for _external_ connections to the broker
-    # i.e. those from _outside_ the docker network. This could be from the host machine
-    # running docker, or maybe further afield if you've got a more complicated setup. 
-    # If the latter is true, you will need to change the value 'localhost' in 
-    # KAFKA_ADVERTISED_LISTENERS to one that is resolvable to the docker host from those 
-    # remote clients
-    #
-    # For connections _internal_ to the docker network, such as from other services
-    # and components, use kafka:29092.
-    #
-    # See https://rmoff.net/2018/08/02/kafka-listeners-explained/ for details
-    # "`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-
-    #
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
@@ -128,35 +88,30 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS: "true"
-  
-  graphite:
-    image: graphiteapp/graphite-statsd
+  gogen-metrics-dogstatsd:
+    build:
+      context: gogen-metrics-dogstatsd
+    command: start
+    environment:
+      - CRIBL_STATSD
+  splunk:
+    build:
+      context: splunk
     ports:
-      - 8100:80
-    volumes:
-      - ./graphite/carbon.conf:/opt/graphite/conf/carbon.conf:ro
-      - ./graphite/storage-schemas.conf:/opt/graphite/conf/storage-schemas.conf:ro
-
-  grafana:
-    image: grafana/grafana
-    ports:
-      - 8200:3000
-    volumes:
-      - ./grafana/data:/var/lib/grafana
-
-  telegraf:
-    image: telegraf:latest
-    volumes:
-      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-      - "/var/run/docker.sock:/var/run/docker.sock"
-
+      - 8000:8000
+      - 8088:8088
+      - 8089:8089
+      - 9997:9997
+    environment:
+      - DONT_TIMEOUT=1
+      - CRIBL_ROUTING_DEMO=1
   apiserver:
     build:
       context: apiserver
     volumes:
-      - "./data:/opt/data"
+      - ./data:/opt/data
     ports:
-      - "3000:3000"
+      - 3000:3000
     restart: always
     ulimits:
       nofile:
@@ -174,14 +129,34 @@ services:
     build:
       context: redis
     ports:
-      - "6379:6379"
-    volumes:
-      - "./data:/data"
-
-  autoheal:
-    restart: always
-    image: willfarrell/autoheal
+      - 6379:6379
+  influxdb:
+    image: influxdb:1.7
     environment:
-      - AUTOHEAL_CONTAINER_LABEL=all
+      - INFLUX_DB=cribl
+      - INFLUX_ADMIN_USER=admin
+      - INFLUX_ADMIN_PASSWORD=admin
+    ports:
+      - 8086:8086
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 8200:3000
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ./grafana:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=cribldemo
+  cribl-influxdb:
+    image: telegraf:latest
+    volumes:
+      - ./telegraf/cribl-influx.conf:/etc/telegraf/telegraf.conf:ro
+  minio:
+    image: minio/minio:latest
+    environment:
+      - MINIO_ACCESS_KEY=ACCESSKEY
+      - MINIO_SECRET_KEY=SECRETKEY
+    ports:
+      - 9001:9000
+    volumes:
+      - ./minio:/data
+    command: server /data

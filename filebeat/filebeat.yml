@@ -1,6 +1,10 @@
 filebeat.inputs:
 - type: docker
   containers.ids: '*'
+- type: log
+  paths:
+    - /var/log/authfailed.log
+    - /var/log/gogen.log
 
 setup.template.settings:
   index.number_of_shards: 3
@@ -12,4 +16,4 @@ path:
   logs: /var/log/beats
 
 output.elasticsearch:
-  hosts: ["http://cribl-w0:10200"]
+  hosts: ["${CRIBL_ELASTIC}"]

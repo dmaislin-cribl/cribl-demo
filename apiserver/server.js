@@ -12,7 +12,7 @@ const path = require('path');
 const os = require('os');
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'apiserver'));
 
-const customersCsvPath = path.resolve(__dirname, '../data/customer_master_small.csv');
+const customersCsvPath = path.resolve(__dirname, '/data/customer_master_small.csv');
 const customerLines = fs.readFileSync(customersCsvPath, 'utf8');
 customerLines.split('\n').forEach((l, idx) => {
   const parts = l.split(',');
