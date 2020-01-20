@@ -24,13 +24,13 @@
     "ui:placeholder":"Defaults to unlimited"
   },
   "passthrough": {
-    "ui:options": { "inline": true, "width": "calc(50% - 86px)" }
+    "ui:options": { "inline": true, "width": "calc(50% - 85px)" }
   },
   "sufficientStatsOnly": {
-    "ui:options": { "inline": true, "width": "calc(50% - 80px)" }
+    "ui:options": { "inline": true, "width": "calc(50% - 85px)" }
   },
   "metricsMode": {
-    "ui:options": { "inline": true, "width": "165px" }
+    "ui:options": { "inline": true, "width": "170px" }
   },
   "lagTolerance": {
     "ui:options": { "inline": true, "width": "50%" },

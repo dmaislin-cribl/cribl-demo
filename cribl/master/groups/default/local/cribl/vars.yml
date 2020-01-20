@@ -1,0 +1,15 @@
+accessCombined:
+  type: expression
+  lib: custom
+  description: Access combined events
+  value: index=='cribl' && sourcetype=='access_combined'
+  tags: routing
+criblIndex:
+  type: boolean
+  lib: custom
+  description: Checks if index is cribl
+  args:
+    - type: boolean
+      name: additional
+  value: "index=='cribl' && (additional === undefined ? true : additional)"
+  tags: routing

@@ -9,4 +9,6 @@ inputs:
   CriblLogs:
     type: cribl
     disabled: false
-
+  CriblMetrics:
+    type: criblmetrics
+    disabled: false

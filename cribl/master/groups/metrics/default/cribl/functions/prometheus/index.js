@@ -21,7 +21,7 @@ exports.init = (opts) => {
     fields: conf.fields || [],
     batchWriteInterval: conf.batchWriteInterval
   };
-  publisher = C.Publish.RESTPublisher(publishOpts);
+  publisher = C.internal.Publish.RESTPublisher(publishOpts);
   cLogger.info('init complete', publishOpts);
 };
 

@@ -103,7 +103,6 @@ function processRegex(conf, event, fieldStr) {
     if (!m) {
       break;
     }
-
     for (let k = 1; k < conf.key2value.length; k++) {
       const kv = conf.key2value[k];
       const gName = conf.regex.groups[k];
@@ -163,7 +162,7 @@ exports.process = (event) => {
     return event;
   }
   const field = srcField.get(event);
-  if (!field) {
+  if (field == null) {
     return event;
   }
   const fieldStr = `${field}`;

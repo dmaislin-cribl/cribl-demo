@@ -1,0 +1,52 @@
+---
+output:
+  format:
+    type : expandedstatsd           # expandedstatsd, newlinedelimited
+    #statsdprefix : 'cribl.scope'    # prepends each statsd metric
+    statsdmaxlen : 512              # max size of a formatted statsd string
+    verbosity : 4                   # 0-9 (0 is least verbose, 9 is most)
+          # 0-9 controls which expanded tags are output
+          #      1 "data"
+          #      1 "unit"
+          #      2 "class"
+          #      2 "proto"
+          #      3 "op"
+          #      4 "host"
+          #      4 "proc"
+          #      5 "domain"
+          #      5 "file"
+          #      6 "localip"
+          #      6 "remoteip"
+          #      6 "localp"
+          #      6 "port"
+          #      6 "remotep"
+          #      7 "fd"
+          #      7 "pid"
+          #      8 "duration"
+          #      9 "numops"
+          #
+          # 5-9 disables event summarization of different kinds
+          #      5  turns off error event summarization
+          #      6  turns off filesystem open/close event summarization
+          #      6  turns off dns event summarization
+          #      7  turns off filesystem stat event summarization
+          #      7  turns off network connect event summarization
+          #      8  turns off filesystem seek event summarization
+          #      9  turns off filesystem read/write summarization
+          #      9  turns off network  send/receive summarization
+    tags:
+    #- user: $USER
+    #- feeling: elation
+  transport:                        # defines how scope output is sent
+    type: udp                       # udp, unix, file, syslog
+    host: 127.0.0.1
+    port: 8125
+  summaryperiod : 10                # in seconds
+  commandpath : '/var/tmp'
+
+logging:
+  level: info                      # debug, info, warning, error, none
+  transport:
+    type: file
+    path: '/tmp/scope.log'
+...

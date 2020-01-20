@@ -3,7 +3,7 @@ rulesets:
   default:
     conf:
       functions:
-        - filter: "true"
+        - filter: "!cribl.group"
           id: eval
           description: Default Mappings
           disabled: false

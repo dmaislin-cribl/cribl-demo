@@ -2,7 +2,7 @@ exports.name = 'Lookup';
 exports.version = '0.2';
 exports.group = 'Standard';
 
-const { CSV, LookupSpec, LookupFactory } = C.Lookup;
+const { CSV, LookupSpec, LookupFactory } = C.internal.Lookup;
 const cLogger = C.util.getLogger('func:lookup');
 
 let table;
