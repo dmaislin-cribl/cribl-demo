@@ -1,1 +1,1 @@
-FROM cribl/cribl:next
+FROM cribl/cribl:latest
