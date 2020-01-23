@@ -8,7 +8,7 @@ inputs:
     splunkHecAPI: /services/collector
   CriblLogs:
     type: cribl
-    disabled: false
+    disabled: true
   CriblMetrics:
     type: criblmetrics
-    disabled: false
+    disabled: true
