@@ -6,6 +6,4 @@ functions:
       add:
         - name: cribl
           value: "'yes'"
-        - name: foo
-          value: "'bar'"
       remove: []

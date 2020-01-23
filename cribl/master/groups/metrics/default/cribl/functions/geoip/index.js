@@ -1,6 +1,6 @@
 const cLogger = C.util.getLogger('func:geoip');
 const { NestedPropertyAccessor } = C.expr;
-const { GeoIpDatabase } = C.Lookup;
+const { GeoIpDatabase } = C.internal.Lookup;
 
 exports.name = 'GeoIP';
 exports.version = '0.1';

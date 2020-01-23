@@ -46,7 +46,7 @@ exports.init = (opts) => {
     flushMemLimit: Math.min(maxMem, C.util.parseMemoryStringToBytes(conf.flushMemLimit || `${maxMem}`, err => { throw err; })),
     metricsMode: Boolean(conf.metricsMode)
   };
-  aggregator = C.Aggregation.aggregationMgr(aggOpts);
+  aggregator = C.internal.Aggregation.aggregationMgr(aggOpts);
 
   // Init eval
   const add = [];
