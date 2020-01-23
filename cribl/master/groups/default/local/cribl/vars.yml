@@ -1,9 +1,3 @@
-accessCombined:
-  type: expression
-  lib: custom
-  description: Access combined events
-  value: index=='cribl' && sourcetype=='access_combined'
-  tags: routing
 criblIndex:
   type: boolean
   lib: custom
