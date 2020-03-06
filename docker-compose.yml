@@ -124,7 +124,7 @@ services:
       retries: 3
     privileged: true
     environment:
-      - DISABLE_ACCESS_COUNT=1
+      DISABLE_ACCESS_COUNT: 1
   redis:
     build:
       context: redis
