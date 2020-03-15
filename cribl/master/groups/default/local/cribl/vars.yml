@@ -1,5 +1,5 @@
 criblIndex:
-  type: boolean
+  type: expression
   lib: custom
   description: Checks if index is cribl
   args:
