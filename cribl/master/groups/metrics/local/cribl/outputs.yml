@@ -5,9 +5,6 @@ outputs:
       - filter: "true"
         output: splunk-metrics
         final: false
-      - filter: "true"
-        output: splunk-metrics
-        final: false
       - filter: "false"
         output: localhost
         final: false
