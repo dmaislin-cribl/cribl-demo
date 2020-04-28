@@ -1,0 +1,29 @@
+samples:  
+- name: pan
+  generator: sample
+
+  tokens:
+  - name: ts1
+    type: timestamp
+    format: regex
+    token: (\w{3}\s\d{1,2}\s\d{1,2}:\d{2}:\d{2})
+    replacement: '%b %d %H:%M:%S'
+  - name: ts2
+    type: timestamp
+    format: regex
+    token: (\d{4}\/\d{2}\/\d{2}\s\d{2}:\d{2}:\d{2})
+    replacement: '%Y/%m/%d %H:%M:%S'
+  - name: index
+    type: static
+    field: index
+    format: template
+    replacement: cribl
+  - name: sourcetype
+    type: static
+    field: sourcetype
+    format: template
+    replacement: pan:traffic
+  fromSample: pan.sample
+  count: 1
+  interval: 1
+  randomizeEvents: true

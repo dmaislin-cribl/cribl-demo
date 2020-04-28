@@ -94,31 +94,12 @@ services:
     command: start
     environment:
       - CRIBL_STATSD
-  gogen-pantraffic-hec:
+  gogen-pantraffic-syslog:
     build:
-      context: gogen-pantraffic-hec
+      context: gogen-pantraffic-syslog
     command: start
     environment:
-      - CRIBL_HEC
-  elasticsearch:
-    build:
-      context: elasticsearch/
-    volumes:
-      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-    ports:
-      - 9200:9200
-      - 9300:9300
-    environment:
-      ES_JAVA_OPTS: -Xmx256m -Xms256m
-  kibana:
-    build:
-      context: kibana
-    volumes:
-      - ./kibana/config/:/usr/share/kibana/config:ro
-    ports:
-      - 5601:5601
-    depends_on:
-      - elasticsearch
+      - CRIBL_SYSLOG
   splunk:
     build:
       context: splunk

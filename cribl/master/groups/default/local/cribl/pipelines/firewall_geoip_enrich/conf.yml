@@ -1,0 +1,124 @@
+functions:
+  - id: eval
+    filter: sourcetype!='pan:traffic'
+    disabled: null
+    conf: {}
+    description: Short-circuit all events that are NOT sourcetype pan:traffic
+    final: true
+  - id: regex_extract
+    filter: "true"
+    disabled: null
+    conf:
+      source: _raw
+      iterations: 100
+      regex: /(?:[^,]*,){4}(?<log_subtype>[^,]*),(?:[^,]*,){2}(?<src_ip>[^,]*),(?<dest_ip>[^,]*),(?:[^,]*,){7}(?<src_zone>[^,]*),(?<dest_zone>[^,]*),(?:[^,]*,){11}(?<transport>[^,]*),(?<action>[^,]*),(?:[^,]*,){2}(?<bytes_in>[^,]*)/
+    description: Extract subtype, src/dest zones, transport, action and bytes_in
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Drop events of log_subtype=start as they often have incorrect app
+        assignment. Log_subtype=end contain better information.
+  - id: drop
+    filter: log_subtype=='start'
+    disabled: null
+    conf: {}
+    description: Drop events of log subtype of start.
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: |-
+        Sample traffic with 0 bytes received at 5:1
+        Sample traffic from trusted-trusted & action allowed at 10:1
+  - id: sampling
+    filter: "true"
+    disabled: null
+    conf:
+      rules:
+        - filter: bytes_in==0
+          rate: 5
+        - filter: src_zone=='trusted' && dest_zone=='trusted' && action=='allow'
+          rate: 10
+    description: Sample traffic
+  - id: geoip
+    filter: sourcetype=='pan:traffic'
+    disabled: null
+    conf:
+      inField: src_ip
+      outField: source_geoip
+      file: GeoLite2-City.mmdb
+    description: Lookup GEOIP of Src IP address
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Clear out non-EN languages and geocode_ids from the geoip data (removing
+        "extraneous" data)
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      remove:
+        - "*.names.de"
+        - "*.names.es"
+        - "*.names.fr"
+        - "*.names.ja"
+        - "*.names.pt-BR"
+        - "*.names.ru"
+        - "*.names.zh-CN"
+        - "*.geoname_id"
+  - id: reverse_dns
+    filter: "true"
+    disabled: null
+    conf:
+      fields:
+        - inFieldName: src_ip
+          outFieldName: src_hostname
+        - inFieldName: dst_ip
+          outFieldName: dst_hostname
+      cacheTTL: 60
+  - id: lookup
+    filter: src_ip.startsWith('10.')
+    disabled: null
+    conf:
+      matchMode: cidr
+      matchType: specific
+      reloadPeriodSec: 60
+      addToEvent: false
+      inFields:
+        - eventField: src_ip
+          lookupField: cidr
+      outFields:
+        - lookupField: src_location
+          eventField: location
+      file: internal_cidr_lookup.csv
+  - id: lookup
+    filter: dest_ip.startsWith('10.')
+    disabled: null
+    conf:
+      matchMode: cidr
+      matchType: specific
+      reloadPeriodSec: 60
+      addToEvent: false
+      inFields:
+        - eventField: dest_ip
+          lookupField: cidr
+      file: internal_cidr_lookup.csv
+      outFields:
+        - lookupField: location
+          eventField: dest_location
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Drop all date_* fields from each event. They're unreliable (non TZ
+        aware) and are very rarely used.
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      remove:
+        - date_*
+    description: Drop fields that start with date_*
+groups: {}

@@ -1,0 +1,61 @@
+asyncFuncTimeout: 1000
+output: default
+description: 'Add source, sourcetype, other meta information'
+functions:
+  - id: auto_timestamp
+    filter: 'true'
+    disabled: false
+    conf:
+      srcField: _raw
+      dstField: _time
+      defaultTimezone: utc
+      timeExpression: time.getTime() / 1000
+      offset: 0
+      maxLen: 150
+      defaultTime: now
+  - id: eval
+    filter: 'true'
+    disabled: true
+    conf:
+      add:
+        - name: sourcetype
+          value: '''syslog'''
+        - name: source
+          value: __inputId
+  - id: reverse_dns
+    filter: ipaddr
+    disabled: true
+    conf:
+      fields:
+        - inFieldName: ipaddr
+          outFieldName: revdns
+      cacheTTL: 60
+    description: resolve IP address to populate hostname
+  - id: eval
+    filter: message
+    conf:
+      add:
+        - name: _raw
+          value: message
+      remove:
+        - message
+    description: >-
+      If a message field exists, replace _raw with this now that the hostname
+      and timestamp are dealt with.  This reduces volume 15-20% in most
+      cases.  Also, the message field itself is not useful as a delivery-time
+      extraction, so remove it.
+  - id: eval
+    filter: 'true'
+    conf:
+      remove:
+        - severity
+        - facility
+    description: Drop redundant fields
+  - id: eval
+    filter: procid=='-'
+    conf:
+      add: []
+      remove:
+        - procid
+    description: Remove useless values for procid
+groups: {}
