@@ -63,7 +63,7 @@ functions:
     disabled: null
     conf:
       inField: src_ip
-      outField: source_geoip
+      outField: src_geoip
       file: GeoLite2-City.mmdb
     description: Lookup GEOIP of Src IP address
   - id: geoip
@@ -106,8 +106,8 @@ functions:
       fields:
         - inFieldName: src_ip
           outFieldName: src_hostname
-        - inFieldName: dst_ip
-          outFieldName: dst_hostname
+        - inFieldName: dest_ip
+          outFieldName: dest_hostname
       cacheTTL: 60
   - id: comment
     filter: "true"
@@ -148,15 +148,7 @@ functions:
     filter: "true"
     disabled: null
     conf:
-      comment: Drop all date_* fields from each event. They're unreliable (non TZ
-        aware) and are very rarely used.
-  - id: eval
-    filter: "true"
-    disabled: null
-    conf:
-      remove:
-        - date_*
-    description: Drop fields that start with date_*
+      comment: Enrich data with compromised-ips feed from proofpoint/Emerging Threats Open Source feed
   - id: eval
     filter: "true"
     disabled: null

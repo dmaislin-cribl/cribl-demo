@@ -1,7 +1,7 @@
 cidr,location
-10.0.0.0/8,General Private
+10.0.0.0/8,Corporate Nets
 10.0.0.0/24,Boston DMZ
 10.0.2.0/24,New York Client Net
-192.168.0.0/16,Home Private
-172.16.0.0/12,Storage Private
+192.168.0.0/16,Home Worker Nets
+172.16.0.0/12,Application Nets
 127.0.0.0/8,Loopback
