@@ -1,12 +1,23 @@
 functions:
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: |-
+        Circuit Breaker to do a no-op on data not coming in from the PaloAltoFirewall source...
   - id: eval
-    filter: sourcetype!='pan:traffic'
+    filter: __inputId!='syslog:PaloAltoFirewall:tcp'
     disabled: null
     conf: {}
-    description: Short-circuit all events that are NOT sourcetype pan:traffic
     final: true
-  - id: regex_extract
+  - id: comment
     filter: "true"
+    disabled: null
+    conf:
+      comment: |-
+        Extract some relevant fields from the traffic log
+  - id: regex_extract
+    filter: __inputId=='syslog:PaloAltoFirewall:tcp'
     disabled: null
     conf:
       source: _raw
@@ -33,7 +44,7 @@ functions:
         Sample traffic from trusted-trusted & action allowed at 10:1
   - id: sampling
     filter: "true"
-    disabled: null
+    disabled: true
     conf:
       rules:
         - filter: bytes_in==0
@@ -41,14 +52,28 @@ functions:
         - filter: src_zone=='trusted' && dest_zone=='trusted' && action=='allow'
           rate: 10
     description: Sample traffic
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: |-
+        Do GeoIP Lookup on both src_ip and dest_ip       
   - id: geoip
-    filter: sourcetype=='pan:traffic'
+    filter: "true"
     disabled: null
     conf:
       inField: src_ip
       outField: source_geoip
       file: GeoLite2-City.mmdb
     description: Lookup GEOIP of Src IP address
+  - id: geoip
+    filter: "true"
+    disabled: null
+    conf:
+      inField: dest_ip
+      outField: dest_geoip
+      file: GeoLite2-City.mmdb
+    description: Lookup GEOIP of Dest IP address
   - id: comment
     filter: "true"
     disabled: null
@@ -68,6 +93,12 @@ functions:
         - "*.names.ru"
         - "*.names.zh-CN"
         - "*.geoname_id"
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: |-
+        Reverse DNS to grab domain names of external IP addresses
   - id: reverse_dns
     filter: "true"
     disabled: null
@@ -78,8 +109,13 @@ functions:
         - inFieldName: dst_ip
           outFieldName: dst_hostname
       cacheTTL: 60
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Lookup internal subnet for both dest and src ip's
   - id: lookup
-    filter: src_ip.startsWith('10.')
+    filter: "true"
     disabled: null
     conf:
       matchMode: cidr
@@ -90,11 +126,11 @@ functions:
         - eventField: src_ip
           lookupField: cidr
       outFields:
-        - lookupField: src_location
-          eventField: location
+        - lookupField: location
+          eventField: subnet_usage
       file: internal_cidr_lookup.csv
   - id: lookup
-    filter: dest_ip.startsWith('10.')
+    filter: "true"
     disabled: null
     conf:
       matchMode: cidr
@@ -107,7 +143,7 @@ functions:
       file: internal_cidr_lookup.csv
       outFields:
         - lookupField: location
-          eventField: dest_location
+          eventField: subnet_usage
   - id: comment
     filter: "true"
     disabled: null
@@ -121,4 +157,12 @@ functions:
       remove:
         - date_*
     description: Drop fields that start with date_*
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      add:
+        - name: compromised
+          value: "(C.Lookup('compromised-ips.csv').match(src_ip) ||
+            C.Lookup('compromised-ips.csv').match(dest_ip)) ? true : false"
 groups: {}

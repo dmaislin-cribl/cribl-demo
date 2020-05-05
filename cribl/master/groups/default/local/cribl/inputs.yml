@@ -79,3 +79,15 @@ inputs:
       disabled: true
     tls:
       disabled: true
+  PaloAltoFirewall:
+    disabled: false
+    host: 0.0.0.0
+    maxBufferSize: 1000
+    ipWhitelistRegex: /.*/
+    timestampTimezone: local
+    singleMsgUdpPackets: false
+    tls:
+      disabled: true
+    type: syslog
+    udpPort: 3514
+    tcpPort: 3514
