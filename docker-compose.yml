@@ -100,7 +100,7 @@ services:
       context: gogen-pantraffic-syslog
     command: start
     environment:
-      - CRIBL_PAN_SYSLOG
+      - CRIBL_SYSLOG
   splunk:
     build:
       context: splunk

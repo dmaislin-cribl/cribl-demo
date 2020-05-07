@@ -106,7 +106,7 @@ routes:
     description: ""
     clones:
       - {}
-    filter: __inputId=='syslog:PaloAltoFirewall:tcp'
+    filter: sourcetype=='pan:traffic'
     output: splunk
   - id: OsuFhD
     name: Main Route
