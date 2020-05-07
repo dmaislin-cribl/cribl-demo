@@ -24,16 +24,4 @@ functions:
         - name: index
           value: cribl
     description: Add sourcetype and index to PAN Firewall Traffic events.
-  - id: eval
-    filter: "true"
-    disabled: null
-    conf:
-      add:
-        - name: index
-          value: "index ? index : 'cribl'"
-        - name: source
-          value: "source ? source : appname"
-        - name: sourcetype
-          value: "sourcetype ? sourcetype : 'nagios'"
-      remove: []
 groups: {}
