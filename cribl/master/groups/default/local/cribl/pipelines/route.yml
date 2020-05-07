@@ -107,7 +107,7 @@ routes:
     clones:
       - {}
     filter: sourcetype=='pan:traffic'
-    output: splunk
+    output: default
   - id: OsuFhD
     name: Main Route
     final: true
