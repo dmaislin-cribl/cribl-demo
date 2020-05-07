@@ -98,6 +98,16 @@ routes:
         source: filter
     filter: C.vars.accessCombined()
     output: default
+  - id: ojhMN1
+    name: Palo Alto Firewall Traffic
+    final: true
+    disabled: false
+    pipeline: firewall_geoip_enrich
+    description: ""
+    clones:
+      - {}
+    filter: sourcetype=='pan:traffic'
+    output: default
   - id: OsuFhD
     name: Main Route
     final: true

@@ -19,6 +19,7 @@ services:
       - 10080:10080
       - 10001:10001
       - 9999:9999
+      - 3514:3514
       - 5140:5140
     environment:
       - CRIBL_DIST_MASTER_URL=tcp://criblmaster@cribl:4200
@@ -94,6 +95,12 @@ services:
     command: start
     environment:
       - CRIBL_STATSD
+  gogen-pantraffic-syslog:
+    build:
+      context: gogen-pantraffic-syslog
+    command: start
+    environment:
+      - CRIBL_SYSLOG
   splunk:
     build:
       context: splunk
