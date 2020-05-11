@@ -1,0 +1,61 @@
+samples:  
+- name: pan
+  generator: sample
+
+  tokens:
+  - name: ts1
+    type: timestamp
+    format: regex
+    token: (\w{3}\s\d{1,2}\s\d{1,2}:\d{2}:\d{2})
+    replacement: '%b %d %H:%M:%S'
+  - name: ts2
+    type: timestamp
+    format: regex
+    token: (\d{4}\/\d{2}\/\d{2}\s\d{2}:\d{2}:\d{2})
+    replacement: '%Y/%m/%d %H:%M:%S'
+  - name: source
+    type: fieldChoice
+    format: regex
+    token: ^[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,([^,]+)
+    sample: panips.csv
+    srcField: source
+    group: 1
+  - name: nat_source
+    type: fieldChoice
+    format: regex
+    token: ^[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,([^,]+)
+    sample: panips.csv
+    srcField: source
+    group: 1
+  - name: dest
+    type: fieldChoice
+    format: regex
+    token: ^[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,(\d+\.\d+\.\d+\.\d+)
+    sample: panips.csv
+    srcField: destination
+    group: 1
+  - name: nat_dest
+    type: fieldChoice
+    format: regex
+    token: ^[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,(\d+\.\d+\.\d+\.\d+)
+    sample: panips.csv
+    srcField: destination
+    group: 1
+  - name: src_zone
+    type: fieldChoice
+    format: regex
+    token: ^[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,([^,]+)
+    sample: panips.csv
+    srcField: source_zone
+    group: 1
+  - name: dest_zone
+    type: fieldChoice
+    format: regex
+    token: ^[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,([^,]+)
+    sample: panips.csv
+    srcField: destination_zone
+    group: 1
+  fromSample: pan.sample
+  count: 1
+  interval: 1
+  randomizeEvents: true
