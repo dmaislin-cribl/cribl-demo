@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# call the cli-auth expect script to log into the cli
+/opt/cribl/bin/cli-auth
+
+# Run commit and deploy separately for each worker group (commit-deploy will fail if
+# there is nothing to commit, but we want to push a deploy either way.
+/opt/cribl/bin/cribl groups commit -g default -m "init"
+/opt/cribl/bin/cribl groups deploy -g default
+/opt/cribl/bin/cribl groups commit -g metrics -m "init"
+/opt/cribl/bin/cribl groups deploy -g metrics
