@@ -9,6 +9,8 @@ services:
       - ./cribl/master/groups:/opt/cribl/groups
       - ./cribl/master/local:/opt/cribl/local
       - ./cribl/scripts:/opt/cribl/scripts
+    environment:
+      - CRIBL_AFTER_START_CMD_1=”sleep 60 && $CRIBL_HOME/demo-scripts/cli-deploy”
   cribl-w0:
     build:
       context: cribl
