@@ -9,3 +9,5 @@ $CRIBL_HOME/bin/cribl groups commit -g default -m "init"
 $CRIBL_HOME/bin/cribl groups deploy -g default
 $CRIBL_HOME/bin/cribl groups commit -g metrics -m "init"
 $CRIBL_HOME/bin/cribl groups deploy -g metrics
+$CRIBL_HOME/bin/cribl groups commit -g logs -m "init"
+$CRIBL_HOME/bin/cribl groups deploy -g logs
