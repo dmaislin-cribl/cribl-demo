@@ -47,3 +47,4 @@ outputs:
     type: influxdb
     url: http://influxdb:8086/write
     database: cribl
+    onBackpressure: drop

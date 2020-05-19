@@ -25,7 +25,7 @@ services:
       - 3514:3514
       - 5140:5140
     environment:
-      - CRIBL_DIST_MASTER_URL=tcp://criblmaster@cribl:4200
+      - CRIBL_DIST_MASTER_URL=tcp://criblmaster@cribl:4200?tag=logs
   cribl-w1:
     build:
       context: cribl
