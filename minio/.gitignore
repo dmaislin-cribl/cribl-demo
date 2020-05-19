@@ -1,4 +1,4 @@
-!firehose/.gitkeep
-!archival/.gitkeep
 *
 !.gitignore
+!firehose/.gitkeep
+!archival/.gitkeep
