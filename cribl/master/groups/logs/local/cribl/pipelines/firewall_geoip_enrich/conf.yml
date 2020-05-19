@@ -52,7 +52,7 @@ functions:
         (resulting in dest_geoip) and remove non-english language fields  "
     groupId: 2vbLEq
   - id: geoip
-    filter: "true"
+    filter: "src_ip"
     disabled: null
     conf:
       inField: src_ip
@@ -61,7 +61,7 @@ functions:
     description: Lookup GEOIP of Src IP address
     groupId: 2vbLEq
   - id: geoip
-    filter: "true"
+    filter: "dest_ip"
     disabled: null
     conf:
       inField: dest_ip
@@ -148,6 +148,17 @@ functions:
         - name: compromised
           value: "(C.Lookup('compromised-ips.csv').match(src_ip) ||
             C.Lookup('compromised-ips.csv').match(dest_ip)) ? true : false"
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      add:
+        - name: _raw
+          value: message
+      remove:
+        - message
+        - severity
+        - facility
 groups:
   gB4TB7:
     name: Extraction and Reduction
