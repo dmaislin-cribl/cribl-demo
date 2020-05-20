@@ -104,6 +104,22 @@ services:
     command: start
     environment:
       - CRIBL_SYSLOG
+  cribl-sa:
+    build:
+      context: cribl
+    ports:
+      - 9005:9000
+    volumes:
+      - ./cribl/sa-local:/opt/cribl/local
+    environment:
+      - CRIBL_HOME=/opt/cribl
+      - CRIBL_AFTER_START_CMD_1=sleep 60 && $CRIBL_HOME/demo-scripts/cli-deploy
+  gogen-datacollection-syslog:
+    build:
+      context: gogen-datacollection-syslog
+    command: start
+    environment:
+      - CRIBL_SA_SYSLOG
   splunk:
     build:
       context: splunk
