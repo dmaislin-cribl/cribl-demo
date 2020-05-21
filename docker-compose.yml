@@ -114,6 +114,7 @@ services:
     environment:
       - CRIBL_HOME=/opt/cribl
       - CRIBL_AFTER_START_CMD_1=sleep 60 && $CRIBL_HOME/demo-scripts/cli-deploy
+      - CRIBL_AFTER_START_CMD_2=sleep 600 && /bin/kill -TERM 1
   gogen-datacollection-syslog:
     build:
       context: gogen-datacollection-syslog
