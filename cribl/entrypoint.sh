@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Add a signal trap to allow the container to kill itself (used for the SA datacollection instance
+trap "exit" SIGTERM
+
+
 # Assumed to be an s3 location
 if [ -n "$CRIBL_CONFIG_LOCATION" ]; then
     # Trim s3://
