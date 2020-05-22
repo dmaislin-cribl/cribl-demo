@@ -1,7 +1,7 @@
 samples:  
 - name: pan
   generator: sample
-  begin: -7d
+  begin: -10d
   end: now
 
   tokens:

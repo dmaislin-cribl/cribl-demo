@@ -1,0 +1,21 @@
+demo_collector:
+  type: collection
+  taskQueueSize: 100
+  ttl: 900s
+  collector:
+    conf:
+      signatureVersion: v4
+      recurse: true
+      maxBatchSize: 10
+      awsApiKey: ACCESSKEY
+      awsSecretKey: SECRETKEY
+      region: us-east-1
+      endpoint: http://minio:9000
+      bucket: data_collection_demo
+      path: ""
+    destructive: false
+    type: s3
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
