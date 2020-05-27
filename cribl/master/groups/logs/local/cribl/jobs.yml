@@ -19,3 +19,6 @@ demo_collector:
     type: collection
     staleChannelFlushMs: 10000
     sendToRoutes: true
+    metadata:
+      - name: collection
+        value: "'demo_collector'"
