@@ -9,7 +9,7 @@ outputs:
     region: us-east-1
     endpoint: http://minio:9000
     signatureVersion: v4
-    partitionExpr: "`${__inputId.replace(/:/g, '_')}/${C.Time.strftime(_time ? _time : Date.now(), '%Y-%m-%d_%H')}/${host}/${sourcetype}`"
+    partitionExpr: "`${C.Time.strftime(_time ? _time : Date.now(), '%Y/%m/%d/%H')}/${host}/${sourcetype}`"
     format: json
     baseFileName: CriblOut
     compress: none
