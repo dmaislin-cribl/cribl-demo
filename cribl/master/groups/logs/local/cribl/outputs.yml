@@ -1,4 +1,7 @@
 outputs:
+  default:
+    defaultId: splunk
+    type: default
   splunk:
     type: splunk
     host: splunk
@@ -7,9 +10,6 @@ outputs:
     nestedFields: none
     tls:
       disabled: true
-  default:
-    defaultId: splunk
-    type: default
   statsd:
     type: router
     rules:
