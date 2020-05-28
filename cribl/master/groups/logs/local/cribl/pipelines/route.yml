@@ -9,7 +9,7 @@ routes:
     clones:
       - {}
     filter: collection=='demo_collector' && sourcetype=='pan:traffic'
-    output: splunk
+    output: default
   - id: semK5P
     name: Archival
     final: false
