@@ -98,6 +98,16 @@ routes:
         source: filter
     filter: C.vars.accessCombined()
     output: default
+  - id: CollRoute
+    name: Collection Processing Route
+    final: true
+    disabled: false
+    pipeline: firewall_geoip_enrich
+    description: Catchall for routing data through main pipeline
+    clones:
+      - {}
+    filter: collection=='demo_collector'
+    output: splunk
   - id: ojhMN1
     name: Palo Alto Firewall Traffic
     final: true
