@@ -12,10 +12,13 @@ demo_collector:
       region: us-east-1
       endpoint: http://minio:9000
       bucket: data_collection_demo
-      path: ""
+      path: /${_time:%Y}/${_time:%m}/${_time:%d}/${_time:%H}/${host}/${sourcetype}/
     destructive: false
     type: s3
   input:
     type: collection
     staleChannelFlushMs: 10000
     sendToRoutes: true
+    metadata:
+      - name: collection
+        value: "'demo_collector'"

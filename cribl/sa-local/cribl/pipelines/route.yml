@@ -7,5 +7,5 @@ routes:
     description: ""
     clones:
       - {}
-    filter: __inputId=='syslog:syslog:tcp'
+    filter: sourcetype=='pan:traffic'
     output: s3dc
