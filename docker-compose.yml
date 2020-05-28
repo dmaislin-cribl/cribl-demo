@@ -104,22 +104,6 @@ services:
     command: start
     environment:
       - CRIBL_SYSLOG
-  cribl-sa:
-    build:
-      context: cribl
-    ports:
-      - 9005:9000
-    volumes:
-      - ./cribl/sa-local:/opt/cribl/local
-    environment:
-      - CRIBL_HOME=/opt/cribl
-      - CRIBL_AFTER_START_CMD_1=sleep 660 && /bin/kill -TERM 1
-  gogen-datacollection-syslog:
-    build:
-      context: gogen-datacollection-syslog
-    command: start
-    environment:
-      - CRIBL_SA_SYSLOG
   splunk:
     build:
       context: splunk
@@ -198,6 +182,22 @@ services:
     volumes:
       - ./minio:/data
     command: server /data
+  cribl-sa:
+    build:
+      context: cribl
+    ports:
+      - 9005:9000
+    volumes:
+      - ./cribl/sa-local:/opt/cribl/local
+    environment:
+      - CRIBL_HOME=/opt/cribl
+      - CRIBL_AFTER_START_CMD_1=sleep 660 && /bin/kill -TERM 1
+  gogen-datacollection-syslog:
+    build:
+      context: gogen-datacollection-syslog
+    command: start
+    environment:
+      - CRIBL_SA_SYSLOG
 volumes:
   ? grafana
   ? influxdb
