@@ -4,7 +4,7 @@ routes:
     name: Collection Processing Route
     final: true
     disabled: false
-    pipeline: firewall_geoip_enrich
+    pipeline: passthru
     description: Collection Route for Pan:Firewall events
     clones:
       - {}

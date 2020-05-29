@@ -3,7 +3,7 @@ routes:
     name: syslog_to_minio
     final: true
     disabled: false
-    pipeline: passthru
+    pipeline: firewall_geoip_enrich
     description: ""
     clones:
       - {}
