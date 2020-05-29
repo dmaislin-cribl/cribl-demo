@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   cribl:
-    image: cribl/cribl:latest
+    image: cribl/cribl:${CRIBL_TAG:-latest}
     ports:
       - 9000:9000
     volumes:
@@ -13,7 +13,7 @@ services:
       - CRIBL_HOME=/opt/cribl
       - CRIBL_AFTER_START_CMD_1=sleep 60 && $CRIBL_HOME/demo-scripts/cli-deploy
   cribl-w0:
-    image: cribl/cribl:latest
+    image: cribl/cribl:${CRIBL_TAG:-latest}
     ports:
       - 9002:9000
       - 10200:10200
@@ -26,7 +26,7 @@ services:
     environment:
       - CRIBL_DIST_MASTER_URL=tcp://criblmaster@cribl:4200?tag=logs
   cribl-w1:
-    image: cribl/cribl:latest
+    image: cribl/cribl:${CRIBL_TAG:-latest}
     ports:
       - 9003:9000
       - 8125:8125
@@ -181,8 +181,7 @@ services:
       - ./minio:/data
     command: server /data
   cribl-sa:
-    build:
-      context: cribl
+    image: cribl/cribl:${CRIBL_TAG:-latest}
     ports:
       - 9005:9000
     volumes:
