@@ -4,12 +4,12 @@ routes:
     name: Collection Processing Route
     final: true
     disabled: false
-    pipeline: firewall_geoip_enrich
+    pipeline: passthru
     description: Collection Route for Pan:Firewall events
     clones:
       - {}
     filter: collection=='demo_collector' && sourcetype=='pan:traffic'
-    output: splunk
+    output: default
   - id: semK5P
     name: Archival
     final: false
