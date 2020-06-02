@@ -1,8 +1,7 @@
 samples:  
 - name: pan
   generator: sample
-  begin: -10d
-  end: now
+
 
   tokens:
   - name: ts1
@@ -46,14 +45,14 @@ samples:
   - name: src_zone
     type: fieldChoice
     format: regex
-    token: ^[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,([^,]+)
+    token: ^[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,([^,]+)
     sample: panips.csv
     srcField: source_zone
     group: 1
   - name: dest_zone
     type: fieldChoice
     format: regex
-    token: ^[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,[^,]+,([^,]+)
+    token: ^[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,([^,]+)
     sample: panips.csv
     srcField: destination_zone
     group: 1
