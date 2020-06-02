@@ -96,12 +96,6 @@ services:
     command: start
     environment:
       - CRIBL_STATSD
-  gogen-pantraffic-syslog:
-    build:
-      context: gogen-pantraffic-syslog
-    command: start
-    environment:
-      - CRIBL_SYSLOG
   splunk:
     build:
       context: splunk
@@ -180,6 +174,12 @@ services:
     volumes:
       - ./minio:/data
     command: server /data
+  gogen-pantraffic-syslog:
+    build:
+      context: gogen-pantraffic-syslog
+    command: start
+    environment:
+      - CRIBL_SYSLOG
   cribl-sa:
     image: cribl/cribl:${CRIBL_TAG:-latest}
     ports:

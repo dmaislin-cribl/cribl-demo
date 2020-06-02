@@ -1,3 +1,4 @@
 #!/bin/bash
 
-tar --to-stdout -xzf $(/opt/cribl/bin/cribl diag create | awk '{print $NF}' | sed -e "s/\.$//g") system.json | jq '.BUILD.VERSION' -r
+
+jq -r '.info.version' $CRIBL_HOME/default/ui/static/swagger/openapi.json
