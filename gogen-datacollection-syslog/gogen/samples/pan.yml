@@ -1,6 +1,9 @@
 samples:  
 - name: pan
   generator: sample
+  begin: -10d
+  end: now
+
 
 
   tokens:
@@ -57,6 +60,9 @@ samples:
     srcField: destination_zone
     group: 1
   fromSample: pan.sample
-  count: 1
+  count: 3
   interval: 1
+  begin: 2020-05-01T00:00:00Z
+  end: 2020-05-31T11:59:00Z
   randomizeEvents: true
+  randomizeCounts: 0.2
