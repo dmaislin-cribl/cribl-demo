@@ -1,6 +1,9 @@
 samples:  
 - name: pan
   generator: sample
+  begin: -10d
+  end: now
+
 
 
   tokens:
