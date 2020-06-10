@@ -33,6 +33,7 @@ functions:
     conf: {}
     description: Drop events of log subtype of start.
     groupId: gB4TB7
+groups:
   gB4TB7:
     name: Extraction and Reduction
     description: Eliminate data that shouldn't be here and extract fields.

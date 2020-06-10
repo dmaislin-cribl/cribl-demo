@@ -52,6 +52,7 @@ samples:
     srcField: destination_zone
     group: 1
   fromSample: pan.sample
-  count: 1
-  interval: 1
+  count: 60
+  interval: 60
+  earliest: -60s
   randomizeEvents: true
