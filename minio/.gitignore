@@ -1,3 +1,5 @@
-!firehose/.gitkeep
 *
 !.gitignore
+!firehose/.gitkeep
+!archival
+!data_collection_demo

@@ -1,0 +1,43 @@
+functions:
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: >-
+        1 - Circuit Breaker to keep non-matching data out.
+
+        2 - Regular Expression Extraction to pull out relevant fields.
+
+        3 - Drop events of log_subtype==start, as they often have incorrect app assignments.
+
+        4 - (disabled) Sampling: Sample traffic with 0 bytes received at 5:1, Sample traffic from trusted-trusted & action allowed at 10:1
+    groupId: gB4TB7
+  - id: eval
+    filter: sourcetype!='pan:traffic'
+    disabled: null
+    conf: {}
+    final: true
+    groupId: gB4TB7
+  - id: regex_extract
+    filter: sourcetype=='pan:traffic'
+    disabled: null
+    conf:
+      source: _raw
+      iterations: 100
+      regex: /(?:[^,]*,){4}(?<log_subtype>[^,]*),(?:[^,]*,){2}(?<src_ip>[^,]*),(?<dest_ip>[^,]*),(?:[^,]*,){7}(?<src_zone>[^,]*),(?<dest_zone>[^,]*),(?:[^,]*,){11}(?<transport>[^,]*),(?<action>[^,]*),(?:[^,]*,){2}(?<bytes_in>[^,]*)/
+    description: Extract subtype, src/dest zones, transport, action and bytes_in
+    groupId: gB4TB7
+  - id: drop
+    filter: log_subtype=='start'
+    disabled: null
+    conf: {}
+    description: Drop events of log subtype of start.
+    groupId: gB4TB7
+groups:
+  gB4TB7:
+    name: Extraction and Reduction
+    description: Eliminate data that shouldn't be here and extract fields.
+    index: 0
+  Icop75:
+    name: DNS and Local LAN Lookup
+    index: 2

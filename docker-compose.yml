@@ -1,17 +1,19 @@
 version: "3.5"
 services:
   cribl:
-    build:
-      context: cribl
+    image: cribl/cribl:${CRIBL_TAG:-latest}
     ports:
       - 9000:9000
     volumes:
       - ./cribl/master/groups:/opt/cribl/groups
       - ./cribl/master/local:/opt/cribl/local
       - ./cribl/scripts:/opt/cribl/scripts
+      - ./cribl/demo-scripts:/opt/cribl/demo-scripts
+    environment:
+      - CRIBL_HOME=/opt/cribl
+      - CRIBL_AFTER_START_CMD_1=sleep 60 && $CRIBL_HOME/demo-scripts/cli-deploy
   cribl-w0:
-    build:
-      context: cribl
+    image: cribl/cribl:${CRIBL_TAG:-latest}
     ports:
       - 9002:9000
       - 10200:10200
@@ -22,10 +24,9 @@ services:
       - 3514:3514
       - 5140:5140
     environment:
-      - CRIBL_DIST_MASTER_URL=tcp://criblmaster@cribl:4200
+      - CRIBL_DIST_MASTER_URL=tcp://criblmaster@cribl:4200?tag=logs
   cribl-w1:
-    build:
-      context: cribl
+    image: cribl/cribl:${CRIBL_TAG:-latest}
     ports:
       - 9003:9000
       - 8125:8125
@@ -95,12 +96,6 @@ services:
     command: start
     environment:
       - CRIBL_STATSD
-  gogen-pantraffic-syslog:
-    build:
-      context: gogen-pantraffic-syslog
-    command: start
-    environment:
-      - CRIBL_SYSLOG
   splunk:
     build:
       context: splunk
@@ -179,6 +174,27 @@ services:
     volumes:
       - ./minio:/data
     command: server /data
+  gogen-pantraffic-syslog:
+    build:
+      context: gogen-pantraffic-syslog
+    command: start
+    environment:
+      - CRIBL_SYSLOG
+  cribl-sa:
+    image: cribl/cribl:${CRIBL_TAG:-latest}
+    ports:
+      - 9005:9000
+    volumes:
+      - ./cribl/sa-local:/opt/cribl/local
+    environment:
+      - CRIBL_HOME=/opt/cribl
+      - CRIBL_AFTER_START_CMD_1=sleep 660 && /bin/kill -TERM 1
+  gogen-datacollection-syslog:
+    build:
+      context: gogen-datacollection-syslog
+    command: start
+    environment:
+      - CRIBL_SA_SYSLOG
 volumes:
   ? grafana
   ? influxdb

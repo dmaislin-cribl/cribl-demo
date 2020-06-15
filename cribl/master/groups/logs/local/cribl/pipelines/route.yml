@@ -1,11 +1,31 @@
 id: default
 routes:
+  - id: CollRoute
+    name: Collection Processing Route
+    final: true
+    disabled: false
+    pipeline: passthru
+    description: Collection Route for Pan:Firewall events
+    clones:
+      - {}
+    filter: collection=='demo_collector' && sourcetype=='pan:traffic'
+    output: default
+  - id: ojhMN1
+    name: Palo Alto Firewall Traffic
+    final: true
+    disabled: false
+    pipeline: firewall_geoip_enrich
+    description: ""
+    clones:
+      - {}
+    filter: sourcetype=='pan:traffic'
+    output: pan-firewall-external
   - id: semK5P
-    name: Firehose
+    name: Archival
     final: false
     disabled: false
     pipeline: passthru
-    description: Copy the full firehose to S3
+    description: Copy ALL data to S3
     clones:
       - __index: bigjson
     filter: "true"
@@ -97,16 +117,6 @@ routes:
       - index: cribl-modified
         source: filter
     filter: C.vars.accessCombined()
-    output: default
-  - id: ojhMN1
-    name: Palo Alto Firewall Traffic
-    final: true
-    disabled: false
-    pipeline: firewall_geoip_enrich
-    description: ""
-    clones:
-      - {}
-    filter: sourcetype=='pan:traffic'
     output: default
   - id: OsuFhD
     name: Main Route

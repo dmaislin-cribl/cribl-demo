@@ -10,6 +10,14 @@ rulesets:
             add:
               - name: groupId
                 value: "'metrics'"
+        - filter: cribl.tags.includes('logs')
+          id: eval
+          description: Logs
+          final: true
+          conf:
+            add:
+              - name: groupId
+                value: "'logs'"
         - filter: "true"
           id: eval
           description: Default Mappings

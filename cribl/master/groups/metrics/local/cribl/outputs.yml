@@ -11,7 +11,7 @@ outputs:
       - filter: "true"
         output: influxdb
         final: false
-    onBackpressure: drop
+    onBackpressure: block
   splunk-metrics:
     type: splunk
     pipeline: metrics_to_logs
@@ -47,3 +47,4 @@ outputs:
     type: influxdb
     url: http://influxdb:8086/write
     database: cribl
+    onBackpressure: block
