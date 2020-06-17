@@ -19,7 +19,10 @@ demo_collector:
     type: collection
     staleChannelFlushMs: 10000
     sendToRoutes: true
+    preprocess:
+      disabled: true
     metadata:
       - name: collection
         value: "'demo_collector'"
-    pipeline: collection-conditioning
+    breakerRulesets:
+      - Cribl
