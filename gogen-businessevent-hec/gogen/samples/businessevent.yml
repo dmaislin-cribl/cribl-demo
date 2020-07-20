@@ -97,9 +97,31 @@ tokens:
   type: script
   name: orderNumber
   init:
-    id: "910000000000"
+    id: "8100000000000000"
   script: >
-    state["id"] = state["id"] + 1
+    function luhn(n)
+      x=tonumber(n)
+      n=string.reverse(n)
+      local s1=0
+      --sum odd digits
+      for i=1,n:len(),2 do
+        s1=s1+n:sub(i,i)
+      end
+      --evens
+      local s2=0
+      for i=2,n:len(),2 do
+        local doubled=string.format("%d", n:sub(i,i)*2)
+        doubled=string.gsub(doubled,'(%d)(%d)',function(a,b)return a+b end)
+        s2=s2+doubled
+      end
+      local total=s1+s2
+      if total%10==0 then
+        return luhn(string.format("%d", (x+1)))
+      end
+      --print("Returning")
+      return string.format("%d",x)
+    end
+    state["id"] = luhn(string.format("%d", (state["id"] + 1)))
     return state["id"]
 - format: template
   name: userName
