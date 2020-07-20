@@ -97,7 +97,7 @@ tokens:
   type: script
   name: orderNumber
   init:
-    id: "9000000000000000"
+    id: "910000000000"
   script: >
     state["id"] = state["id"] + 1
     return state["id"]
