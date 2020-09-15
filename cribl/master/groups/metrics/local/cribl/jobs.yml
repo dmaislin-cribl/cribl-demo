@@ -145,3 +145,33 @@ speedtest:
       disabled: true
     breakerRulesets:
       - Cribl
+weatherbit:
+  type: collection
+  ttl: 4h
+  removeFields: []
+  resumeOnBoot: false
+  schedule: {}
+  collector:
+    conf:
+      discovery:
+        discoverType: list
+        itemList:
+          - "60601"
+          - "94105"
+          - "10022"
+          - "20500"
+          - "90038"
+      collectMethod: get
+      authentication: none
+      collectUrl: "`https://api.weatherbit.io/v2.0/current?postal_code=${id}&units=I&key=\
+        0018fca125f245198919f5e087f6cb43`"
+    destructive: false
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: false
+    preprocess:
+      disabled: true
+    pipeline: process_weather
+    output: splunk-metrics

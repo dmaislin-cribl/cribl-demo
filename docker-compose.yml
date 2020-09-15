@@ -12,7 +12,6 @@ services:
     environment:
       - CRIBL_HOME=/opt/cribl
       - CRIBL_AFTER_START_CMD_1=sleep 60 && $CRIBL_HOME/demo-scripts/cli-deploy
-        > /tmp/deploy.log
       - SCOPE_METRIC_DEST=udp://${CRIBL_STATSD}
       - SCOPE_EVENT_DEST=tcp://${CRIBL_TCPJSON}
   cribl-w0:
