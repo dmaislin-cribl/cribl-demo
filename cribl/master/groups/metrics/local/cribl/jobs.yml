@@ -175,3 +175,82 @@ weatherbit:
       disabled: true
     pipeline: process_weather
     output: splunk-metrics
+salesforce_status:
+  type: collection
+  ttl: 4h
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: "*/5 * * * *"
+    skippable: true
+    maxConcurrentRuns: 1
+    run:
+      mode: run
+      timeRangeType: absolute
+      expression: "true"
+      logLevel: info
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+    enabled: true
+  collector:
+    conf:
+      discovery:
+        discoverType: list
+        itemList:
+          - NA134
+          - NA111
+          - NA135
+      collectMethod: get
+      authentication: none
+      collectUrl: "`https://api.status.salesforce.com/v1/instances/${id}/status?childProd\
+        ucts=false`"
+    destructive: false
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: false
+    preprocess:
+      disabled: true
+    pipeline: sfdc_status
+    output: influxdb
+    metadata:
+      - name: sfdc_instance
+        value: "`${__collectible.id}`"
+      - name: sourcetype
+        value: "`sfdc_status`"
+      - name: index
+        value: "`cribl`"
+      - name: source
+        value: "`SFDC_instance_status_api`"
+earthquakes_last_hour:
+  type: collection
+  ttl: 4h
+  removeFields: []
+  resumeOnBoot: false
+  schedule: {}
+  collector:
+    conf:
+      discovery:
+        discoverType: none
+      collectMethod: get
+      authentication: none
+      collectUrl: "`https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.ge\
+        ojson`"
+    destructive: false
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: false
+    preprocess:
+      disabled: true
+    metadata:
+      - name: sourcetype
+        value: "`usgs_earthquakes`"
+      - name: index
+        value: "`cribl`"
+    breakerRulesets:
+      - Cribl - Do Not Break Ruleset
+    pipeline: usgs_earthquakes
+    output: splunk-metrics
