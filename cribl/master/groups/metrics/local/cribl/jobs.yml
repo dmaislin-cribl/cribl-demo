@@ -175,6 +175,11 @@ weatherbit:
       disabled: true
     pipeline: process_weather
     output: splunk-metrics
+    metadata:
+      - name: sourcetype
+        value: "`weather`"
+      - name: index
+        value: "`cribl`"
 salesforce_status:
   type: collection
   ttl: 4h

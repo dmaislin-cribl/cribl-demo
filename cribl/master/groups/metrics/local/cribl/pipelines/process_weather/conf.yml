@@ -11,12 +11,6 @@ functions:
       srcField: _raw
       remove:
         - count
-  - id: json_unroll
-    filter: "true"
-    disabled: true
-    conf:
-      path: data.0
-      name: ddd
   - id: flatten
     filter: "true"
     disabled: false
@@ -61,7 +55,10 @@ functions:
         - sourcetype
   - id: serialize
     filter: "true"
-    disabled: null
+    disabled: true
     conf:
       type: json
       dstField: _raw
+      fields:
+        - city_name
+        - weather_description
