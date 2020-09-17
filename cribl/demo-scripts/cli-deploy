@@ -2,16 +2,25 @@
 
 if [ -d $CRIBL_HOME/groups ]; then
   # call the cli-auth expect script to log into the cli
-  $CRIBL_HOME/bin/cribl auth login -u admin -p cribldemo
+  while [ true ]; do
+    $CRIBL_HOME/bin/cribl auth login -u admin -p cribldemo
+    if [[ $? -eq 0 ]]; then
+      echo "Authentication Successful"
+      break
+    else
+      echo "Auth Failed, sleeping for 10 secs"
+      sleep 10
+    fi
+  done
 
-  # Run commit and deploy separately for each worker group (commit-deploy will fail if
-  # there is nothing to commit, but we want to push a deploy either way.
-  $CRIBL_HOME/bin/cribl groups commit -g default -m "init"
-  $CRIBL_HOME/bin/cribl groups deploy -g default
-  $CRIBL_HOME/bin/cribl groups commit -g metrics -m "init"
-  $CRIBL_HOME/bin/cribl groups deploy -g metrics
-  $CRIBL_HOME/bin/cribl groups commit -g logs -m "init"
-  $CRIBL_HOME/bin/cribl groups deploy -g logs
+  for grp in $(find $CRIBL_HOME/groups -maxdepth 1 -mindepth 1 -type d -printf "%f\n"); do
+
+    # Run commit and deploy separately for each worker group (commit-deploy will fail if
+    # there is nothing to commit, but we want to push a deploy either way.
+    echo "Committing and Deploying ${grp}"
+    $CRIBL_HOME/bin/cribl groups commit -g ${grp} -m "init"
+    $CRIBL_HOME/bin/cribl groups deploy -g ${grp}
+  done
 
 else
   echo "Not running in distributed mode - no need to deploy groups"
