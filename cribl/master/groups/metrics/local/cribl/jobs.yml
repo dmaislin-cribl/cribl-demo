@@ -119,7 +119,7 @@ speedtest:
   type: collection
   ttl: 4h
   schedule:
-    cronSchedule: "* */4 * * *"
+    cronSchedule: 0 */4 * * *
     skippable: true
     run:
       mode: run
@@ -134,7 +134,7 @@ speedtest:
     conf:
       shell: /bin/bash
       discoverScript: echo "speedtest"
-      collectScript: speedtest --json
+      collectScript: speedtest --json --server 33560
     destructive: false
     type: script
   input:
@@ -186,7 +186,7 @@ salesforce_status:
   removeFields: []
   resumeOnBoot: false
   schedule:
-    cronSchedule: "*/5 * * * *"
+    cronSchedule: "*/30 * * * *"
     skippable: true
     maxConcurrentRuns: 1
     run:
@@ -233,7 +233,18 @@ earthquakes_last_hour:
   ttl: 4h
   removeFields: []
   resumeOnBoot: false
-  schedule: {}
+  schedule:
+    cronSchedule: 0 * * * *
+    skippable: true
+    maxConcurrentRuns: 1
+    run:
+      mode: run
+      timeRangeType: absolute
+      expression: "true"
+      logLevel: info
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+    enabled: true
   collector:
     conf:
       discovery:
