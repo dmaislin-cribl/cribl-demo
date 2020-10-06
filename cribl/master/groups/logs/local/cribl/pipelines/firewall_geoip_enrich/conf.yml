@@ -1,7 +1,7 @@
 functions:
   - id: comment
     filter: "true"
-    disabled: null
+    disabled: false
     conf:
       comment: >-
         1 - Circuit Breaker to keep non-matching data out.
@@ -14,22 +14,91 @@ functions:
     groupId: gB4TB7
   - id: eval
     filter: sourcetype!='pan:traffic'
-    disabled: null
+    disabled: false
     conf: {}
     final: true
     groupId: gB4TB7
-  - id: regex_extract
-    filter: sourcetype=='pan:traffic'
+  - id: serde
+    filter: "true"
     disabled: null
     conf:
-      source: _raw
-      iterations: 100
-      regex: /(?:[^,]*,){4}(?<log_subtype>[^,]*),(?:[^,]*,){2}(?<src_ip>[^,]*),(?<dest_ip>[^,]*),(?:[^,]*,){7}(?<src_zone>[^,]*),(?<dest_zone>[^,]*),(?:[^,]*,){11}(?<transport>[^,]*),(?<action>[^,]*),(?:[^,]*,){2}(?<bytes_in>[^,]*)/
-    description: Extract subtype, src/dest zones, transport, action and bytes_in
+      mode: extract
+      type: delim
+      delimChar: ","
+      quoteChar: '"'
+      escapeChar: \
+      nullValue: "-"
+      srcField: _raw
+      fields:
+        - future_use_1
+        - receive_time
+        - serial_number
+        - type
+        - threat_content_type
+        - future_use_2
+        - generated_time
+        - src_ip
+        - dest_ip
+        - nat_src_ip
+        - nat_dest_ip
+        - rule_name
+        - src_user
+        - dest_user
+        - application
+        - virtual_system
+        - src_zone
+        - dest_zone
+        - inbound_interface
+        - outbound_interface
+        - log_action
+        - future_use_3
+        - session_id
+        - repeat_count
+        - src_port
+        - dest_port
+        - nat_src_port
+        - nat_dest_port
+        - flags
+        - protocol
+        - action
+        - bytes
+        - bytes_sent
+        - bytes_received
+        - packets
+        - start_time
+        - elapsed_time
+        - category
+        - future_use_4
+        - sequence_number
+        - action_flags
+        - src_location
+        - dest_location
+        - future_use_5
+        - packets_sent
+        - packets_received
+        - session_end_reason
+        - device_group_hierarchy_level_1
+        - device_group_hierarchy_level_2
+        - device_group_hierarchy_level_3
+        - device_group_hierarchy_level_4
+        - virtual_system_name
+        - device_name
+        - action_src
+        - src_vm_uuid
+        - dest_vm_uuid
+        - tunnel_id_imsi
+        - monitor_tag_imei
+        - parent_session_id
+        - parent_start_time
+        - tunnel_type
+        - sctp_association_id
+        - sctp_chunks
+        - sctp_chunks_sent
+        - sctp_chunks_received
     groupId: gB4TB7
   - id: drop
     filter: log_subtype=='start'
-    disabled: null
+    disabled: false
     conf: {}
     description: Drop events of log subtype of start.
     groupId: gB4TB7
@@ -46,32 +115,26 @@ functions:
     groupId: gB4TB7
   - id: comment
     filter: "true"
-    disabled: null
+    disabled: false
     conf:
       comment: "Do GeoIP lookup on both src_ip (resulting in src_geoip) and dest_ip
         (resulting in dest_geoip) and remove non-english language fields  "
     groupId: 2vbLEq
   - id: geoip
-    filter: "src_ip"
-    disabled: null
+    filter: src_ip || dest_ip
+    disabled: false
     conf:
       inField: src_ip
       outField: src_geoip
       file: GeoLite2-City.mmdb
-    description: Lookup GEOIP of Src IP address
-    groupId: 2vbLEq
-  - id: geoip
-    filter: "dest_ip"
-    disabled: null
-    conf:
-      inField: dest_ip
-      outField: dest_geoip
-      file: GeoLite2-City.mmdb
-    description: Lookup GEOIP of Dest IP address
+      additionalFields:
+        - extraInField: dest_ip
+          extraOutField: dest_geoip
+    description: Lookup GEOIP of Src and Dest IP address
     groupId: 2vbLEq
   - id: eval
     filter: "true"
-    disabled: null
+    disabled: false
     conf:
       remove:
         - "*.names.de"
@@ -85,7 +148,7 @@ functions:
     groupId: 2vbLEq
   - id: comment
     filter: "true"
-    disabled: null
+    disabled: false
     conf:
       comment: Reverse DNS to get hostnames of external IP address (
         (src|dest)_hostname ), and lookup the subnet of internal IP addresses
@@ -93,7 +156,7 @@ functions:
     groupId: Icop75
   - id: reverse_dns
     filter: "true"
-    disabled: null
+    disabled: false
     conf:
       fields:
         - inFieldName: src_ip
@@ -104,7 +167,7 @@ functions:
     groupId: Icop75
   - id: lookup
     filter: "true"
-    disabled: null
+    disabled: false
     conf:
       matchMode: cidr
       matchType: specific
@@ -120,7 +183,7 @@ functions:
     groupId: Icop75
   - id: lookup
     filter: "true"
-    disabled: null
+    disabled: false
     conf:
       matchMode: cidr
       matchType: specific
@@ -142,7 +205,7 @@ functions:
         Open Source feed
   - id: eval
     filter: "true"
-    disabled: null
+    disabled: false
     conf:
       add:
         - name: compromised
@@ -150,7 +213,7 @@ functions:
             C.Lookup('compromised-ips.csv').match(dest_ip)) ? true : false"
   - id: eval
     filter: "true"
-    disabled: null
+    disabled: false
     conf:
       add:
         - name: _raw
@@ -164,10 +227,13 @@ groups:
     name: Extraction and Reduction
     description: Eliminate data that shouldn't be here and extract fields.
     index: 0
+    disabled: false
   2vbLEq:
     name: GeoIP
     description: GeoIP Enrichment
     index: 1
+    disabled: false
   Icop75:
     name: DNS and Local LAN Lookup
     index: 2
+    disabled: false
