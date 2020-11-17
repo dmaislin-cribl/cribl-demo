@@ -17,14 +17,7 @@
       "enumNames": ["Exact", "CIDR", "Regex"],
       "default": "exact"
     },
-    "matchType": {
-      "title": "Match Type",
-      "type": "string",
-      "description": "For CIDR and Wildcard Match Mode, this attribute further refines how to resolve multiple matches. 'First Match' will return the first matching entry, 'Most Specific' will scan all entries finding the most specific match, and 'All' will return all matches in output as arrays.",
-      "enum": ["first", "specific","all"],
-      "enumNames": ["First Match", "Most Specific", "All"],
-      "default": "first"
-    },
+    "matchType": {},
     "reloadPeriodSec": {
       "type": "number",
       "title": "Reload Period (sec)",
@@ -76,10 +69,47 @@
             "type": "string",
             "title": "Lookup Field Name in Event",
             "description": "(optional) field name to add to event, defaults to lookup field name"
+          },
+          "defaultValue" :{
+            "type": "string",
+            "title": "Default Value",
+            "description": "(optional) Value to assign if lookup entry not found"
           }
         }
       }
-
+    }
+  },
+  "dependencies": {
+    "matchMode": {
+      "oneOf": [
+        {
+          "properties": {
+            "matchMode": {
+              "enum":["cidr", "regex"]
+            },
+            "matchType": {
+              "title": "Match Type",
+              "type": "string",
+              "description": "This attribute further refines how to resolve multiple matches.",
+              "enum": ["first", "specific","all"],
+              "default": "first"
+            }
+          }
+        },
+        {
+          "properties": {
+            "matchMode": {
+              "enum":["exact"]
+            },
+            "ignoreCase": {
+              "type": "boolean",
+              "title": "Ignore case",
+              "default": false,
+              "description": "Ignore case when performing Match Mode: Exact lookups"
+            }
+          }
+        }
+      ]
     }
   }
 }

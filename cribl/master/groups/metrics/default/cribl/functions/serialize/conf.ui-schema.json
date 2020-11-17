@@ -8,19 +8,29 @@
   },
   "fields": {
     "ui:field": "Tags",
-    "ui:placeholder": "Enter field names",
-    "ui:options": {
-      "popupEditor": "ParserEditor",
-      "updateFormProperties": ["type"],
-      "parserFormPath": "conf"
-    }
+    "ui:placeholder": "Enter field names"
   },
   "dstField": {
     "ui:placeholder": "Destination field name",
-    "ui:options": { "inline": true, "width": "50%" }
+    "ui:options": { "inline": true, "width": "40%" }
   },
   "srcField": {
     "ui:placeholder": "Source field name",
-    "ui:options": { "inline": true, "width": "50%" }
+    "ui:options": { "inline": true, "width": "40%" }
+  },
+  "cleanFields": {
+    "ui:options": { "inline": true, "width": "20%" }
+  },
+  "delimChar": {
+    "ui:options": { "inline": true, "width": "25%" }
+  },
+  "escapeChar": {
+    "ui:options": { "inline": true, "width": "25%" }
+  },
+  "quoteChar": {
+    "ui:options": { "inline": true, "width": "25%" }
+  },
+  "nullValue": {
+    "ui:options": { "inline": true, "width": "25%" }
   }
 }

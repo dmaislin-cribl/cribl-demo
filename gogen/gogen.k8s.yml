@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: gogen
+  name: gogen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: gogen
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: gogen
+    spec:
+      containers:
+        - env:
+            - name: GOGEN_OUT
+              value: http
+            - name: GOGEN_OUTPUTTEMPLATE
+              value: json
+            - name: GOGEN_URL
+              value: http://cribl-w0:10080/cribl/_bulk
+          image: gogen-bigjson-webhook
+          name: gogen-bigjson-wehook
+        - env:
+            - name: GOGEN_OUT
+              value: http
+            - name: GOGEN_OUTPUTTEMPLATE
+              value: splunkhec
+            - name: GOGEN_URL
+              value: http://cribl-w0:10088/services/collector/event
+          image: gogen-businessevent-hec
+          name: gogen-businessevent-hec
+        - env:
+            - name: GOGEN_OUT
+              value: tcp
+            - name: GOGEN_URL
+              value: cribl-w1:8125
+          image: gogen-metrics-dogstatsd
+          name: gogen-metrics-dogstatsd
+        - env:
+            - name: GOGEN_OUT
+              value: tcp
+            - name: GOGEN_OUTPUTTEMPLATE
+              value: rfc5424
+            - name: GOGEN_URL
+              value: cribl-w0:5140
+          image: gogen-pantraffic-syslog
+          name: gogen-pantraffic-syslog
+        - env:
+            - name: GOGEN_OUT
+              value: tcp
+            - name: GOGEN_OUTPUTTEMPLATE
+              value: rfc5424
+            - name: GOGEN_URL
+              value: cribl-w0:5140
+          image: gogen-statechange-syslog
+          name: gogen-statechange-syslog
+        - env:
+            - name: SPLUNK_CMD
+              value: cmd mkdir -p /var/log/httpd
+            - name: SPLUNK_CMD_1
+              value: cmd gogen -v -cd /etc/gogen -o file --filename /var/log/httpd/access_log -lj gen -s shoppingapache 2>/var/log/gogen.log &
+            - name: SPLUNK_CMD_2
+              value: add monitor /var/log/httpd/access_log -auth admin:cribldemo -sourcetype access_combined -index cribl
+            - name: SPLUNK_CMD_3
+              value: add forward-server cribl-w0:9999 -auth admin:cribldemo -ssl-cert-path /opt/splunk/etc/auth/client.pem
+          image: gogen-accesscombined-forwarder
+          name: gogen-accesscombined-forwarder
+        - env:
+            - name: GOGEN_OUT
+              value: http
+            - name: GOGEN_URL
+              value: http://cribl-w0:10200
+            - name: GOGEN_OUTPUTTEMPLATE
+              value: elasticsearch
+          image: gogen-authfailed-filebeat
+          name: gogen-authfailed-filebeat
+        - env:
+            - name: GOGEN_OUT
+              value: tcp
+            - name: GOGEN_URL
+              value: cribl-sa:5140
+            - name: GOGEN_OUTPUTTEMPLATE
+              value: rfc5424
+          image: gogen-datacollection-syslog
+          name: gogen-datacollection-syslog
+      restartPolicy: Always
+status: {}

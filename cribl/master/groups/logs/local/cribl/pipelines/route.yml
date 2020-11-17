@@ -1,4 +1,5 @@
 id: default
+groups: {}
 routes:
   - id: CollRoute
     name: Collection Processing Route

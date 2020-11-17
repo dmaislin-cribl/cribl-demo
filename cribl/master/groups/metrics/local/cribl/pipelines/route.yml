@@ -1,6 +1,15 @@
 id: default
 groups: {}
 routes:
+  - id: SzBeGP
+    name: devnull
+    final: true
+    disabled: true
+    pipeline: passthru
+    description: ""
+    clones: []
+    filter: "true"
+    output: devnull
   - id: A8y30n
     name: speedtest
     final: true
@@ -9,7 +18,7 @@ routes:
     description: ""
     clones: []
     filter: client && server && download && upload
-    output: influxdb
+    output: influxdb2
   - id: M6yz8j
     name: mtr
     final: true
@@ -18,7 +27,7 @@ routes:
     description: ""
     clones: []
     filter: report.mtr
-    output: influxdb
+    output: influxdb2
   - id: A1JddJ
     name: statsd
     final: true

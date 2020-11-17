@@ -1,0 +1,77 @@
+apiVersion: skaffold/v2beta9
+kind: Config
+metadata:
+  name: cribl-demo
+build:
+  artifacts:
+  - image: apiserver
+    context: apiserver
+  - image: cribl-master
+    context: cribl/master
+  - image: cribl-worker
+    context: cribl/worker
+  - image: cribl-sa
+    context: cribl/sa
+  - image: gogen-bigjson-webhook
+    context: gogen/bigjson-webhook
+  - image: gogen-businessevent-hec
+    context: gogen/businessevent-hec
+  - image: gogen-metrics-dogstatsd
+    context: gogen/metrics-dogstatsd
+  - image: gogen-pantraffic-syslog
+    context: gogen/pantraffic-syslog
+  - image: gogen-statechange-syslog
+    context: gogen/statechange-syslog
+  - image: gogen-accesscombined-forwarder
+    context: gogen/accesscombined-forwarder
+  - image: gogen-authfailed-filebeat
+    context: gogen/statechange-syslog
+  - image: gogen-datacollection-syslog
+    context: gogen/datacollection-syslog
+  - image: grafana
+    context: grafana
+  - image: redis
+    context: redis
+  - image: splunk
+    context: splunk
+deploy:
+  kubectl:
+    manifests:
+    - apiserver/apiserver.k8s.yml
+    # - cribl/cribl.k8s.yml
+    - cribl/sa/cribl-sa.k8s.yml
+    - minio/minio.k8s.yml
+    # - kafka/kafka.k8s.yml
+    - gogen/gogen.k8s.yml
+    - telegraf/kube-state-metrics.yml
+    - grafana/grafana.k8s.yml
+    - redis/redis.k8s.yml
+    - splunk/splunk.k8s.yml
+  helm:
+    releases:
+    - name: cribl
+      chartPath: cribl/charts/logstream-master
+      artifactOverrides:
+        image: cribl-master
+      valuesFiles:
+      - cribl/master.values.yml
+    - name: cribl-w0
+      chartPath: cribl/charts/logstream-workergroup
+      artifactOverrides:
+        image: cribl-worker
+      valuesFiles:
+      - cribl/logs-wg.values.yml
+    - name: cribl-w1
+      chartPath: cribl/charts/logstream-workergroup
+      artifactOverrides:
+        image: cribl-worker
+      valuesFiles:
+      - cribl/metrics-wg.values.yml
+    - name: telegraf
+      chartPath: telegraf
+      valuesFiles:
+      - telegraf/values.yaml
+    - name: influxdb2
+      chartPath: influxdb2
+      valuesFiles:
+      - influxdb2/values.yaml

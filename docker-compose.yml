@@ -1,22 +1,14 @@
 version: "3.5"
 services:
   cribl:
-    image: cribl/cribl:${CRIBL_TAG:-latest}
+    image: cribl/cribl:next
     ports:
       - 9000:9000
-    volumes:
-      - ./cribl/master/groups:/opt/cribl/groups
-      - ./cribl/master/local:/opt/cribl/local
-      - ./cribl/scripts:/opt/cribl/scripts
-      - ./cribl/demo-scripts:/opt/cribl/demo-scripts
     environment:
       - CRIBL_HOME=/opt/cribl
-      - CRIBL_AFTER_START_CMD_1=sleep 60 && $CRIBL_HOME/demo-scripts/cli-deploy
-        > /tmp/deploy.log
-      - SCOPE_METRIC_DEST=udp://${CRIBL_STATSD}
-      - SCOPE_EVENT_DEST=tcp://${CRIBL_TCPJSON}
+      - CRIBL_AFTER_START_CMD_1=sleep 60 && /opt/cribl/demo-scripts/cli-deploy > /tmp/deploy.log
   cribl-w0:
-    image: cribl/cribl:${CRIBL_TAG:-latest}
+    image: cribl/cribl:next
     ports:
       - 9002:9000
       - 10200:10200
@@ -28,11 +20,8 @@ services:
       - 5140:5140
     environment:
       - CRIBL_DIST_MASTER_URL=tcp://criblmaster@cribl:4200?tag=logs
-      - SCOPE_METRIC_DEST=udp://${CRIBL_STATSD}
-      - SCOPE_EVENT_DEST=tcp://${CRIBL_TCPJSON}
-      - SCOPE_TAG_service=cribl-w0
   cribl-w1:
-    image: cribl/cribl:${CRIBL_TAG:-latest}
+    image: cribl/cribl:next
     ports:
       - 9003:9000
       - 8125:8125
@@ -46,17 +35,12 @@ services:
       - CRIBL_AFTER_START_CMD_1=apt-get update && apt-get install -y
         --no-install-recommends mtr python python-pip
       - CRIBL_AFTER_START_CMD_2=pip install speedtest-cli
-      - SCOPE_METRIC_DEST=udp://${CRIBL_STATSD}
-      - SCOPE_EVENT_DEST=tcp://${CRIBL_TCPJSON}
-      - SCOPE_TAG_service=cribl-w1
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
   gogen-businessevent-hec:
     build:
       context: gogen-businessevent-hec
     command: start
     environment:
-      - CRIBL_HEC
+      - CRIBL_HEC=http://cribl-w0:10088/services/collector/event
   gogen-accesscombined-forwarder:
     build:
       context: universalforwarder
@@ -67,28 +51,25 @@ services:
         &
       - SPLUNK_CMD_2=add monitor /var/log/httpd/access_log -auth admin:cribldemo
         -sourcetype access_combined -index cribl
-      - SPLUNK_CMD_3=add forward-server ${CRIBL_SPLUNK} -auth admin:cribldemo
-        ${CRIBL_SPLUNK_ARGS}
+      - SPLUNK_CMD_3=add forward-server cribl-w0:9999 -auth admin:cribldemo
+        -ssl-cert-path /opt/splunk/etc/auth/client.pem
   gogen-authfailed-filebeat:
     build:
       context: filebeat
-    volumes:
-      - ${DOCKER_LIB_CONTAINERS:-/var/lib/docker/containers}:/var/lib/docker/containers
-      - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - CRIBL_ELASTIC
+      - CRIBL_ELASTIC=http://cribl-w0:9200
   gogen-statechange-syslog:
     build:
       context: gogen-statechange-syslog
     command: start
     environment:
-      - CRIBL_SYSLOG
+      - CRIBL_SYSLOG=cribl-w0:5140
   gogen-bigjson-kafka:
     build:
       context: gogen-bigjson-kafka
     command: start
     environment:
-      - CRIBL_KAFKA
+      - CRIBL_KAFKA=kafka:29092
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
@@ -128,8 +109,6 @@ services:
   apiserver:
     build:
       context: apiserver
-    volumes:
-      - ./data:/opt/data
     ports:
       - 4000:4000
     restart: always
@@ -145,16 +124,11 @@ services:
     privileged: true
     environment:
       DISABLE_ACCESS_COUNT: 1
-      SCOPE_METRIC_DEST: udp://${CRIBL_STATSD}
-      SCOPE_EVENT_DEST: tcp://${CRIBL_TCPJSON}
   redis:
     build:
       context: redis
     ports:
       - 6379:6379
-    environment:
-      - SCOPE_METRIC_DEST=udp://${CRIBL_STATSD}
-      - SCOPE_EVENT_DEST=tcp://${CRIBL_TCPJSON}
   influxdb:
     image: influxdb:1.7
     environment:
@@ -178,9 +152,8 @@ services:
     image: telegraf:latest
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-      - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - CRIBL_STATSD
+      - CRIBL_STATSD=cribl-w1:8125
   prometheus:
     image: prom/prometheus:latest
     volumes:
@@ -195,16 +168,16 @@ services:
     ports:
       - 9001:9000
     volumes:
-      - ./minio:/data
+      - minio:/data
     command: server /data
   gogen-pantraffic-syslog:
     build:
       context: gogen-pantraffic-syslog
     command: start
     environment:
-      - CRIBL_SYSLOG
+      - CRIBL_SYSLOG=cribl-w0:5140
   cribl-sa:
-    image: cribl/cribl:${CRIBL_TAG:-latest}
+    image: cribl/cribl:next
     ports:
       - 9005:9000
     volumes:
@@ -217,7 +190,8 @@ services:
       context: gogen-datacollection-syslog
     command: start
     environment:
-      - CRIBL_SA_SYSLOG
+      - CRIBL_SA_SYSLOG=cribl-sa:5140
 volumes:
   ? grafana
   ? influxdb
+  ? minio

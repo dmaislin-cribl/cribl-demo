@@ -72,7 +72,7 @@ exports.process = (event) => {
         if (typeof el !== 'object' || objName) {
           el = { [objName || 'value']: el };
         }
-        const clone = event.clone();
+        const clone = event.__clone();
         clone.__json = Object.assign({}, master, el);
         clone._raw = JSON.stringify(clone.__json);
         return clone;

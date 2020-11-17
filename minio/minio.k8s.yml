@@ -1,0 +1,88 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: minio
+  name: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: minio
+    spec:
+      initContainers:
+      - name: install
+        image: minio/minio:latest
+        command:
+        - mkdir
+        - -p
+        - /data/data_collection_demo
+        - /data/firehose
+        - /data/archival
+        volumeMounts:
+        - name:  minio
+          mountPath: "/data"
+      containers:
+        - args:
+            - server
+            - /data
+          env:
+            - name: MINIO_ACCESS_KEY
+              value: ACCESSKEY
+            - name: MINIO_SECRET_KEY
+              value: SECRETKEY
+          image: minio/minio:latest
+          name: minio
+          ports:
+            - containerPort: 9000
+          resources: {}
+          volumeMounts:
+            - mountPath: /data
+              name: minio
+      restartPolicy: Always
+      volumes:
+        - name: minio
+          persistentVolumeClaim:
+            claimName: minio
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: minio
+  name: minio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: minio
+  name: minio
+spec:
+  ports:
+    - name: "9010"
+      port: 9010
+      targetPort: 9000
+  selector:
+    io.kompose.service: minio
+status:
+  loadBalancer: {}

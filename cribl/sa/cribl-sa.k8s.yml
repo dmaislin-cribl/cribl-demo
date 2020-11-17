@@ -1,0 +1,37 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cribl-sa
+spec:
+  activeDeadlineSeconds: 660
+  template:
+    spec:
+      containers:
+        - env:
+            # - name: CRIBL_AFTER_START_CMD_1
+            #   value: sleep 660 && /bin/kill -TERM 1
+            - name: CRIBL_HOME
+              value: /opt/cribl
+          image: cribl-sa
+          name: cribl-sa
+          ports:
+            - containerPort: 9000
+            - containerPort: 5140
+          resources: {}
+      restartPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cribl-sa
+spec:
+  selector:
+    job-name: cribl-sa
+  ports:
+  - name: ui 
+    port: 9005
+    targetPort: 9000
+  - name: syslog
+    port: 5140
+    targetPort: 5140

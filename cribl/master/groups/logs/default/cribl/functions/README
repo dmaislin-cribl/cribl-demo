@@ -38,7 +38,7 @@ exports.init = (opt) => {
 ```
 
 Configuration:
-In the function's directory you can include a file called conf.json/ym; - if present the file will be read, merged with configuration
+In the function's directory you can include a file called conf.json/yml; - if present the file will be read, merged with configuration
 from the pipeline (for this function) and passed to the function at initialzation time, ie init()
 
 ```

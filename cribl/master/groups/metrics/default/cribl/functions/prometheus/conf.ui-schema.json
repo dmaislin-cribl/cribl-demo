@@ -7,10 +7,10 @@
     "ui:options": { "inline": true, "width": "200px" }
   },
   "update": {
-    "ui:options": { "inline": true, "width": "162px" }
+    "ui:options": { "inline": true, "width": "200px" }
   },
   "batchWriteInterval": {
-    "ui:options": { "labelInline": true, "inline": true, "width": "calc(100% - 362px" }
+    "ui:options": { "labelInline": true, "inline": true, "width": "calc(100% - 400px" }
   },
   "ui:options": {
     "groups": {

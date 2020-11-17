@@ -1,3 +1,6 @@
 outputs:
   devnull:
     type: devnull
+  default:
+    defaultId: devnull
+    type: default

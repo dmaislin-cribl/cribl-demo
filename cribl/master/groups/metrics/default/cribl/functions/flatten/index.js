@@ -21,7 +21,7 @@ exports.init = (opts) => {
 
 exports.process = (event) => {
   event.__traverseForFlatten(event, depth, (path, value, obj, key, level) => {
-    if (level === depth && event.isInternalField(key)) { return true; }
+    if (level === depth && event.__isInternalField(key)) { return true; }
     if (level === depth && !wildCardList.test(key)) { return true; }
     // for now, we are dealing with matched objects
     if (level === 1 && (typeof value === "object")) {
