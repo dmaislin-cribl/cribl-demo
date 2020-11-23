@@ -12,6 +12,8 @@ spec:
   activeDeadlineSeconds: 90
   template:
     metadata:
+      annotations:
+        io.cribl.scope/disable: 'true'
       labels:
         {{- include "influxdb.labels" . | nindent 8 }}
     spec:

@@ -26,7 +26,7 @@ spec:
             - name: GOGEN_URL
               value: http://cribl-w0:10080/cribl/_bulk
           image: gogen-bigjson-webhook
-          name: gogen-bigjson-wehook
+          name: gogen-bigjson-webhook
         - env:
             - name: GOGEN_OUT
               value: http

@@ -21,6 +21,7 @@ config:
 
 podAnnotations: {}
 
+env: {}
 
 service:
   type: ClusterIP

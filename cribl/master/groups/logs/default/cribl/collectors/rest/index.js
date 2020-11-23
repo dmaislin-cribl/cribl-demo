@@ -25,7 +25,7 @@ const DISC_TYPE_LIST = 'list';
 
 const AUTH_TYPES = [RestAuthType.NONE, RestAuthType.BASIC, RestAuthType.LOGIN];
 
-function validateCollectOpts(opts) {
+function validateCollectOpts(opts, conf) {
   if (opts == null) {
     throw new Error('Invalid Argument, missing collect configuration');
   }
@@ -41,6 +41,9 @@ function validateCollectOpts(opts) {
   if (opts.authType === RestAuthType.BASIC && (opts.username == null || opts.password == null)) {
     throw new Error(`Invalid argument, username and password are required with ${RestAuthType.BASIC} authentication`);
   }
+  if (conf.collectMethod === 'post_with_body' && !opts.postBody) {
+    throw new Error('Invalid Argument: Collect postBody is required when Post with Body is specified!');
+  }
 }
 
 async function getDataFromResult(result, dataField) {
@@ -51,12 +54,12 @@ async function getDataFromResult(result, dataField) {
   return npa ? npa.get(dataObj) : dataObj;
 }
 
-function validateDiscoverOpts(opts) {
+function validateDiscoverOpts(opts,conf) {
   const discoverType = opts.type || undefined;
   if (discoverType === DISC_TYPE_NONE) {
     // Validation not required
   } else if (discoverType === DISC_TYPE_HTTP) {
-    validateCollectOpts(opts);
+    validateCollectOpts(opts, conf);
   } else if (discoverType === DISC_TYPE_JSON) {
     if (!opts.resultData) {
       throw new Error(`Invalid argument - resultData is required for discover type ${DISC_TYPE_JSON}`);
@@ -70,6 +73,9 @@ function validateDiscoverOpts(opts) {
     }
   } else {
     throw new Error(`Invalid discover type: ${discoverType}!`);
+  }
+  if (conf.discoverMethod === 'post_with_body' && !opts.postBody) {
+    throw new Error('Invalid Argument: Collect postBody is required when Post with Body is specified!');
   }
 }
 
@@ -97,6 +103,12 @@ function copyParams(pIn, pOut) {
   });
 }
 
+function getMethod(value) {
+  const method = value || RestVerb.GET;
+  // Allowed method values: 'get', 'post', or 'post_with_body'. Map the latter two options to 'post'.
+  return method === RestVerb.GET ? method : RestVerb.POST;
+}
+
 exports.init = async (opts) => {
   const conf = opts.conf;
   filter = conf.filter || 'true';
@@ -120,10 +132,11 @@ exports.init = async (opts) => {
   if (discoverConf.type !== DISC_TYPE_NONE) {
     discoverOpts.authType = conf.authentication;
     discoverOpts.url = discoverConf.discoverUrl;
-    discoverOpts.method = discoverConf.discoverMethod || RestVerb.GET;
+    discoverOpts.method = getMethod(discoverConf.discoverMethod);
     discoverOpts.params = {};
     discoverOpts.headers = {};
     discoverOpts.dataField = discoverConf.discoverDataField;
+    discoverOpts.postBody = discoverConf.discoverBody;
     // For Basic auth
     discoverOpts.username = conf.username;
     discoverOpts.password = conf.password;
@@ -141,15 +154,16 @@ exports.init = async (opts) => {
     copyParams(discoverConf.discoverRequestParams, discoverOpts.params);
     copyParams(discoverConf.discoverRequestHeaders, discoverOpts.headers);
     discoverOpts.exprArgs = { earliest, latest };
-    validateDiscoverOpts(discoverOpts);
+    validateDiscoverOpts(discoverOpts,discoverConf);
   }
   // Collect
   if (conf.collectUrl) {
     collectOpts.authType = conf.authentication;
     collectOpts.url = conf.collectUrl;
-    collectOpts.method = (conf.collectMethod || RestVerb.GET).trim();
+    collectOpts.method = getMethod(conf.collectMethod)
     collectOpts.params = {};
     collectOpts.headers = {};
+    collectOpts.postBody = conf.collectBody;
     // For basic auth
     collectOpts.username = conf.username;
     collectOpts.password = conf.password;
@@ -157,7 +171,7 @@ exports.init = async (opts) => {
     copyParams(conf.collectRequestParams, collectOpts.params);
     copyParams(conf.collectRequestHeaders, collectOpts.headers);
   }
-  validateCollectOpts(collectOpts);
+  validateCollectOpts(collectOpts, conf);
 };
 
 // Handle authentication steps and update internal config attributes with authentication results.

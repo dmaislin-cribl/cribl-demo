@@ -23,6 +23,7 @@ customerLines.split('\n').forEach((l, idx) => {
     customers[parts[parts.length - 1]] = parts.reduce((prev, cur, ridx) => { prev[fields[ridx]] = cur; return prev; }, {});
   }
 });
+const custArr = Object.keys(customers);
 
 
 const express = require('express');
@@ -101,6 +102,13 @@ function getAndIncrAccessCount(userName) {
   })
 }
 
+function randUser() {
+  const randBetween = (min, max) => {
+    return Math.floor(Math.random() * (max - min) + min);
+  }
+  return custArr[randBetween(0, custArr.length)];
+}
+
 app.get('/users/:userName', (req, res, next) => {
   const userName = req.params.userName;
   if (!userName) {
@@ -134,6 +142,45 @@ app.get('/users/:userName', (req, res, next) => {
       res.status(500).send(error.message);
       next();
     });
+  return;
+});
+
+// Health tries to access a random user.
+// It's a demo, it's not supposed to make sense.
+// This forces the health endpoint to try the same bad behavior as the API so the health endpoint will also time out.
+app.get('/health', (req, res, next) => {
+  const userName = randUser();
+  const cust = customers[userName];
+  getAndIncrAccessCount(userName)
+    .then((accessCount) => {
+      cust.accessCount = accessCount;
+      res.send('healthy');
+      next();
+    })
+    .catch((error) => {
+      console.error('health fail');
+      console.error(error);
+      // don't return so it will time out
+    });
+});
+
+app.get('/randUsers/:numUsers', (req, res, next) => {
+  const numUsers = +req.params.numUsers;
+  if (!numUsers) {
+    res.status(400).send('userName param missing');
+    return;
+  }
+  if (typeof numUsers !== 'number' || numUsers === NaN) {
+    res.status(400).send('userName not integer');
+    return;
+  }
+
+  const ret = [];
+  for (let i=0; i < numUsers; i++) {
+    ret.push(randUser());
+  }
+  res.send(JSON.stringify(ret));
+  next();
   return;
 });
 

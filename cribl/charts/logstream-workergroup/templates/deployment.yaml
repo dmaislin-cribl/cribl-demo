@@ -34,6 +34,10 @@ spec:
                   key: url-master
             - name: NODE_TLS_REJECT_UNAUTHORIZED
               value: "0"
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value }}
+            {{- end }}
           ports: 
             {{-  range .Values.service.ports }}
             - name: {{ .name }}

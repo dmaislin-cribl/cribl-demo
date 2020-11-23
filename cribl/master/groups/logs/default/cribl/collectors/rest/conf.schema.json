@@ -36,35 +36,12 @@
                   "type": "string",
                   "title": "Discover method",
                   "description": "Discover HTTP method.",
-                  "enum": [ "get", "post" ],
-                  "enumNames": [ "GET", "POST" ],
+                  "enum": [ "get", "post", "post_with_body" ],
+                  "enumNames": [ "GET", "POST", "POST with Body" ],
                   "default": "get"
                 },
-                "discoverRequestParams": {
-                  "title": "Discover Parameters",
-                  "description": "Optional discover request parameters",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "required": [
-                      "name",
-                      "value"
-                    ],
-                    "properties": {
-                      "name": {
-                        "title": "Name",
-                        "type": "string",
-                        "description": "Parameter Name"
-                      },
-                      "value": {
-                        "title": "Value",
-                        "type": "string",
-                        "description": "JavaScript expression to compute the parameter value (can be constant)",
-                        "jsExpression": true
-                      }
-                    }
-                  }
-                },
+                "discoverRequestParams": {},
+                "discoverBody": {},
                 "discoverRequestHeaders": {
                   "title": "Discover Headers",
                   "description": "Optional discover request headers",
@@ -91,6 +68,90 @@
                   "type": "string",
                   "title": "Discover Data Field",
                   "description": "The name of the field in response JSON that contains discover results, leave blank if the result is an array."
+                }
+              },
+              "dependencies" : {
+                "discoverMethod" : {
+                  "oneOf" : [
+                    {
+                      "properties": {
+                        "discoverMethod": {
+                          "enum": [ "get" ]
+                        },
+                        "discoverRequestParams": {
+                          "title": "Discover Parameters",
+                          "description": "Optional discover request parameters",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "value"
+                            ],
+                            "properties": {
+                              "name": {
+                                "title": "Name",
+                                "type": "string",
+                                "description": "Parameter Name"
+                              },
+                              "value": {
+                                "title": "Value",
+                                "type": "string",
+                                "description": "JavaScript expression to compute the parameter value (can be constant)",
+                                "jsExpression": true
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "properties": {
+                        "discoverMethod": {
+                          "enum": [ "post" ]
+                        },
+                        "discoverRequestParams": {
+                          "title": "Discover Parameters",
+                          "description": "Optional discover request parameters",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "value"
+                            ],
+                            "properties": {
+                              "name": {
+                                "title": "Name",
+                                "type": "string",
+                                "description": "Parameter Name"
+                              },
+                              "value": {
+                                "title": "Value",
+                                "type": "string",
+                                "description": "JavaScript expression to compute the parameter value (can be constant)",
+                                "jsExpression": true
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "properties": {
+                        "discoverMethod": {
+                          "enum": [ "post_with_body" ]
+                        },
+                        "discoverBody": {
+                          "type": "string",
+                          "title": "Discover POST Body",
+                          "description": "Template for POST body to send with the discover request",
+                          "default": "`{ }`",
+                          "jsExpression": true
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             },
@@ -153,32 +214,12 @@
       "type": "string",
       "title": "Collect method",
       "description": "Collect HTTP method.",
-      "enum": [ "get", "post" ],
-      "enumNames": [ "GET", "POST" ],
+      "enum": [ "get", "post", "post_with_body" ],
+      "enumNames": [ "GET", "POST", "POST with Body" ],
       "default": "get"
     },
-    "collectRequestParams": {
-      "title": "Collect Parameters",
-      "description": "Optional collect request parameters",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["name","value"],
-        "properties": {
-          "name": {
-            "title": "Name",
-            "type": "string",
-            "description": "Parameter Name"
-          },
-          "value": {
-            "title": "Value",
-            "type": "string",
-            "description": "JavaScript expression to compute the parameter value (can be constant)",
-            "jsExpression": true
-          }
-        }
-      }
-    },
+    "collectRequestParams": {},
+    "collectBody": {},
     "collectRequestHeaders": {
       "title": "Collect Headers",
       "description": "Optional collect request headers",
@@ -211,6 +252,76 @@
     }
   },
   "dependencies": {
+   "collectMethod": {
+     "oneOf": [
+       {
+         "properties": {
+           "collectMethod" : { "enum" :  ["get"] },
+           "collectRequestParams": {
+             "title": "Collect Parameters",
+             "description": "Optional collect request parameters",
+             "type": "array",
+             "items": {
+               "type": "object",
+               "required": ["name","value"],
+               "properties": {
+                 "name": {
+                   "title": "Name",
+                   "type": "string",
+                   "description": "Parameter Name"
+                 },
+                 "value": {
+                   "title": "Value",
+                   "type": "string",
+                   "description": "JavaScript expression to compute the parameter value (can be constant)",
+                   "jsExpression": true
+                 }
+               }
+             }
+           }
+         }
+       },
+       {
+         "properties": {
+           "collectMethod" : { "enum" :  ["post"] },
+           "collectRequestParams": {
+             "title": "Collect Parameters",
+             "description": "Optional collect request parameters",
+             "type": "array",
+             "items": {
+               "type": "object",
+               "required": ["name","value"],
+               "properties": {
+                 "name": {
+                   "title": "Name",
+                   "type": "string",
+                   "description": "Parameter Name"
+                 },
+                 "value": {
+                   "title": "Value",
+                   "type": "string",
+                   "description": "JavaScript expression to compute the parameter value (can be constant)",
+                   "jsExpression": true
+                 }
+               }
+             }
+           }
+         }
+       },
+       {
+         "properties": {
+           "collectMethod" : { "enum" :  ["post_with_body"] },
+           "collectBody": {
+             "type": "string",
+             "title": "Collect POST Body",
+             "description": "Template for POST body to send with the collect request, parameters from the discover resoponse can be referenced using template params: ${variable}",
+             "default": "`{ }`",
+             "jsExpression": true
+           }
+         }
+       }
+     ]
+   },
     "authentication": {
       "oneOf": [
         {

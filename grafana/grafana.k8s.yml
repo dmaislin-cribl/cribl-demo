@@ -33,6 +33,8 @@ spec:
       creationTimestamp: null
       labels:
         io.kompose.service: grafana
+      annotations:
+        io.cribl.scope/disable: 'true'
     spec:
       containers:
         - env:

@@ -12,6 +12,8 @@ spec:
   serviceName: "{{ include "influxdb.fullname" . }}"
   template:
     metadata:
+      annotations:
+        io.cribl.scope/disable: 'true'
       labels:
       {{- include "influxdb.selectorLabels" . | nindent 8 }}
     spec:
