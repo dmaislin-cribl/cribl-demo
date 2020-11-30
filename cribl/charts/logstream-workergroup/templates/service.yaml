@@ -9,6 +9,7 @@ metadata:
 
 spec:
   type: {{ .Values.service.type }}
+  clusterIP: None
   ports:
       {{-  range .Values.service.ports }}
       - port: {{ .port }}

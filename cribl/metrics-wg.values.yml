@@ -19,8 +19,8 @@ config:
   token: criblmaster
 
 
-podAnnotations:
-  io.cribl.scope/disable: 'true'
+podAnnotations: {}
+  # io.cribl.scope/disable: 'true'
 
 env: {}
 

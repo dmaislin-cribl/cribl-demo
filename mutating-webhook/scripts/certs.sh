@@ -1,5 +1,4 @@
 #!/bin/bash
-set -o errexit
 
 if [ "${OS_TYPE}" = "linux" ]; then
   SEDI="sed -i"
@@ -32,7 +31,7 @@ echo "Checking for CSR object - ${CSR_NAME}"
 kubectl get csr ${CSR_NAME} -n ${K8S_NAMESPACE} >/dev/null 2>/dev/null
 if [ $? -eq 0 ]; then
   echo "CSR ${CSR_NAME} found. Deleting it."
-  kubectl delete csr ${CSR_NAME} -n ${K8S_NAMESPACE} || exit 8  
+  kubectl delete csr ${CSR_NAME} -n ${K8S_NAMESPACE}
 else
   echo "CSR ${CSR_NAME} not found."
 fi

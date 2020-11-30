@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         {{- include "influxdb.labels" . | nindent 8 }}
+      annotations:
+        io.cribl.scope/disable: 'true'
     spec:
       containers:
       - name: {{ template "influxdb.fullname" . }}-fix-dbrp
@@ -33,8 +35,25 @@ spec:
         args:
           - -cx
           - |
-            apt-get update && apt-get install -y curl jq && \
-            export BUCKET_ID=$(curl -s -H "Authorization: Token ${INFLUXDB_TOKEN}" -H "Content-Type: application/json" http://{{ template "influxdb.fullname" . }}:{{ .Values.service.port }}/api/v2/buckets?name=cribl | jq -r .buckets[0].id) && \
-            export ORG_ID=$(curl -s -H "Authorization: Token ${INFLUXDB_TOKEN}" -H "Content-Type: application/json" http://{{ template "influxdb.fullname" . }}:{{ .Values.service.port }}/api/v2/orgs?org=cribl | jq -r .orgs[0].id) && \
-            curl -X POST -H "Authorization: Token ${INFLUXDB_TOKEN}" -H "Content-Type: application/json" http://{{ template "influxdb.fullname" . }}:{{ .Values.service.port }}/api/v2/dbrps -d "{\"bucket_id\": \"${BUCKET_ID}\",\"database\": \"cribl\",\"default\": true,\"organization\": \"cribl\",\"organization_id\": \"${ORG_ID}\",\"retention_policy\": \"forever\" }"
+            influx v1 dbrp create \
+            --bucket-id $(influx bucket ls \
+              -t ${INFLUXDB_TOKEN} \
+              --host http://{{ template "influxdb.fullname" . }}:{{ .Values.service.port }} \
+              --org {{ .Values.adminUser.organization }} \
+              --name {{ .Values.adminUser.bucket }} \
+              --json | \
+                grep -oP "id\"\s*:\s*\"\K[^\"]+") \
+            --db {{ .Values.adminUser.bucket }} \
+            --default \
+            --org {{ .Values.adminUser.organization }} \
+            --rp forever \
+            --host http://{{ template "influxdb.fullname" . }}:{{ .Values.service.port }} \
+            -t ${INFLUXDB_TOKEN} || sleep 180
+          # - echo foo
+          # - -cx
+          # - |
+          #   apt-get update && apt-get install -y curl jq && \
+          #   export BUCKET_ID=$(curl -s -H "Authorization: Token ${INFLUXDB_TOKEN}" -H "Content-Type: application/json" http://{{ template "influxdb.fullname" . }}:{{ .Values.service.port }}/api/v2/buckets?name=cribl | jq -r .buckets[0].id) && \
+          #   export ORG_ID=$(curl -s -H "Authorization: Token ${INFLUXDB_TOKEN}" -H "Content-Type: application/json" http://{{ template "influxdb.fullname" . }}:{{ .Values.service.port }}/api/v2/orgs?org=cribl | jq -r .orgs[0].id) && \
+          #   curl -X POST -H "Authorization: Token ${INFLUXDB_TOKEN}" -H "Content-Type: application/json" http://{{ template "influxdb.fullname" . }}:{{ .Values.service.port }}/api/v2/dbrps -d "{\"bucket_id\": \"${BUCKET_ID}\",\"database\": \"cribl\",\"default\": true,\"organization\": \"cribl\",\"organization_id\": \"${ORG_ID}\",\"retention_policy\": \"forever\" }"
       restartPolicy: OnFailure

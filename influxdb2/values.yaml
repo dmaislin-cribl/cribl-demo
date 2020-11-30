@@ -52,7 +52,7 @@ persistence:
   ##
   # storageClass: "-"
   accessMode: ReadWriteOnce
-  size: 50Gi
+  size: 1Gi
 
 service:
   port: 8086
