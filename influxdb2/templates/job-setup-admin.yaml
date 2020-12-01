@@ -36,7 +36,7 @@ spec:
         args:
           - -c
           - |
-            sleep 15 && influx setup -f \
+            influx setup -f \
             --host http://{{ template "influxdb.fullname" . }}:{{ .Values.service.port }} \
             -o {{ .Values.adminUser.organization }} \
             -b {{ .Values.adminUser.bucket }} \

@@ -119,6 +119,14 @@ routes:
         source: filter
     filter: C.vars.accessCombined()
     output: default
+  - id: AvIq12
+    name: Internal Metrics
+    final: true
+    disabled: false
+    pipeline: passthru
+    description: Send internal metrics
+    filter: __inputId=='cribl:CriblMetrics'
+    output: statsd
   - id: OsuFhD
     name: Main Route
     final: true

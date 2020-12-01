@@ -46,3 +46,11 @@ routes:
     clones: []
     filter: _raw.startsWith('***CRIBL***')
     output: statsd
+  - id: AvIq12
+    name: Internal Metrics
+    final: true
+    disabled: false
+    pipeline: passthru
+    description: Send internal metrics
+    filter: __inputId=='cribl:CriblMetrics'
+    output: statsd

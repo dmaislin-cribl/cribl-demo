@@ -43,11 +43,11 @@ data:
     bearer_token = "/run/secrets/kubernetes.io/serviceaccount/token"
     insecure_skip_verify = true
 
-    [[inputs.prometheus]]
-    monitor_kubernetes_pods = true
-    # kubernetes_label_selector = "app=influxdb"
-    metric_version = 2
-    monitor_kubernetes_pods_namespace = ""
-    kubernetes_services = ["http://kube-state-metrics.kube-system.svc.cluster.local:8080/metrics","https://kubernetes.default.svc.cluster.local/metrics"]
-    bearer_token = "/run/secrets/kubernetes.io/serviceaccount/token"
-    insecure_skip_verify = true
+    # [[inputs.prometheus]]
+    # monitor_kubernetes_pods = true
+    # # kubernetes_label_selector = "app=influxdb"
+    # metric_version = 2
+    # monitor_kubernetes_pods_namespace = ""
+    # kubernetes_services = ["http://kube-state-metrics.kube-system.svc.cluster.local:8080/metrics","https://kubernetes.default.svc.cluster.local/metrics"]
+    # bearer_token = "/run/secrets/kubernetes.io/serviceaccount/token"
+    # insecure_skip_verify = true

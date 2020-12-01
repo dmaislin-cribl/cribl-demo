@@ -40,9 +40,9 @@ spec:
               fieldPath: status.hostIP
 {{ toYaml .Values.env | indent 8 }}
         volumeMounts:
-        - name: varrunutmpro
-          mountPath: /var/run/utmp
-          readOnly: true
+        # - name: varrunutmpro
+        #   mountPath: /var/run/utmp
+        #   readOnly: true
         - name: sysro
           mountPath: /rootfs/sys
           readOnly: true

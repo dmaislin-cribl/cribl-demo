@@ -17,6 +17,7 @@ config:
   host: logstream-master
   tag: kubernetes
   token: criblmaster
+  healthPort: 9000
 
 
 podAnnotations: {}
