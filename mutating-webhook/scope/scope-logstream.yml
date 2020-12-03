@@ -13,9 +13,9 @@ event:
   format:
     type : ndjson                   # ndjson
   watch:
-  #  - type: file
-  #    name: .*log.*                 # whitelist ex regex describing log file names
-  #    value: .*                     # whitelist ex regex describing field values
+   - type: file
+     name: .*log.*                 # whitelist ex regex describing log file names
+     value: .*                     # whitelist ex regex describing field values
    - type: console
      name: (stdout)|(stderr)
      value: .*

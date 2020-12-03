@@ -4,6 +4,7 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
+    app.kubernetes.io/name: apiserver
     io.kompose.service: apiserver
   name: apiserver
 spec:
@@ -16,6 +17,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
+        app.kubernetes.io/name: apiserver
         io.kompose.service: apiserver
     spec:
       containers:
@@ -44,6 +46,7 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
+    app.kubernetes.io/name: apiserver
     io.kompose.service: apiserver
   name: apiserver
 spec:
@@ -61,6 +64,7 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
+    app.kubernetes.io/name: baddev
     io.kompose.service: baddev
   name: baddev
 spec:
@@ -73,6 +77,7 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
+        app.kubernetes.io/name: baddev
         io.kompose.service: baddev
     spec:
       containers:

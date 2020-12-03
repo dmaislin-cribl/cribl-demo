@@ -3,9 +3,16 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: cribl-sa
+  labels:
+    app.kubernetes.io/name: cribl-sa
 spec:
   activeDeadlineSeconds: 660
   template:
+    metadata:
+      annotations:
+        io.cribl.scope/disable: 'true'
+      labels:
+        app.kubernetes.io/name: cribl-sa
     spec:
       containers:
         - env:

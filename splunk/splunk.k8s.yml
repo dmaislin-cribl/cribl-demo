@@ -5,6 +5,7 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: splunk
+    app.kubernetes.io/name: splunk
   name: splunk
 spec:
   replicas: 1
@@ -17,6 +18,7 @@ spec:
       creationTimestamp: null
       labels:
         io.kompose.service: splunk
+        app.kubernetes.io/name: splunk
       annotations:
         io.cribl.scope/disable: 'true'
     spec:
@@ -44,6 +46,7 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: splunk
+    app.kubernetes.io/name: splunk
   name: splunk
 spec:
   ports:

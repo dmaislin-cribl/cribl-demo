@@ -5,6 +5,7 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: grafana
+    app.kubernetes.io/name: grafana
   name: grafana
 spec:
   accessModes:
@@ -20,12 +21,14 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: grafana
+    app.kubernetes.io/name: grafana
   name: grafana
 spec:
   replicas: 1
   selector:
     matchLabels:
       io.kompose.service: grafana
+      app.kubernetes.io/name: grafana
   strategy:
     type: Recreate
   template:
@@ -33,6 +36,7 @@ spec:
       creationTimestamp: null
       labels:
         io.kompose.service: grafana
+        app.kubernetes.io/name: grafana
       annotations:
         io.cribl.scope/disable: 'true'
     spec:
@@ -61,6 +65,7 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: grafana
+    app.kubernetes.io/name: grafana
   name: grafana
 spec:
   ports:

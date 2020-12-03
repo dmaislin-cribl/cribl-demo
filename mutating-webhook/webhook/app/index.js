@@ -59,6 +59,7 @@ app.post('/mutate', (req, res, next) => {
     if (req.body.kind !== 'AdmissionReview') return sendError(req, res, 'kind is not AdmissionReview');
     if (!admReq.object) return sendError(req, res, 'object missing from AdmissionReview');
     if (!admReq.object.metadata) return sendError(req, res, 'metadata missing from request.object');
+    if (!admReq.object.metadata.labels) return sendError(req, res, 'labels missing from request.object.metadata');
     if (!admReq.object.spec.containers) return sendError(req, res, 'containers missing from request.object.spec');
     if (admReq.object.metadata.annotations) {
         if (admReq.object.metadata.annotations['io.cribl.scope/disable']) {
@@ -73,7 +74,7 @@ app.post('/mutate', (req, res, next) => {
             path: '/spec/initContainers/-',
             value: {
                 name: 'scope-init',
-                image: 'cribl/scope-init:0.0.1',
+                image: 'cribl/scope-init:0.0.2',
                 volumeMounts: [{
                     mountPath: '/scope',
                     name: 'scope',
@@ -126,6 +127,59 @@ app.post('/mutate', (req, res, next) => {
                 name: 'SCOPE_EXEC_PATH',
                 value: '/scope/scope',
             },
+        });
+        jsonPatch.push({
+            op: 'add',
+            path: `/spec/containers/${i}/env/-`,
+            value: {
+                name: 'SCOPE_TAG_node_name',
+                valueFrom: {
+                    fieldRef: {
+                        fieldPath: 'spec.nodeName',
+                    },
+                },
+            },
+        });
+        jsonPatch.push({
+            op: 'add',
+            path: `/spec/containers/${i}/env/-`,
+            value: {
+                name: 'SCOPE_TAG_pod_name',
+                valueFrom: {
+                    fieldRef: {
+                        fieldPath: 'metadata.name',
+                    },
+                },
+            },
+        });
+        jsonPatch.push({
+            op: 'add',
+            path: `/spec/containers/${i}/env/-`,
+            value: {
+                name: 'SCOPE_TAG_namespace',
+                valueFrom: {
+                    fieldRef: {
+                        fieldPath: 'metadata.namespace',
+                    },
+                },
+            },
+        });
+        Object.keys(admReq.object.metadata.labels).forEach(k => {
+            if (k.startsWith('app.kubernetes.io')) {
+                const parts = k.split('/');
+                if (parts.length > 1) {
+                    const name = `SCOPE_TAG_${parts[1].toLowerCase()}`;
+                    const value = admReq.object.metadata.labels[k];
+                    jsonPatch.push({
+                        op: 'add',
+                        path: `/spec/containers/${i}/env/-`,
+                        value: {
+                            name,
+                            value,
+                        },
+                    });
+                }
+            }
         });
     }
     console.log('JSONPatch: ', JSON.stringify(jsonPatch));
