@@ -74,7 +74,7 @@ app.post('/mutate', (req, res, next) => {
             path: '/spec/initContainers/-',
             value: {
                 name: 'scope-init',
-                image: 'cribl/scope-init:0.0.2',
+                image: 'cribl/scope-init:0.0.3',
                 volumeMounts: [{
                     mountPath: '/scope',
                     name: 'scope',
