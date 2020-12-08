@@ -81,3 +81,18 @@ deploy:
       chartPath: influxdb2
       valuesFiles:
       - influxdb2/values.yaml
+
+profiles:
+  - name: prod
+    deploy:
+      kustomize: 
+        paths: ["./grafana", "./splunk"]
+
+      helm:
+        releases:
+        - name: cribl
+          chartPath: cribl/charts/logstream-master
+          artifactOverrides:
+            image: cribl-master
+          valuesFiles:
+            - cribl/master.values.prod.yml
