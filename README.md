@@ -36,10 +36,12 @@ If you don't have homebrew, check out the following links for install instructio
     * Minikube: https://minikube.sigs.k8s.io/docs/start/
     * Skaffold: https://skaffold.dev/docs/install/
 
-To run the demo (again, on a Mac):
+To run the demo LOCALLY on minikube (again, on a Mac):
 
-    ./start.sh
-    skaffold dev --port-forward=true
+    ./start.sh local
+    skaffold dev --port-forward=true -p dev
+
+If you already have minikube running, you can omit the "local" argument to `start.sh`. The `-p dev` argument to skaffold invokes the "dev" profile, which uses kube-proxy redirection for service deployment. If that's omitted, the services for cribl, splunk and grafana will all attempt to create load balancers.
 
 Now, you can access Cribl at http://localhost:9000 with username `admin` password `cribldemo`. 
 
@@ -105,10 +107,10 @@ Generating tags...
 ```
 
 ## Deploying the build
-We'll use `skaffold deploy` to deploy the environment. By default, all services use the ClusterIP type, but we want the user facing services to instead use a LoadBalancer type. To acheive this, we use the Kustomize utility, and associate kustomizations to a profile. In this case, if we use the "prod" profile, those services will be deployed using the LoadBalancer type. In addition, we have to include the --tag option to specify the tag we want to deploy. Finally, to deploy in a namespace, specify -n \<namespace>. For example, to deploy the tag "demo1" to the "testing" namespace:
+We'll use `skaffold deploy` to deploy the environment, using the -n \<namespace> argument to deploy in a namespace. For example, to deploy the tag "demo1" to the "testing" namespace:
 
 ```
-skaffold deploy --tag demo1 -p prod -n testing
+skaffold deploy --tag demo1 -n testing
 Tags used in deployment:
  - apiserver -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/apiserver:demo1
  - cribl-master -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/cribl-master:demo1
