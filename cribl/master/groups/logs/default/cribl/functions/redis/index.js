@@ -4,7 +4,6 @@ exports.group = 'Standard';
 exports.version = 0.1;
 const cLogger = C.util.getLogger('func:redis');
 const { Expression, NestedPropertyAccessor } = C.expr;
-const { Redis } = C.internal;
 
 let commands = [];           // array of: {keyExpr: Expression, command: Function, outField?: NestedPropertyAccessor, argsExpr?: Expression}
 let client;                  // redis client 
@@ -43,6 +42,7 @@ function getClient() {
 
 exports.init = (opt) => {
   conf = (opt || {}).conf || {};
+  const { Redis } = C.internal;
 
   commands = (conf.commands || []).map(cmd => {
     const {command, keyExpr, argsExpr, outField} = cmd;
@@ -60,10 +60,12 @@ exports.init = (opt) => {
 
   const maxBlockSecs = (conf.maxBlockSecs || 0) * 1000;
   cLogger.info('connecting', {url: conf.url});
+  const tls = conf.url.startsWith('rediss://') ? {rejectUnauthorized: false} : undefined; // allow for self-signed certs
   client = Redis.createClient({
     url: conf.url,
     enable_offline_queue: false,
     string_numbers: false,
+    tls,
     retry_strategy: function(options) {
       return options.attempt > 7 ? 10000 :
         Math.min(Math.pow(2, options.attempt-1) * 100, 10000);
@@ -85,6 +87,7 @@ exports.init = (opt) => {
     }, maxBlockSecs)
   });
   client.on('reconnecting', opts => cLogger.info('reconnecting', {url: conf.url, ...opts}));
+  client.on('error', error => cLogger.error('redis client error', {error}));
   getClient().catch(()=>{}); // init readyClientProm
 };
 

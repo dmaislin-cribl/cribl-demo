@@ -1,7 +1,6 @@
 {
   "ignoreFields": {
-    "items": {
-      "ui:placeholder": "Enter field name"
-    }
+    "ui:field": "Tags",
+    "ui:placeholder": "Field names"
   } 
 }

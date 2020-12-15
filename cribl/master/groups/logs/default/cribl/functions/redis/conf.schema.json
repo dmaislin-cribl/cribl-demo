@@ -17,8 +17,7 @@
           "command": {
             "title": "Command",
             "description": "Redis command to perform. For a complete list visit: https://redis.io/commands",
-            "type": "string",
-            "default": "get"
+            "type": "string"
           },
           "keyExpr": {
             "title": "Key",
@@ -37,8 +36,9 @@
     },
     "url": {
       "title": "Redis URL",
-      "description": "Redis URL to connect to, format: [redis[s]:]//[[user][:password@]][host][:port][/db-number][?db=db-number[&password=bar[&option=value]]]",
-      "type": "string"
+      "description": "Redis URL to connect to, format: redis[s]://[[user][:password@]][host][:port][/db-number][?db=db-number[&password=bar[&option=value]]]",
+      "type": "string",
+      "pattern": "^redis[s]?://[a-zA-Z0-9].+"
     },
     "maxBlockSecs": {
       "type": "number",

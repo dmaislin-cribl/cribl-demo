@@ -23,8 +23,12 @@ exports.init = (opts) => {
     region: conf.region,
     endpoint: conf.endpoint,
     signatureVersion: conf.signatureVersion,
-    mockClient: opts.mockClient
+    mockClient: opts.mockClient,
+    enableAssumeRole: conf.enableAssumeRole || false,
+    assumeRoleArn: conf.assumeRoleArn,
+    assumeRoleExternalId: conf.assumeRoleExternalId
   });
+  exports.provider = provider;
   return provider.init();
 };
 

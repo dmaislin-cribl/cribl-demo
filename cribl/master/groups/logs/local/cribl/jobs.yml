@@ -66,3 +66,25 @@ baddev:
     throttleRatePerSec: "0"
     pipeline: passthru
     output: devnull
+pods:
+  type: collection
+  ttl: 4h
+  removeFields: []
+  resumeOnBoot: false
+  schedule: {}
+  collector:
+    conf:
+      shell: /bin/bash
+      discoverScript: echo "kubernetes"
+      collectScript: 'curl -H "Authorization: Bearer $(cat
+        /run/secrets/kubernetes.io/serviceaccount/token)" --insecure
+        https://${CRIBL_COLLECT_ARG}/api/v1/pods'
+    destructive: false
+    type: script
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"

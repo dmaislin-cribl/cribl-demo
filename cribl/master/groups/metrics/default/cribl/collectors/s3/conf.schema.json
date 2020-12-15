@@ -95,6 +95,12 @@
       "default": "v4",
       "enum": ["v2", "v4"]
     },
+    "enableAssumeRole": {
+      "type":"boolean",
+      "title": "Enable Assume Role",
+      "description": "Use Assume Role credentials",
+      "default": false
+    },
     "assumeRoleArn": {
       "type":"string",
       "title": "AssumeRole ARN",

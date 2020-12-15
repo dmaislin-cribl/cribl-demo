@@ -42,6 +42,9 @@
       }
     }
   },
+  "url": {
+    "ui:placeholder": "URL to connect to, e.g. redis://localhost:6379"
+  },
   "ui:options": {
     "groups": {
       "advanced": {

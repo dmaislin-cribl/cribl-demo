@@ -40,6 +40,18 @@
         "title": "Content Filter ",
         "description": "Filter results by content",
         "default": "(true)"
+      },
+      "compareExpression": {
+        "type": "string",
+        "title": "Event sort score",
+        "description": "Scoring expression by which events are sorted, event is populated under evt."
+      },
+      "reverse": {
+        "type": "boolean",
+        "title": "Reverse results",
+        "description": "Reverse results order",
+        "default": true
       }
+
     }
   }

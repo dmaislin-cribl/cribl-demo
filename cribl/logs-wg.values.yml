@@ -72,3 +72,8 @@ autoscaling:
   targetCPUUtilizationPercentage: 50
   # targetMemoryUtilizationPercentage: 80
 
+rbac:
+  create: true
+
+serviceAccount:
+  create: true

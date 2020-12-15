@@ -2,34 +2,32 @@
 
 const { httpSearch, isHttp200, RestVerb, HttpError } = C.internal.HttpUtils;
 const { PrometheusParser } = C.internal.Parsers;
+const { DiscoveryAdapterFactory } = C.internal.Adapters;
 
 exports.name = 'Prometheus';
 exports.version = '0.1';
 exports.disabled = false;
 exports.destroyable = false;
 
-let targets;
+let conf;
 let batchSize;
+let dimensions;
 
 exports.getParser = (job) => {
-  return new PrometheusParser(job.logger());
+  return new PrometheusParser(job.logger(), dimensions);
 };
 
 exports.init = async (opts) => {
-  const conf = opts.conf;
+  conf = opts.conf;
   batchSize = conf.maxBatchSize || 10;
-  if (conf.targetList == null) {
-    throw new Error('Invalid Configuration - missing required parameter conf.targetList');
-  }
-  const targetList = conf.targetList.map(v => v.trim()).filter(v => v.length).map(v => { return { source: !v.startsWith('http') ? `http://${v}/metrics` : v }; });
-  if (targetList.length === 0) {
-    throw new Error('Invalid Configuration - no valid targets specified');
-  }
-  targets = targetList;
+  dimensions = conf.dimensionList;
+  // validate adapter conf
+  DiscoveryAdapterFactory.create(conf).validate();
 };
 
 exports.discover = async (job) => {
   try {
+    const targets = (await DiscoveryAdapterFactory.create(conf, job.logger()).discoverTargets()) || [];
     const results = [];
     for (const record of targets) {
       results.push(record);

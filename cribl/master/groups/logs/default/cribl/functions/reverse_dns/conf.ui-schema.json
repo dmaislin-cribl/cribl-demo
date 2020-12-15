@@ -15,5 +15,14 @@
         "ui:placeholder": "Enter field name"
       }
     }
+  },
+  "ui:options": {
+    "groups": {
+      "advanced": {
+        "title": "Advanced Settings",
+        "collapsed": true,
+        "properties": ["cacheTTL"]
+      }
+    }
   }
 }

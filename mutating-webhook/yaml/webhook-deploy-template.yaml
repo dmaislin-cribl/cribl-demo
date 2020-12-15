@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: WEBHOOK_APP
-          image: DOCKER_REPO_NAME/WEBHOOK_APP:0.0.3
+          image: DOCKER_REPO_NAME/WEBHOOK_APP:0.0.4
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: certs

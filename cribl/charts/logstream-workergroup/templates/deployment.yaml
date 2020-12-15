@@ -18,6 +18,7 @@ spec:
       labels:
         {{- include "logstream-workergroup.selectorLabels" . | nindent 8 }}
     spec:
+      serviceAccountName: {{ template "logstream-workergroup.serviceAccountName" . }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

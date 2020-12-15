@@ -36,18 +36,30 @@
   },
   "ui:options": {
     "groups": {
+      "authentication": {
+        "title": "Authentication",
+        "collapsed": true,
+        "properties": [
+          "awsApiKey",
+          "awsSecretKey"
+        ]
+      },
+      "assumeRole": {
+        "title": "Assume Role",
+        "collapsed": true,
+        "properties": [
+          "enableAssumeRole",
+          "assumeRoleArn",
+          "assumeRoleExternalId"
+        ]
+      },
       "advanced": {
         "title": "Advanced Collector Settings",
         "collapsed": true,
         "properties": [
           "endpoint",
-          "signatureVersion",
-          "assumeRoleArn",
-          "assumeRoleExternalId"
-        ],
-        "style": {
-          "marginLeft": 30
-        }
+          "signatureVersion"
+        ]
       }
     }
   }

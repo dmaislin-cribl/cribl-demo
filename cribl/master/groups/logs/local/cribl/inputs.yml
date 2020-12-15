@@ -9,6 +9,14 @@ inputs:
     tls:
       disabled: true
     authToken: ""
+  CriblMetrics:
+    disabled: false
+    prefix: cribl.logstream.
+    type: criblmetrics
+    pipeline: cribl_metrics_rollup
+    metadata:
+      - name: index
+        value: cribl-metrics
   tcpjson:
     type: tcpjson
     disabled: false
@@ -64,11 +72,14 @@ inputs:
     tcpPort: 5140
     maxBufferSize: 1000
     ipWhitelistRegex: /.*/
-  CriblMetrics:
+  appscope:
     disabled: false
-    prefix: cribl.logstream.
-    type: criblmetrics
-    pipeline: cribl_metrics_rollup
-    metadata:
-      - name: index
-        value: cribl-metrics
+    host: 0.0.0.0
+    tls:
+      disabled: true
+    ipWhitelistRegex: /.*/
+    enableProxyHeader: false
+    staleChannelFlushMs: 10000
+    authToken: ""
+    type: appscope
+    port: 10002
