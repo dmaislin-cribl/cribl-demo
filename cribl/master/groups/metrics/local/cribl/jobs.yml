@@ -119,7 +119,7 @@ speedtest:
   type: collection
   ttl: 4h
   schedule:
-    cronSchedule: "* */4 * * *"
+    cronSchedule: "0 */4 * * *"
     skippable: true
     run:
       mode: run
