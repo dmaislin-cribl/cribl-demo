@@ -1,9 +1,9 @@
 default:
   description: Default Worker Groups
   tags: default
-metrics:
-  description: For Metrics Workloads
-  tags: metrics
-logs:
-  description: For Log Based Workloads
-  tags: logs
+sitea:
+  description: Site A Workloads (formerly logs)
+  tags: sitea
+siteb:
+  description: Site B Workloads (formerly metrics)
+  tags: siteb

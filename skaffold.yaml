@@ -62,19 +62,19 @@ deploy:
       artifactOverrides:
         image: cribl-worker
       valuesFiles:
-      - cribl/logs-wg.values.yml
+      - cribl/sitea-wg.values.yml
     - name: cribl-w0-noscope
       chartPath: cribl/charts/logstream-workergroup
       artifactOverrides:
         image: cribl-worker
       valuesFiles:
-      - cribl/logs-wg-noscope.values.yml
+      - cribl/sitea-wg-noscope.values.yml
     - name: cribl-w1
       chartPath: cribl/charts/logstream-workergroup
       artifactOverrides:
         image: cribl-worker
       valuesFiles:
-      - cribl/metrics-wg.values.yml
+      - cribl/siteb-wg.values.yml
     - name: telegraf
       chartPath: telegraf
       valuesFiles:

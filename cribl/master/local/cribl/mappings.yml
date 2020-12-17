@@ -2,22 +2,22 @@ rulesets:
   default:
     conf:
       functions:
-        - filter: cribl.tags.includes('metrics')
+        - filter: cribl.tags.includes('siteb')
           id: eval
-          description: Metrics
+          description: Site B
           final: true
           conf:
             add:
               - name: groupId
-                value: "'metrics'"
-        - filter: cribl.tags.includes('logs')
+                value: "'siteb'"
+        - filter: cribl.tags.includes('sitea')
           id: eval
-          description: Logs
+          description: Site A
           final: true
           conf:
             add:
               - name: groupId
-                value: "'logs'"
+                value: "'sitea'"
         - filter: "true"
           id: eval
           description: Default Mappings

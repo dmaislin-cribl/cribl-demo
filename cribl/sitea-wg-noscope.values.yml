@@ -11,52 +11,51 @@ criblImage:
   tag: "next"
 
 imagePullSecrets: []
-nameOverride: "cribl-w1"
+nameOverride: "cribl-w0"
 
 config: 
   host: cribl-internal
-  tag: metrics
+  tag: sitea
   token: criblmaster
 
 
-podAnnotations: {}
-  # io.cribl.scope/disable: 'true'
+podAnnotations:
+  io.cribl.scope/disable: 'true'
 
 env: {}
-
 
 service:
   type: ClusterIP
   annotations: {}
 
   ports:
-  # - name: tcpjson
-  #   port: 10001
-  #   protocol: TCP
-  # - name: s2s
-  #   port: 9997
-  #   protocol: TCP
-  # - name: s2s-alt
-  #   port: 9999
-  #   protocol: TCP
-  # - name: http
-  #   port: 10080
-  #   protocol: TCP
-  # - name: splunkhec
-  #   port: 10080
-  #   protocol: TCP
-  # - name: https
-  #   port: 10081
-  #   protocol: TCP    
-  # - name: syslog
-  #   port: 5140
-  #   protocol: TCP
-  - name: metrics
-    port: 8125
+  - name: tcpjson
+    port: 10001
     protocol: TCP
-  - name: metrics-udp
-    port: 8125
-    protocol: UDP
+  - name: s2s
+    port: 9997
+    protocol: TCP
+  - name: s2s-alt
+    port: 9999
+    protocol: TCP
+  - name: http
+    port: 10080
+    protocol: TCP
+  - name: splunkhec
+    port: 10088
+    protocol: TCP
+  - name: https
+    port: 10081
+    protocol: TCP    
+  - name: syslog
+    port: 5140
+    protocol: TCP
+  # - name: metrics
+  #   port: 8125
+  #   protocol: TCP
+  - name: elastic
+    port: 9200
+    protocol: TCP
 
 resources: 
   limits:

@@ -80,22 +80,16 @@ functions:
     disabled: null
     conf:
       comment: Lookup JSESSIONID against Redis
-  - id: demo_redisLookup
+  - id: redis
     filter: "true"
-    disabled: false
+    disabled: null
     conf:
-      host: redis
-      port: "6379"
-      fromField: JSESSIONID
-      toField: userName
-      secure: false
-  - id: eval
-    filter: "true"
-    disabled: true
-    conf:
-      add:
-        - name: userName
-          value: "'mwilde'"
+      commands:
+        - command: get
+          outField: userName
+          keyExpr: "`session_${JSESSIONID}`"
+      maxBlockSecs: 60
+      url: redis://redis:6379
   - id: comment
     filter: "true"
     disabled: null

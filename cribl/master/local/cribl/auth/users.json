@@ -1,1 +1,2 @@
 {"username":"admin","first":"admin","last":"admin","email":"admin","passwd":"YGnKSKxO8t4cWImXkIJg9tYi8zPV1HjGqjxlrD6gkTU="}
+{"first":"Audit","last":"User","email":"audit@cribl.io","roles":["reader_logs","user"],"username":"audit-user","password":"cribldemo"}

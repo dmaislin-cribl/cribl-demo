@@ -1,0 +1,5 @@
+reader_logs:
+  policy:
+    - GroupRead logs
+  description: ReadOnly Role for Logs Worker Group
+
