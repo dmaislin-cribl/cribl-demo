@@ -35,6 +35,7 @@ build:
   - image: splunk
     context: splunk
 deploy:
+  statusCheckDeadlineSeconds: 300
   kustomize: 
     paths: ["./grafana", "./splunk"]
   kubectl:
@@ -62,19 +63,25 @@ deploy:
       artifactOverrides:
         image: cribl-worker
       valuesFiles:
-      - cribl/sitea-wg.values.yml
+      - cribl/logs-wg.values.yml
     - name: cribl-w0-noscope
       chartPath: cribl/charts/logstream-workergroup
       artifactOverrides:
         image: cribl-worker
       valuesFiles:
-      - cribl/sitea-wg-noscope.values.yml
+      - cribl/logs-wg-noscope.values.yml
     - name: cribl-w1
       chartPath: cribl/charts/logstream-workergroup
       artifactOverrides:
         image: cribl-worker
       valuesFiles:
-      - cribl/siteb-wg.values.yml
+      - cribl/metrics-wg.values.yml
+    - name: cribl-w2
+      chartPath: cribl/charts/logstream-workergroup
+      artifactOverrides:
+        image: cribl-worker
+      valuesFiles:
+      - cribl/aws-wg.values.yml
     - name: telegraf
       chartPath: telegraf
       valuesFiles:

@@ -1,0 +1,146 @@
+outputs:
+  default:
+    defaultId: splunk
+    type: default
+  splunk:
+    dnsResolvePeriodSec: 60
+    excludeSelf: true
+    loadBalanceStatsPeriodSec: 300
+    indexerDiscovery: false
+    throttleRatePerSec: "0"
+    tls:
+      disabled: true
+    connectionTimeout: 10000
+    writeTimeout: 60000
+    onBackpressure: block
+    hosts:
+      - port: 9997
+        tls: inherit
+        weight: 1
+        host: splunk.default.svc.cluster.local
+    type: splunk_lb
+  statsd:
+    type: router
+    rules:
+      - filter: "true"
+        output: splunk-metrics
+        final: false
+      - filter: "false"
+        output: localhost
+        final: false
+      - filter: "true"
+        output: influxdb2
+        final: false
+    onBackpressure: block
+  splunk-metrics:
+    dnsResolvePeriodSec: 60
+    excludeSelf: true
+    loadBalanceStatsPeriodSec: 300
+    indexerDiscovery: false
+    throttleRatePerSec: "0"
+    tls:
+      disabled: true
+    connectionTimeout: 5000
+    writeTimeout: 10000
+    onBackpressure: queue
+    pipeline: metrics_to_logs
+    hosts:
+      - port: 9998
+        tls: inherit
+        weight: 1
+        host: splunk.default.svc.cluster.local
+    type: splunk_lb
+  localhost:
+    type: statsd_ext
+    protocol: udp
+    host: localhost
+    port: 9125
+    mtu: 512
+    flushPeriodSec: 1
+    connectionTimeout: 5000
+    writeTimeout: 10000
+  influxdb2:
+    timestampPrecision: ms
+    dynamicValueFieldName: true
+    valueFieldName: value
+    concurrency: 5
+    maxPayloadSizeKB: 4096
+    flushPeriodSec: 1
+    auth:
+      disabled: true
+    onBackpressure: block
+    type: influxdb
+    url: http://influxdb2:8086/write?rp=forever
+    database: cribl
+    extraHttpHeaders:
+      - name: Authorization
+        value: Token
+          sKvQsRYB9OTwG53QszRyoEYd6t99Xp_HlG29GxDs1sfxep7XHkMPWrqKroMs8mSoGPokIvUlJuptcESe_X8uig==
+      - name: User-Agent
+        value: Cribl-42.0-5eea030d
+  s3:
+    type: s3
+    bucket: archival
+    destPath: ""
+    stagePath: /tmp/cribl
+    awsApiKey: ACCESSKEY
+    awsSecretKey: SECRETKEY
+    region: us-east-1
+    endpoint: http://minio:9010
+    signatureVersion: v4
+    partitionExpr: "`${__inputId.replace(/:/g, '_')}/${C.Time.strftime(_time ? _time :
+      Date.now(), '%Y-%m-%d_%H')}/${host}/${sourcetype}`"
+    format: json
+    baseFileName: CriblOut
+    compress: none
+    maxFileSizeMB: 32
+    maxFileOpenTimeSec: 60
+    maxFileIdleTimeSec: 30
+    maxOpenFiles: 100
+    onBackpressure: block
+  splunk-pan:
+    dnsResolvePeriodSec: 60
+    excludeSelf: true
+    loadBalanceStatsPeriodSec: 300
+    indexerDiscovery: false
+    throttleRatePerSec: "0"
+    tls:
+      disabled: true
+    connectionTimeout: 10000
+    writeTimeout: 60000
+    onBackpressure: block
+    hosts:
+      - port: 9997
+        tls: inherit
+        weight: 1
+        host: splunk.default.svc.cluster.local
+    type: splunk_lb
+  s3-pan:
+    type: s3
+    bucket: archival
+    destPath: ""
+    stagePath: /tmp/cribl
+    awsApiKey: ACCESSKEY
+    awsSecretKey: SECRETKEY
+    region: us-east-1
+    endpoint: http://minio:9010
+    signatureVersion: v4
+    partitionExpr: "`${__inputId.replace(/:/g, '_')}/${C.Time.strftime(_time ? _time :
+      Date.now(), '%Y-%m-%d_%H')}/${host}/${sourcetype}`"
+    format: json
+    baseFileName: CriblOut
+    compress: none
+    maxFileSizeMB: 32
+    maxFileOpenTimeSec: 60
+    maxFileIdleTimeSec: 30
+    maxOpenFiles: 100
+    onBackpressure: block
+  pan-firewall-external:
+    rules:
+      - final: false
+        filter: src_zone=='untrusted' || dest_zone=='untrusted'
+        output: splunk-pan
+      - final: true
+        filter: "true"
+        output: s3-pan
+    type: router

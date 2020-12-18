@@ -1,9 +1,12 @@
 default:
   description: Default Worker Groups
   tags: default
-sitea:
-  description: Site A Workloads (formerly logs)
-  tags: sitea
-siteb:
-  description: Site B Workloads (formerly metrics)
-  tags: siteb
+logs:
+  description: On Prem Log Workloads
+  tags: logs
+metrics:
+  description: On Prem Metrics Workloads
+  tags: metrics
+aws:
+  description: AWS Workloads
+  tags: aws
