@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
     app.kubernetes.io/name: gogen
     io.kompose.service: gogen
@@ -14,7 +13,6 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         io.kompose.service: gogen
         app.kubernetes.io/name: gogen
@@ -22,11 +20,22 @@ spec:
       containers:
         - env:
             - name: GOGEN_OUT
+              value: tcp
+            - name: GOGEN_OUTPUTTEMPLATE
+              value: rfc5424
+            - name: GOGEN_URL
+              value: cribl-w2:5140
+            - name: GOGEN_DEBUG
+              value: "true"
+          image: gogen-flowlogs-syslog
+          name: gogen-flowlogs-syslog
+        - env:
+            - name: GOGEN_OUT
               value: http
             - name: GOGEN_OUTPUTTEMPLATE
               value: json
             - name: GOGEN_URL
-              value: http://cribl-w0:10080/cribl/_bulk
+              value: http://cribl-w2:10080/cribl/_bulk
           image: gogen-bigjson-webhook
           name: gogen-bigjson-webhook
         - env:

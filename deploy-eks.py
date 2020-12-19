@@ -87,7 +87,8 @@ r53 = boto3.client("route53")
 
 
 # get acct id and hosted zone id
-acctid = sts.get_caller_identity()['Account']
+acct = sts.get_caller_identity()
+options.description += "<br>Created by %s" % acct['UserId']
 zoneid = get_hosted_zone(options)
 
 # Make sure the ECR repos are setup.
@@ -101,7 +102,7 @@ kubeclient = client.CoreV1Api()
 check_namespace(options, kubeclient)
 
 # Set up the SKAFFOLD env var
-os.environ['SKAFFOLD_DEFAULT_REPO'] = "%s.dkr.ecr.%s.amazonaws.com/%s" % (acctid, options.region, options.repohead)
+os.environ['SKAFFOLD_DEFAULT_REPO'] = "%s.dkr.ecr.%s.amazonaws.com/%s" % (acct['Account'], options.region, options.repohead)
 
 # Run skaffold build with the namespace as the tag (this allows us to have different images for different deployments/namespaces)
 rval = subprocess.call("/usr/local/bin/skaffold build --tag=%s" % options.ns,  shell=True)
@@ -158,6 +159,16 @@ htmlb = htmlout.encode("utf8")
 
 # put the index.html file up.
 resp = s3.put_object(Bucket=revhost, Body=htmlb, Key="ns-%s/index.html" % options.ns, ACL='public-read', ContentType='text/html')
+tagset = {
+  'TagSet': [
+    {
+      'Key': 'namespace-description',
+      'Value': options.description
+    }
+  ]
+}
+print("Tagset: %s" % json.dumps(tagset))
+#tagresp = s3.put_object_tagging(Bucket=revhost, Key="ns-%s/index.html" % options.ns, Tagging=tagset)
 print("Done")
 
 print ("Updating R53")

@@ -1,0 +1,35 @@
+name: flowlogs
+count: 1
+interval: 1
+randomizeEvents: true
+lines:
+- _raw: 2 $account$ eni-0d12e02310dad7104 $source$ $dest$ 41726 2212 6 1 40 $startts$ $endts$ ACCEPT OK
+tokens:
+- name: source
+  type: fieldChoice
+  format: template
+  sample: ippairs.csv
+  srcField: source
+  group: 1
+- name: dest
+  type: fieldChoice
+  format: template
+  sample: ippairs.csv
+  srcField: destination
+  group: 1
+- name: account
+  type: fieldChoice
+  format: template
+  sample: ippairs.csv
+  srcField: account
+  group: 1
+- name: endts
+  format: template
+  type: timestamp
+  replacement: '%s'
+- name: startts
+  format: template
+  type: script
+  script: >
+    state['startts'] = os.time() - math.random(120)
+    return state['startts']

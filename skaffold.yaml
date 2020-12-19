@@ -18,6 +18,8 @@ build:
     context: gogen/businessevent-hec
   - image: gogen-metrics-dogstatsd
     context: gogen/metrics-dogstatsd
+  - image: gogen-flowlogs-syslog
+    context: gogen/flowlogs-syslog
   - image: gogen-pantraffic-syslog
     context: gogen/pantraffic-syslog
   - image: gogen-statechange-syslog
