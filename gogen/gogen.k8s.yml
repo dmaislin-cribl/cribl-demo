@@ -20,17 +20,6 @@ spec:
       containers:
         - env:
             - name: GOGEN_OUT
-              value: tcp
-            - name: GOGEN_OUTPUTTEMPLATE
-              value: rfc5424
-            - name: GOGEN_URL
-              value: cribl-w2:5140
-            - name: GOGEN_DEBUG
-              value: "true"
-          image: gogen-flowlogs-syslog
-          name: gogen-flowlogs-syslog
-        - env:
-            - name: GOGEN_OUT
               value: http
             - name: GOGEN_OUTPUTTEMPLATE
               value: json
@@ -101,5 +90,16 @@ spec:
               value: rfc5424
           image: gogen-datacollection-syslog
           name: gogen-datacollection-syslog
+        - env:
+            - name: GOGEN_OUT
+              value: tcp
+            - name: GOGEN_OUTPUTTEMPLATE
+              value: rfc5424
+            - name: GOGEN_URL
+              value: cribl-w2:5140
+            - name: GOGEN_DEBUG
+              value: "true"
+          image: gogen-flowlogs-syslog
+          name: gogen-flowlogs-syslog
       restartPolicy: Always
 status: {}
