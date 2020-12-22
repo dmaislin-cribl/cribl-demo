@@ -3,22 +3,22 @@ outputs:
     defaultId: splunk
     type: default
   splunk:
-    dnsResolvePeriodSec: 60
-    excludeSelf: true
-    loadBalanceStatsPeriodSec: 300
-    indexerDiscovery: false
+    nestedFields: none
+    systemFields:
+      - cribl_pipe
     throttleRatePerSec: "0"
     tls:
       disabled: true
     connectionTimeout: 10000
     writeTimeout: 60000
+    enableMultiMetrics: false
+    enableACK: true
     onBackpressure: block
-    hosts:
-      - port: 9997
-        tls: inherit
-        weight: 1
-        host: splunk
-    type: splunk_lb
+    port: 9997
+    tls: 
+      disabled: true
+    host: splunk
+    type: splunk
   statsd:
     type: router
     rules:
@@ -33,23 +33,22 @@ outputs:
         final: false
     onBackpressure: block
   splunk-metrics:
-    dnsResolvePeriodSec: 60
-    excludeSelf: true
-    loadBalanceStatsPeriodSec: 300
-    indexerDiscovery: false
+    nestedFields: none
+    systemFields:
+      - cribl_pipe
     throttleRatePerSec: "0"
     tls:
       disabled: true
-    connectionTimeout: 5000
-    writeTimeout: 10000
-    onBackpressure: queue
-    pipeline: metrics_to_logs
-    hosts:
-      - port: 9998
-        tls: inherit
-        weight: 1
-        host: splunk
-    type: splunk_lb
+    connectionTimeout: 10000
+    writeTimeout: 60000
+    enableMultiMetrics: false
+    enableACK: true
+    onBackpressure: block
+    port: 9998
+    tls: 
+      disabled: true
+    host: splunk
+    type: splunk
   localhost:
     type: statsd_ext
     protocol: udp
@@ -99,22 +98,22 @@ outputs:
     maxOpenFiles: 100
     onBackpressure: block
   splunk-pan:
-    dnsResolvePeriodSec: 60
-    excludeSelf: true
-    loadBalanceStatsPeriodSec: 300
-    indexerDiscovery: false
+    nestedFields: none
+    systemFields:
+      - cribl_pipe
     throttleRatePerSec: "0"
     tls:
       disabled: true
     connectionTimeout: 10000
     writeTimeout: 60000
+    enableMultiMetrics: false
+    enableACK: true
     onBackpressure: block
-    hosts:
-      - port: 9997
-        tls: inherit
-        weight: 1
-        host: splunk
-    type: splunk_lb
+    port: 9997
+    tls: 
+      disabled: true
+    host: splunk
+    type: splunk
   s3-pan:
     type: s3
     bucket: archival
