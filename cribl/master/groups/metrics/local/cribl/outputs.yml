@@ -28,7 +28,7 @@ outputs:
       - port: 9998
         tls: inherit
         weight: 1
-        host: splunk.default.svc.cluster.local
+        host: splunk
     type: splunk_lb
   default:
     defaultId: influxdb

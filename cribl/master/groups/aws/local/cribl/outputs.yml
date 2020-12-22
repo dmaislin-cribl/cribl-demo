@@ -17,7 +17,7 @@ outputs:
       - port: 9997
         tls: inherit
         weight: 1
-        host: splunk.default.svc.cluster.local
+        host: splunk
     type: splunk_lb
   statsd:
     type: router
@@ -48,7 +48,7 @@ outputs:
       - port: 9998
         tls: inherit
         weight: 1
-        host: splunk.default.svc.cluster.local
+        host: splunk
     type: splunk_lb
   localhost:
     type: statsd_ext
@@ -113,7 +113,7 @@ outputs:
       - port: 9997
         tls: inherit
         weight: 1
-        host: splunk.default.svc.cluster.local
+        host: splunk
     type: splunk_lb
   s3-pan:
     type: s3

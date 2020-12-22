@@ -113,3 +113,42 @@ profiles:
     - op: remove
       path: /deploy/kustomize
 
+  - name: minimal
+    deploy:
+      helm:
+        releases:
+        - name: cribl
+          chartPath: cribl/charts/logstream-master
+          artifactOverrides:
+            image: cribl-master
+          valuesFiles:
+            - cribl/master-mini.values.yml
+        - name: cribl-w0
+          chartPath: cribl/charts/logstream-workergroup
+          artifactOverrides:
+            image: cribl-worker
+          valuesFiles:
+          - cribl/logs-wg-mini.values.yml
+        - name: cribl-w1
+          chartPath: cribl/charts/logstream-workergroup
+          artifactOverrides:
+            image: cribl-worker
+          valuesFiles:
+          - cribl/metrics-wg-mini.values.yml
+        - name: cribl-w2
+          chartPath: cribl/charts/logstream-workergroup
+          artifactOverrides:
+            image: cribl-worker
+          valuesFiles:
+          - cribl/aws-wg-mini.values.yml
+        #- name: influxdb2
+          #chartPath: influxdb2
+          #valuesFiles:
+          #- influxdb2/values.yaml
+
+    patches:
+    - op: remove
+      path: /deploy/kustomize
+    - op: remove
+      path: /deploy/kubectl/manifests/1
+
