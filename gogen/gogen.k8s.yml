@@ -27,6 +27,13 @@ spec:
               value: http://cribl-w2:10080/cribl/_bulk
           image: gogen-bigjson-webhook
           name: gogen-bigjson-webhook
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
         - env:
             - name: GOGEN_OUT
               value: http
@@ -36,6 +43,13 @@ spec:
               value: http://cribl-w0:10088/services/collector/event
           image: gogen-businessevent-hec
           name: gogen-businessevent-hec
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
         - env:
             - name: GOGEN_OUT
               value: tcp
@@ -43,6 +57,13 @@ spec:
               value: cribl-w1:8125
           image: gogen-metrics-dogstatsd
           name: gogen-metrics-dogstatsd
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
         - env:
             - name: GOGEN_OUT
               value: tcp
@@ -52,6 +73,13 @@ spec:
               value: cribl-w0:5140
           image: gogen-pantraffic-syslog
           name: gogen-pantraffic-syslog
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
         - env:
             - name: GOGEN_OUT
               value: tcp
@@ -61,6 +89,13 @@ spec:
               value: cribl-w0:5140
           image: gogen-statechange-syslog
           name: gogen-statechange-syslog
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
         - env:
             - name: SPLUNK_CMD
               value: cmd mkdir -p /var/log/httpd
@@ -72,6 +107,13 @@ spec:
               value: add forward-server cribl-w0:9999 -auth admin:cribldemo -ssl-cert-path /opt/splunk/etc/auth/client.pem
           image: gogen-accesscombined-forwarder
           name: gogen-accesscombined-forwarder
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
         - env:
             - name: GOGEN_OUT
               value: http
@@ -90,6 +132,13 @@ spec:
               value: rfc5424
           image: gogen-datacollection-syslog
           name: gogen-datacollection-syslog
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
         - env:
             - name: GOGEN_OUT
               value: tcp
@@ -97,9 +146,14 @@ spec:
               value: rfc5424
             - name: GOGEN_URL
               value: cribl-w2:5140
-            - name: GOGEN_DEBUG
-              value: "true"
           image: gogen-flowlogs-syslog
           name: gogen-flowlogs-syslog
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
       restartPolicy: Always
 status: {}

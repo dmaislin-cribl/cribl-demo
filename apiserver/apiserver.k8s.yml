@@ -35,7 +35,14 @@ spec:
           name: apiserver
           ports:
             - containerPort: 4000
-          resources: {}
+          resources: 
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
+
           securityContext:
             privileged: true
       restartPolicy: Always

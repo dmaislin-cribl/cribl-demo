@@ -3,19 +3,31 @@ count: 1
 interval: 1
 randomizeEvents: true
 lines:
-- _raw: 2 $account$ eni-0d12e02310dad7104 $source$ $dest$ 41726 2212 6 1 40 $startts$ $endts$ ACCEPT OK
+- _raw: 2 $account$ eni-0d12e02310dad7104 $source$ $dest$ $sourceport$ $destport$ 6 $packets$ $bytes$ $startts$ $endts$ ACCEPT OK
 tokens:
 - name: source
   type: fieldChoice
   format: template
   sample: ippairs.csv
-  srcField: source
+  srcField: sourceip
+  group: 1
+- name: sourceport
+  type: fieldChoice
+  format: template
+  sample: ippairs.csv
+  srcField: sourceport
   group: 1
 - name: dest
   type: fieldChoice
   format: template
   sample: ippairs.csv
-  srcField: destination
+  srcField: destip
+  group: 1
+- name: destport
+  type: fieldChoice
+  format: template
+  sample: ippairs.csv
+  srcField: destport
   group: 1
 - name: account
   type: fieldChoice
@@ -33,3 +45,15 @@ tokens:
   script: >
     state['startts'] = os.time() - math.random(120)
     return state['startts']
+- name: bytes
+  format: template
+  type: random
+  replacement: int
+  lower: 60
+  upper: 1514
+- name: packets
+  format: template
+  type: random
+  replacement: int
+  lower: 1
+  upper: 50

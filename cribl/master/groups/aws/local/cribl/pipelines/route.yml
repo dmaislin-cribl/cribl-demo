@@ -1,6 +1,15 @@
 id: default
 groups: {}
 routes:
+  - id: kmxeJc
+    name: flowlog-preprocess
+    final: true
+    disabled: false
+    pipeline: setup-flowlogs
+    description: "Feeding generated flow logs to S3 bucket."
+    clones: []
+    filter: __inputId.startsWith('syslog:syslog:tcp')
+    output: s3-flow
   - id: semK5P
     name: Archival
     final: false

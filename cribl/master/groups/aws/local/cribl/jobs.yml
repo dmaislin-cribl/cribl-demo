@@ -66,3 +66,32 @@ baddev:
     throttleRatePerSec: "0"
     pipeline: passthru
     output: devnull
+flowlogs:
+  type: collection
+  ttl: 4h
+  removeFields: []
+  resumeOnBoot: false
+  schedule: {}
+  collector:
+    conf:
+      signatureVersion: v4
+      enableAssumeRole: false
+      recurse: true
+      maxBatchSize: 10
+      awsApiKey: ACCESSKEY
+      awsSecretKey: "#42:XEx9zmHILves563pWOYuP4FlErel1PynJ2jghEu4G70="
+      region: us-east-1
+      endpoint: http://minio:9000
+      bucket: flowlogs
+      path: /VPCFlow/AWSLogs/${aws_account}/vpcflowlogs/${aws_region}/${_time:%Y}/${_time:%m}/${_time:%d}/
+    destructive: false
+    type: s3
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: false
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    pipeline: vpcflow_geoip_enrich
+    output: default

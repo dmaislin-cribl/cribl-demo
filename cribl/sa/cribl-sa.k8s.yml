@@ -25,7 +25,14 @@ spec:
           ports:
             - containerPort: 9000
             - containerPort: 5140
-          resources: {}
+          resources: 
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
+
       restartPolicy: Never
 ---
 apiVersion: v1

@@ -1,0 +1,57 @@
+output: default
+groups: {}
+asyncFuncTimeout: 1000
+functions:
+  - id: serde
+    filter: "true"
+    disabled: null
+    conf:
+      mode: extract
+      type: delim
+      delimChar: " "
+      quoteChar: '"'
+      escapeChar: \
+      nullValue: "-"
+      srcField: _raw
+      fields:
+        - init
+        - host
+        - app
+        - procid
+        - nothing1
+        - nothing2
+        - version
+        - account_id
+        - interface_id
+        - srcaddr
+        - dstaddr
+        - srcport
+        - dstport
+        - protocol
+        - packets
+        - bytes
+        - start
+        - end
+        - action
+        - log_status
+      keep:
+        - message
+      remove: []
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      keep: []
+      remove:
+        - appname
+        - cribl_pipe
+        - facility
+        - facilityName
+        - host
+        - procid
+        - severity
+        - severityName
+        - message
+      add:
+        - name: _raw
+          value: message

@@ -13,23 +13,21 @@ outputs:
         final: false
     onBackpressure: block
   splunk-metrics:
-    dnsResolvePeriodSec: 60
-    excludeSelf: true
-    loadBalanceStatsPeriodSec: 300
-    indexerDiscovery: false
+    systemFields:
+      - cribl_pipe
+    port: 9998
+    nestedFields: none
     throttleRatePerSec: "0"
     tls:
       disabled: true
-    connectionTimeout: 5000
-    writeTimeout: 10000
-    onBackpressure: queue
+    connectionTimeout: 10000
+    writeTimeout: 60000
+    enableMultiMetrics: false
+    enableACK: true
+    onBackpressure: block
+    type: splunk
+    host: splunk
     pipeline: metrics_to_logs
-    hosts:
-      - port: 9998
-        tls: inherit
-        weight: 1
-        host: splunk
-    type: splunk_lb
   default:
     defaultId: influxdb
     type: default
@@ -66,7 +64,7 @@ outputs:
       disabled: true
     onBackpressure: block
     type: influxdb
-    url: http://influxdb2:8086/write?rp=forever
+    url: http://influxdb2-internal:8086/write?rp=forever
     database: cribl
     extraHttpHeaders:
       - name: Authorization

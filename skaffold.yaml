@@ -53,6 +53,11 @@ deploy:
     - redis/redis.k8s.yml
     - splunk/splunk.k8s.yml
   helm:
+    flags:
+      upgrade:
+        [--timeout=600s]                 # Helm upgrade timeout
+      install:
+        [--timeout=600s]   
     releases:
     - name: cribl
       chartPath: cribl/charts/logstream-master

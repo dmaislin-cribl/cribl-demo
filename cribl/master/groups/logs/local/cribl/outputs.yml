@@ -2,10 +2,12 @@ outputs:
   default:
     defaultId: splunk
     type: default
+
   splunk:
-    nestedFields: none
     systemFields:
       - cribl_pipe
+    port: 9997
+    nestedFields: none
     throttleRatePerSec: "0"
     tls:
       disabled: true
@@ -14,11 +16,9 @@ outputs:
     enableMultiMetrics: false
     enableACK: true
     onBackpressure: block
-    port: 9997
-    tls: 
-      disabled: true
-    host: splunk
     type: splunk
+    host: splunk
+
   statsd:
     type: router
     rules:
@@ -33,9 +33,10 @@ outputs:
         final: false
     onBackpressure: block
   splunk-metrics:
-    nestedFields: none
     systemFields:
       - cribl_pipe
+    port: 9998
+    nestedFields: none
     throttleRatePerSec: "0"
     tls:
       disabled: true
@@ -43,12 +44,10 @@ outputs:
     writeTimeout: 60000
     enableMultiMetrics: false
     enableACK: true
+    pipeline: metrics_to_logs
     onBackpressure: block
-    port: 9998
-    tls: 
-      disabled: true
-    host: splunk
     type: splunk
+    host: splunk
   localhost:
     type: statsd_ext
     protocol: udp
@@ -67,10 +66,10 @@ outputs:
     flushPeriodSec: 1
     auth:
       disabled: true
-    onBackpressure: block
     type: influxdb
-    url: http://influxdb2:8086/write?rp=forever
+    url: http://influxdb2-internal:8086/write?rp=forever
     database: cribl
+    onBackpressure: block
     extraHttpHeaders:
       - name: Authorization
         value: Token
@@ -79,13 +78,14 @@ outputs:
         value: Cribl-42.0-5eea030d
   s3:
     type: s3
+    awsAuthenticationMethod: manual
     bucket: archival
     destPath: ""
     stagePath: /tmp/cribl
     awsApiKey: ACCESSKEY
     awsSecretKey: SECRETKEY
     region: us-east-1
-    endpoint: http://minio:9010
+    endpoint: http://minio:9000
     signatureVersion: v4
     partitionExpr: "`${__inputId.replace(/:/g, '_')}/${C.Time.strftime(_time ? _time :
       Date.now(), '%Y-%m-%d_%H')}/${host}/${sourcetype}`"
@@ -98,9 +98,10 @@ outputs:
     maxOpenFiles: 100
     onBackpressure: block
   splunk-pan:
-    nestedFields: none
     systemFields:
       - cribl_pipe
+    port: 9997
+    nestedFields: none
     throttleRatePerSec: "0"
     tls:
       disabled: true
@@ -109,23 +110,21 @@ outputs:
     enableMultiMetrics: false
     enableACK: true
     onBackpressure: block
-    port: 9997
-    tls: 
-      disabled: true
-    host: splunk
     type: splunk
+    host: splunk
+
   s3-pan:
     type: s3
+    awsAuthenticationMethod: manual
     bucket: archival
     destPath: ""
     stagePath: /tmp/cribl
     awsApiKey: ACCESSKEY
     awsSecretKey: SECRETKEY
     region: us-east-1
-    endpoint: http://minio:9010
+    endpoint: http://minio:9000
     signatureVersion: v4
-    partitionExpr: "`${__inputId.replace(/:/g, '_')}/${C.Time.strftime(_time ? _time :
-      Date.now(), '%Y-%m-%d_%H')}/${host}/${sourcetype}`"
+    partitionExpr: "`${C.Time.strftime(_time ? _time : Date.now(), '%Y/%m/%d/%H')}/${sourcetype}/${src_zone}/${src_ip}/${dest_zone}/${dest_ip}`"
     format: json
     baseFileName: CriblOut
     compress: none

@@ -36,7 +36,14 @@ spec:
             - containerPort: 8089
             - containerPort: 9997
             - containerPort: 9998
-          resources: {}
+          resources: 
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
+
       restartPolicy: Always
 status: {}
 ---

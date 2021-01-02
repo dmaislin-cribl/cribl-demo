@@ -3,22 +3,20 @@ outputs:
     defaultId: splunk
     type: default
   splunk:
-    dnsResolvePeriodSec: 60
-    excludeSelf: true
-    loadBalanceStatsPeriodSec: 300
-    indexerDiscovery: false
+    systemFields:
+      - cribl_pipe
+    port: 9997
+    nestedFields: none
     throttleRatePerSec: "0"
     tls:
       disabled: true
     connectionTimeout: 10000
     writeTimeout: 60000
+    enableMultiMetrics: false
+    enableACK: true
     onBackpressure: block
-    hosts:
-      - port: 9997
-        tls: inherit
-        weight: 1
-        host: splunk
-    type: splunk_lb
+    type: splunk
+    host: splunk
   statsd:
     type: router
     rules:
@@ -33,23 +31,21 @@ outputs:
         final: false
     onBackpressure: block
   splunk-metrics:
-    dnsResolvePeriodSec: 60
-    excludeSelf: true
-    loadBalanceStatsPeriodSec: 300
-    indexerDiscovery: false
+    systemFields:
+      - cribl_pipe
+    port: 9998
+    nestedFields: none
     throttleRatePerSec: "0"
     tls:
       disabled: true
-    connectionTimeout: 5000
-    writeTimeout: 10000
-    onBackpressure: queue
+    connectionTimeout: 10000
+    writeTimeout: 60000
+    enableMultiMetrics: false
+    enableACK: true
+    onBackpressure: block
+    type: splunk
+    host: splunk
     pipeline: metrics_to_logs
-    hosts:
-      - port: 9998
-        tls: inherit
-        weight: 1
-        host: splunk
-    type: splunk_lb
   localhost:
     type: statsd_ext
     protocol: udp
@@ -70,7 +66,7 @@ outputs:
       disabled: true
     onBackpressure: block
     type: influxdb
-    url: http://influxdb2:8086/write?rp=forever
+    url: http://influxdb2-internal:8086/write?rp=forever
     database: cribl
     extraHttpHeaders:
       - name: Authorization
@@ -80,13 +76,14 @@ outputs:
         value: Cribl-42.0-5eea030d
   s3:
     type: s3
+    awsAuthenticationMethod: manual
     bucket: archival
     destPath: ""
     stagePath: /tmp/cribl
     awsApiKey: ACCESSKEY
     awsSecretKey: SECRETKEY
     region: us-east-1
-    endpoint: http://minio:9010
+    endpoint: http://minio:9000
     signatureVersion: v4
     partitionExpr: "`${__inputId.replace(/:/g, '_')}/${C.Time.strftime(_time ? _time :
       Date.now(), '%Y-%m-%d_%H')}/${host}/${sourcetype}`"
@@ -99,31 +96,30 @@ outputs:
     maxOpenFiles: 100
     onBackpressure: block
   splunk-pan:
-    dnsResolvePeriodSec: 60
-    excludeSelf: true
-    loadBalanceStatsPeriodSec: 300
-    indexerDiscovery: false
+    systemFields:
+      - cribl_pipe
+    port: 9997
+    nestedFields: none
     throttleRatePerSec: "0"
     tls:
       disabled: true
     connectionTimeout: 10000
     writeTimeout: 60000
+    enableMultiMetrics: false
+    enableACK: true
     onBackpressure: block
-    hosts:
-      - port: 9997
-        tls: inherit
-        weight: 1
-        host: splunk
-    type: splunk_lb
+    type: splunk
+    host: splunk
   s3-pan:
     type: s3
+    awsAuthenticationMethod: manual
     bucket: archival
     destPath: ""
     stagePath: /tmp/cribl
     awsApiKey: ACCESSKEY
     awsSecretKey: SECRETKEY
     region: us-east-1
-    endpoint: http://minio:9010
+    endpoint: http://minio:9000
     signatureVersion: v4
     partitionExpr: "`${__inputId.replace(/:/g, '_')}/${C.Time.strftime(_time ? _time :
       Date.now(), '%Y-%m-%d_%H')}/${host}/${sourcetype}`"
@@ -144,3 +140,28 @@ outputs:
         filter: "true"
         output: s3-pan
     type: router
+  s3-flow:
+    systemFields:
+      - cribl_pipe
+    awsAuthenticationMethod: manual
+    awsApiKey: ACCESSKEY
+    awsSecretKey: SECRETKEY
+    signatureVersion: v4
+    enableAssumeRole: false
+    addIdToStagePath: true
+    objectACL: private
+    partitionExpr: "`/VPCFlow/AWSLogs/${aws_account}/vpcflowlogs/${aws_region}/${C.Time.strftime( _time, '%Y/%m/%d')}/`"
+    format: raw
+    baseFileName: CriblOut
+    compress: none
+    maxFileSizeMB: 32
+    maxFileOpenTimeSec: 300
+    maxFileIdleTimeSec: 30
+    maxOpenFiles: 100
+    onBackpressure: block
+    type: s3
+    bucket: flowlogs
+    region: us-east-1
+    stagePath: /tmp/flowstage
+    endpoint: http://minio:9000
+    destPath: ""

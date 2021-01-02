@@ -2,7 +2,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
     io.kompose.service: minio
     app.kubernetes.io/name: minio
@@ -18,19 +17,18 @@ spec:
     metadata:
       annotations:
         io.cribl.scope/disable: 'true'
-      creationTimestamp: null
       labels:
         io.kompose.service: minio
         app.kubernetes.io/name: minio
     spec:
       initContainers:
       - name: install
-        image: minio/minio:latest
+        image: alpine:latest
         command:
         - mkdir
         - -p
         - /data/data_collection_demo
-        - /data/firehose
+        - /data/flowlogs
         - /data/archival
         volumeMounts:
         - name:  minio
@@ -48,7 +46,6 @@ spec:
           name: minio
           ports:
             - containerPort: 9000
-          resources: {}
           volumeMounts:
             - mountPath: /data
               name: minio
@@ -57,12 +54,10 @@ spec:
         - name: minio
           persistentVolumeClaim:
             claimName: minio
-status: {}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  creationTimestamp: null
   labels:
     io.kompose.service: minio
     app.kubernetes.io/name: minio
@@ -72,20 +67,20 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 100Mi
+      storage: 20Gi
 status: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: null
   labels:
     io.kompose.service: minio
   name: minio
 spec:
+  type: NodePort
   ports:
-    - name: "9010"
-      port: 9010
+    - name: "9000"
+      port: 9000
       targetPort: 9000
   selector:
     io.kompose.service: minio
