@@ -2,4 +2,7 @@ reader_logs:
   policy:
     - GroupRead logs
   description: ReadOnly Role for Logs Worker Group
-
+admin_aws:
+  policy:
+    - GroupFull aws
+  description: Role for AWS admins

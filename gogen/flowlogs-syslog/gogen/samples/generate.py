@@ -38,7 +38,7 @@ with open("output.csv", "w") as fw:
     reader = csv.DictReader(f)
     for row in reader:
       # Local Traffic
-      for i in range(randint(1,20)):
+      for i in range(randint(1,60)):
         local1 = randint(11,254)
         local2 = randint(11,254)
         local3 = randint(11,254)
@@ -53,7 +53,7 @@ with open("output.csv", "w") as fw:
         })
       
       # Remote Source Traffic
-      for i in range(randint(1,20)):
+      for i in range(randint(1,10)):
         local1 = randint(11,254)
         local2 = randint(11,254)
 
@@ -66,7 +66,7 @@ with open("output.csv", "w") as fw:
         })
       
       # Remote Dest Traffic
-      for i in range(randint(1,20)):
+      for i in range(randint(1,10)):
         local1 = randint(11,254)
         local2 = randint(11,254)
 

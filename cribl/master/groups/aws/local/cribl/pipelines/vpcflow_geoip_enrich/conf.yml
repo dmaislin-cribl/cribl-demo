@@ -34,6 +34,11 @@ functions:
         - aws_account
         - src_port
         - dest_port
+  - id: drop
+    filter: C.Net.isPrivate(src_ip) && C.Net.isPrivate(dest_ip)
+    disabled: null
+    conf: {}
+    final: true
   - id: geoip
     filter: "true"
     disabled: null
@@ -93,6 +98,17 @@ functions:
         - inFieldName: dest_ip
           outFieldName: dest_hostname
       cacheTTL: 60
+  - id: redis
+    filter: aws_account
+    disabled: null
+    conf:
+      commands:
+        - outField: aws_account_name
+          command: get
+          keyExpr: "`acctid_${aws_account}`"
+      maxBlockSecs: 60
+      url: redis://redis:6379
+    description: Pull AWS Account Name from REDIS
   - id: lookup
     filter: C.Net.isPrivate(src_ip)
     disabled: false

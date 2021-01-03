@@ -15,13 +15,14 @@ functions:
       srcField: _raw
       fields:
         - init
+        - date
         - host
         - app
         - procid
         - nothing1
         - nothing2
         - version
-        - account_id
+        - aws_account
         - interface_id
         - srcaddr
         - dstaddr
@@ -36,6 +37,7 @@ functions:
         - log_status
       keep:
         - message
+        - aws_account
       remove: []
   - id: eval
     filter: "true"
@@ -55,3 +57,5 @@ functions:
       add:
         - name: _raw
           value: message
+        - value: '"us-east-1"'
+          name: aws_region
