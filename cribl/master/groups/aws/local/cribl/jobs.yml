@@ -45,4 +45,4 @@ flowlogs:
     output: default
     metadata:
       - name: sourcetype
-        value: aws-flowlogs
+        value: `aws-flowlogs`

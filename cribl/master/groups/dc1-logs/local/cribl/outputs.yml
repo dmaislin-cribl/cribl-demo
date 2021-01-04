@@ -20,17 +20,22 @@ outputs:
     host: splunk
 
   statsd:
-    type: router
+    systemFields:
+      - cribl_pipe
     rules:
-      - filter: "true"
+      - filter: index==="cribl-metrics"
         output: splunk-metrics
         final: false
       - filter: "false"
         output: localhost
         final: false
-      - filter: "true"
+      - filter: index==="cribl-metrics"
         output: influxdb2
         final: false
+      - final: true
+        filter: index==="cribl-metrics-multi"
+        output: splunk-multimetrics
+    type: router
     onBackpressure: block
   splunk-metrics:
     systemFields:
@@ -142,3 +147,20 @@ outputs:
         filter: "true"
         output: s3-pan
     type: router
+
+  splunk-multimetrics:
+    systemFields:
+      - cribl_pipe
+    port: 9998
+    nestedFields: none
+    throttleRatePerSec: "0"
+    tls:
+      disabled: true
+    connectionTimeout: 10000
+    writeTimeout: 60000
+    enableMultiMetrics: true
+    enableACK: true
+    onBackpressure: block
+    pipeline: metrics_to_logs
+    type: splunk
+    host: splunk

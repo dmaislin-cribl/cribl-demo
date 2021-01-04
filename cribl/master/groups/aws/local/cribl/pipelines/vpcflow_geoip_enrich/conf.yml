@@ -164,3 +164,8 @@ functions:
         - message
         - severity
         - facility
+  - id: rename
+    filter: "true"
+    disabled: null
+    conf:
+      renameExpr: name.replace("_geoip","") 

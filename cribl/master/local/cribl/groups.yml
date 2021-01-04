@@ -1,12 +1,12 @@
 default:
   description: Default Worker Groups
   tags: default
-logs:
+dc1-logs:
   description: On Prem Log Workloads
-  tags: logs
-metrics:
+  tags: dc1-logs
+dc1-metrics:
   description: On Prem Metrics Workloads
-  tags: metrics
+  tags: dc1-metrics
 aws:
   description: AWS Workloads
   tags: aws

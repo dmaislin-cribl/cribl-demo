@@ -33,7 +33,7 @@ functions:
         - future_use_1
         - receive_time
         - serial_number
-        - type
+        - log_subtype
         - threat_content_type
         - future_use_2
         - generated_time
@@ -250,6 +250,11 @@ functions:
         - message
         - severity
         - facility
+  - id: rename
+    filter: "true"
+    disabled: null
+    conf:
+      renameExpr: name.replace("_geoip","") 
 groups:
   gB4TB7:
     name: Extraction and Reduction

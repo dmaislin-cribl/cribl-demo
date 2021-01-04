@@ -39,6 +39,7 @@ routes:
     description: Convert Access Combined Logs to Splunk Metrics
     clones:
       - index: cribl-metrics
+      - index: cribl-metrics-multi
     filter: C.vars.accessCombined()
     output: statsd
   - id: ZLTc0g

@@ -15,7 +15,7 @@ nameOverride: "cribl-w1"
 
 config: 
   host: cribl-internal
-  tag: metrics
+  tag: dc1-metrics
   token: criblmaster
 
 

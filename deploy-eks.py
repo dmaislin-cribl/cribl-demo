@@ -9,6 +9,7 @@ import json
 import botocore.exceptions
 import subprocess
 import os
+import time
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
@@ -119,6 +120,8 @@ if rval == 0:
 else:
   print("Skaffold Deploy Failed")
   sys.exit(rval)
+
+time.sleep(60)
 
 # Setup the R53 JSON
 chgbatch = { "Comment": "Upserting for the %s.%s domain" % (options.ns, options.domain), "Changes": []}

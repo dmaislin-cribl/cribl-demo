@@ -22,7 +22,7 @@ outputs:
       disabled: true
     connectionTimeout: 10000
     writeTimeout: 60000
-    enableMultiMetrics: false
+    enableMultiMetrics: true
     enableACK: true
     onBackpressure: block
     type: splunk
