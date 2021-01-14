@@ -1,0 +1,24 @@
+weblog:
+  sampleName: weblog.log
+  created: 1574797148907
+  isTemplate: true
+  size: 43418
+  numEvents: 100
+syslog:
+  sampleName: syslog.log
+  created: 1574797148907
+  isTemplate: true
+  size: 20449
+  numEvents: 100
+apache_common:
+  sampleName: apache_common.log
+  created: 1574797148907
+  isTemplate: true
+  size: 17529
+  numEvents: 100
+apache_error:
+  sampleName: apache_error.log
+  created: 1574797148907
+  isTemplate: true
+  size: 23879
+  numEvents: 100

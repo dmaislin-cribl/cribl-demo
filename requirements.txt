@@ -1,5 +1,0 @@
-kubernetes
-pyyaml 
-boto3
-docker
-
