@@ -37,11 +37,11 @@ spec:
             - containerPort: 4000
           resources: 
             limits:
-              cpu: 2000m
-              memory: 4096Mi
-            requests:
-              cpu: 750m
+              cpu: 500m
               memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
 
           securityContext:
             privileged: true
@@ -99,7 +99,14 @@ spec:
           name: baddev
           ports:
             - containerPort: 4000
-          resources: {}
+          resources: 
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
+
           securityContext:
             privileged: true
       restartPolicy: Always

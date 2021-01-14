@@ -10,6 +10,9 @@ import botocore.exceptions
 import subprocess
 import os
 import time
+import docker
+import base64
+
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
@@ -19,9 +22,21 @@ except ImportError:
 services = [ "cribl",  "grafana", "influxdb2", "splunk" ]
 allowed_ports = [ 3000, 8000, 8086, 9000 ]
 
+def docker_login(options, acct):
+  client = docker.from_env()
+  ecr = boto3.client('ecr')
+  token = ecr.get_authorization_token()
+
+  username, password = base64.b64decode(token['authorizationData'][0]['authorizationToken']).decode().split(':')
+  registry = token['authorizationData'][0]['proxyEndpoint']
+  print("Token: %s - %s - %s" % (username,password,registry))
+  resp = client.login(username, password, registry=registry)
+  print(resp['Status'])
+
+
 # Functions
 # Set up ECR Repos for all the images in the skaffold.yaml file.
-def setup_ecr(options):
+def setup_ecr(options,acct):
   ecr = boto3.client('ecr') 
 
   print("Ensuring ECR Repo is Setup...")
@@ -40,6 +55,7 @@ def setup_ecr(options):
           print("Unhandled Error: %s" % error.response['Error']['Code'])
 
   print("Done")
+  docker_login(options,acct)
 
 # Check that the specified namespace exists, and create it if it doesn't
 def check_namespace(options, kubeclient):
@@ -78,8 +94,13 @@ parser.add_option("-n", "--namespace", dest="ns", default="default", help="Names
 parser.add_option("-d", "--domain", dest="domain", default="demo.cribl.io", help="Hosted Zone to Use")
 parser.add_option("-r", "--region", dest="region", default="us-west-2", help="AWS Region to deploy to")
 parser.add_option("-a", "--description", dest="description", default="Demo Environment")
-parser.add_option("-c", "--container-repo-head", dest="repohead", default="cribl-demo-main", help="ECR Repo top level")
+parser.add_option("-c", "--container-repo-head", dest="repohead", default="cribl-demo", help="ECR Repo top level")
+parser.add_option("-p", "--profile", dest="profile", help="Skaffold Profile to run with")
 (options, args) = parser.parse_args()
+
+# Set default env variables
+if "CRIBL_TAG" not in os.environ:
+  os.environ['CRIBL_TAG'] = "latest"
 
 # Set up AWS objects
 s3 = boto3.client('s3')
@@ -93,7 +114,7 @@ options.description += "<br>Created by %s" % acct['UserId']
 zoneid = get_hosted_zone(options)
 
 # Make sure the ECR repos are setup.
-setup_ecr(options)
+setup_ecr(options,acct)
 
 # Setup the K8s API Client
 config.load_kube_config()
@@ -106,7 +127,13 @@ check_namespace(options, kubeclient)
 os.environ['SKAFFOLD_DEFAULT_REPO'] = "%s.dkr.ecr.%s.amazonaws.com/%s" % (acct['Account'], options.region, options.repohead)
 
 # Run skaffold build with the namespace as the tag (this allows us to have different images for different deployments/namespaces)
-rval = subprocess.call("/usr/local/bin/skaffold build --tag=%s" % options.ns,  shell=True)
+skaffbuildcall = "/usr/local/bin/skaffold build --tag=%s" % options.ns
+skaffdeploycall = "/usr/local/bin/skaffold deploy --status-check --tag=%s -n %s" % (options.ns, options.ns)
+if (options.profile):
+  skaffbuildcall = "/usr/local/bin/skaffold build --tag=%s --profile=%s" % (options.ns, options.profile)
+  skaffdeploycall = "/usr/local/bin/skaffold deploy --status-check --tag=%s --profile=%s -n %s" % (options.ns, options.profile, options.ns)
+
+rval = subprocess.call(skaffbuildcall,  shell=True)
 if rval == 0:
   print("Skaffold Build Succeeded")
 else:
@@ -114,7 +141,7 @@ else:
   sys.exit(rval)
 
 # Run Skaffold Deploy with the namespace as tag and namespace to deploy in
-rval = subprocess.call("/usr/local/bin/skaffold deploy --status-check --tag=%s -n %s" % (options.ns, options.ns),  shell=True)
+rval = subprocess.call(skaffdeploycall,  shell=True)
 if rval == 0:
   print("Skaffold Deploy Succeeded")
 else:

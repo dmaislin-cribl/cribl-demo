@@ -18,6 +18,7 @@ functions:
     conf: {}
     final: true
     groupId: gB4TB7
+    description: Ignore anything but Pan Traffic logs
   - id: serde
     filter: "true"
     disabled: null
@@ -104,6 +105,7 @@ functions:
         - src_port
         - dest_port
     groupId: gB4TB7
+    description: Parse the comma delimited log format
   - id: drop
     filter: log_subtype=='start'
     disabled: false
@@ -163,6 +165,7 @@ functions:
         - "*.location.time_zone"
       keep: []
     groupId: 2vbLEq
+    description: Clean Up extraneous GeoIP fields
   - id: flatten
     filter: src_geoip || dest_geoip
     disabled: false
@@ -174,6 +177,7 @@ functions:
       depth: 5
       delimiter: _
     groupId: 2vbLEq
+    description: flatten the Geoip fields for simplicity
   - id: comment
     filter: "true"
     disabled: false
@@ -193,8 +197,9 @@ functions:
           outFieldName: dest_hostname
       cacheTTL: 60
     groupId: Icop75
+    description: Attempt reverse DNS on src and dest
   - id: lookup
-    filter: "true"
+    filter: C.Net.isPrivate(src_ip)
     disabled: false
     conf:
       matchMode: cidr
@@ -209,8 +214,9 @@ functions:
           eventField: subnet_usage
       file: internal_cidr_lookup.csv
     groupId: Icop75
+    description: If src is RFC1918 space, look up the subnet
   - id: lookup
-    filter: "true"
+    filter: C.Net.isPrivate(dest_ip)
     disabled: false
     conf:
       matchMode: cidr
@@ -225,6 +231,7 @@ functions:
         - lookupField: location
           eventField: subnet_usage
     groupId: Icop75
+    description: If dest is RFC1918 space, look up the subnet
   - id: comment
     filter: "true"
     disabled: null
@@ -237,24 +244,39 @@ functions:
     conf:
       add:
         - name: compromised
-          value: "(C.Lookup('compromised-ips.csv').match(src_ip) ||
-            C.Lookup('compromised-ips.csv').match(dest_ip))"
+          value: (C.Lookup('compromised-ips.csv').match(src_ip) ||
+            C.Lookup('compromised-ips.csv').match(dest_ip))
+    description: Check if src or dest are on compromised_ips list
   - id: eval
     filter: "true"
     disabled: false
     conf:
       add:
         - name: _raw
-          value: message
+          value: "message ? message : _raw"
       remove:
         - message
         - severity
         - facility
+    description: Rewrite _raw from message (if there), and remove numerous fields.
   - id: rename
     filter: "true"
     disabled: null
     conf:
-      renameExpr: name.replace("_geoip","") 
+      renameExpr: name.replace(/([^_]+)_.*_([^_]+)/,"$1_$2").replace(/code$/, "country")
+    description: Rename the GeoIP fields to make them more sensical
+  - id: serialize
+    filter: "true"
+    disabled: true
+    conf:
+      type: kvp
+      fields:
+        - "!_*"
+        - "!cribl_breaker"
+        - "*"
+      dstField: _raw
+      cleanFields: false
+    description: Turn on to show reserialization into _raw
 groups:
   gB4TB7:
     name: Extraction and Reduction
@@ -270,3 +292,4 @@ groups:
     name: DNS and Local LAN Lookup
     index: 2
     disabled: false
+    description: Enrich with DNS and "Local LAN" data

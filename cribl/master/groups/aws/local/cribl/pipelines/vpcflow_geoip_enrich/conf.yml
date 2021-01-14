@@ -34,11 +34,13 @@ functions:
         - aws_account
         - src_port
         - dest_port
+    description: Parsing out delimited fields
   - id: drop
     filter: C.Net.isPrivate(src_ip) && C.Net.isPrivate(dest_ip)
     disabled: null
     conf: {}
     final: true
+    description: Drop any internal only (east/west) events
   - id: geoip
     filter: "true"
     disabled: null
@@ -49,6 +51,7 @@ functions:
       additionalFields:
         - extraInField: dest_ip
           extraOutField: dest_geoip
+    description: Lookup both src & dest for Geolocation
   - id: eval
     filter: "true"
     disabled: false
@@ -71,6 +74,7 @@ functions:
         - "*.location.accuracy_radius"
         - "*.location.time_zone"
       keep: []
+    description: Clean out extraneous fields from geoip
   - id: flatten
     filter: src_geoip || dest_geoip
     disabled: false
@@ -81,6 +85,7 @@ functions:
       prefix: ""
       depth: 5
       delimiter: _
+    description: Flatten geoip data to simplify event
   - id: comment
     filter: "true"
     disabled: false
@@ -98,6 +103,7 @@ functions:
         - inFieldName: dest_ip
           outFieldName: dest_hostname
       cacheTTL: 60
+    description: attempt reverse dns lookup on src/dest
   - id: redis
     filter: aws_account
     disabled: null
@@ -124,6 +130,7 @@ functions:
         - lookupField: location
           eventField: subnet_usage
       file: internal_cidr_lookup.csv
+    description: if src is private, lookup subnet
   - id: lookup
     filter: C.Net.isPrivate(dest_ip)
     disabled: false
@@ -139,6 +146,7 @@ functions:
       outFields:
         - lookupField: location
           eventField: subnet_usage
+    description: if dest is private, lookup subnet
   - id: comment
     filter: "true"
     disabled: null
@@ -153,19 +161,22 @@ functions:
         - name: compromised
           value: (C.Lookup('compromised-ips.csv').match(src_ip) ||
             C.Lookup('compromised-ips.csv').match(dest_ip))
-  - id: eval
+    description: Lookup src/dest against compromised IP list
+  - id: rename
     filter: "true"
     disabled: false
     conf:
-      add:
-        - name: _raw
-          value: message
-      remove:
-        - message
-        - severity
-        - facility
-  - id: rename
+      renameExpr: name.replace(/([^_]+)_.*_([^_]+)/,"$1_$2").replace(/code$/, "country")
+    description: Rename the Geoip fields to simplify event.
+  - id: serialize
     filter: "true"
-    disabled: null
+    disabled: true
     conf:
-      renameExpr: name.replace("_geoip","") 
+      type: json
+      dstField: _raw
+      fields:
+        - "!_*"
+        - "!cribl_breaker"
+        - "*"
+      cleanFields: false
+    description: Enable to re-serialize back into _raw

@@ -1,6 +1,6 @@
 reader_logs:
   policy:
-    - GroupRead logs
+    - GroupRead dc1-logs
   description: ReadOnly Role for Logs Worker Group
 admin_aws:
   policy:

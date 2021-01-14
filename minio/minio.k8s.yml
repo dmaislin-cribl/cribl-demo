@@ -49,6 +49,14 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: minio
+          resources:
+            limits:
+              cpu: 750m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+
       restartPolicy: Always
       volumes:
         - name: minio

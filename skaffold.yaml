@@ -8,10 +8,19 @@ build:
     context: apiserver
   - image: cribl-master
     context: cribl/master
+    docker:
+      buildArgs:
+        TAG: '{{.CRIBL_TAG}}'
   - image: cribl-worker
     context: cribl/worker
+    docker:
+      buildArgs:
+        TAG: '{{.CRIBL_TAG}}'
   - image: cribl-sa
     context: cribl/sa
+    docker:
+      buildArgs:
+        TAG: '{{.CRIBL_TAG}}'
   - image: gogen-bigjson-webhook
     context: gogen/bigjson-webhook
   - image: gogen-businessevent-hec
@@ -37,7 +46,7 @@ build:
   - image: splunk
     context: splunk
 deploy:
-  statusCheckDeadlineSeconds: 300
+  statusCheckDeadlineSeconds: 600
   kustomize: 
     paths: ["./grafana", "./splunk"]
   kubectl:
