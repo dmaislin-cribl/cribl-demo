@@ -1,0 +1,64 @@
+output: default
+groups: {}
+asyncFuncTimeout: 1000
+functions:
+  - id: serde
+    filter: "true"
+    disabled: null
+    conf:
+      mode: extract
+      type: json
+      srcField: _raw
+      remove:
+        - count
+  - id: flatten
+    filter: "true"
+    disabled: false
+    conf:
+      fields:
+        - data
+      prefix: weather
+      depth: 5
+      delimiter: _
+  - id: rename
+    filter: "true"
+    disabled: null
+    conf:
+      renameExpr: "name.startsWith('weather_data_0_') ? name.replace('weather_data_0_',
+        '') : name"
+  - id: eval
+    filter: "true"
+    disabled: false
+    conf:
+      remove:
+        - "*"
+      add:
+        - name: index
+          value: "`cribl`"
+        - name: sourcetype
+          value: "`weather`"
+      keep:
+        - aqi
+        - city_name
+        - country_code
+        - lat
+        - lon
+        - precip
+        - temp
+        - weather_description
+        - wind_spd
+        - wind_cdir
+        - host
+        - _time
+        - cribl_breaker
+        - index
+        - sourcetype
+  - id: serialize
+    filter: "true"
+    disabled: true
+    conf:
+      type: json
+      dstField: _raw
+      fields:
+        - city_name
+        - weather_description

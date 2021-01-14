@@ -1,9 +1,0 @@
-{
-  "targetList": {
-    "ui:field": "Tags",
-    "ui:placeholder": "Enter Prometheus targets",
-    "ui:options": {
-      "separator": ","
-    }
-  }
-}
