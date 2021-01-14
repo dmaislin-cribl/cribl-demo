@@ -1,0 +1,48 @@
+flowlogs:
+  type: collection
+  ttl: 4h
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: 0/5 * * * *
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: "0"
+      mode: run
+      timeRangeType: relative
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      earliest: -10m
+      latest: -5m
+    enabled: true
+  collector:
+    conf:
+      signatureVersion: v4
+      enableAssumeRole: false
+      recurse: true
+      maxBatchSize: 10
+      awsApiKey: ACCESSKEY
+      awsSecretKey: "#42:XEx9zmHILves563pWOYuP4FlErel1PynJ2jghEu4G70="
+      region: us-east-1
+      endpoint: http://minio:9000
+      bucket: flowlogs
+      path: /VPCFlow/AWSLogs/${aws_account}/vpcflowlogs/${aws_region}/${_time:%Y}/${_time:%m}/${_time:%d}/
+    destructive: false
+    type: s3
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: false
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    pipeline: vpcflow_geoip_enrich
+    output: default
+    metadata:
+      - name: sourcetype
+        value: `aws-flowlogs`

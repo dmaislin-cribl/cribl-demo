@@ -1,0 +1,28 @@
+inputs:
+  http:
+    type: http
+    disabled: false
+    host: 0.0.0.0
+    port: 10080
+    criblAPI: /cribl
+    splunkHecAPI: ""
+    tls:
+      disabled: true
+    authToken: ""
+  syslog:
+    type: syslog
+    disabled: false
+    pipeline: syslog-conditioning
+    host: 0.0.0.0
+    udpPort: 5140
+    tcpPort: 5140
+    maxBufferSize: 1000
+    ipWhitelistRegex: /.*/
+  CriblMetrics:
+    disabled: false
+    prefix: cribl.logstream.
+    type: criblmetrics
+    pipeline: cribl_metrics_rollup
+    metadata:
+      - name: index
+        value: cribl-metrics

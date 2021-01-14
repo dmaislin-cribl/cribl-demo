@@ -1,0 +1,7 @@
+certs/
+scope/libscope.so
+conf/csr.conf
+node_modules
+yaml/mutatingWebhookConfiguration.yaml
+yaml/csr.yaml
+yaml/webhook-deploy.yaml

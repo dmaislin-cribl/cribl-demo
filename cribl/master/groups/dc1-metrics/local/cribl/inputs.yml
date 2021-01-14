@@ -1,0 +1,17 @@
+inputs:
+  metrics:
+    type: metrics
+    disabled: false
+    host: 0.0.0.0
+    udpPort: 8125
+    tcpPort: 8125
+    maxBufferSize: 1000
+    ipWhitelistRegex: /.*/
+  CriblMetrics:
+    disabled: false
+    prefix: cribl.logstream.
+    type: criblmetrics
+    pipeline: cribl_metrics_rollup
+    metadata:
+      - name: index
+        value: cribl-metrics

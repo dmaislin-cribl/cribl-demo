@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ -d $CRIBL_HOME/groups ]; then
+  CRIBL_GROUPS=$CRIBL_HOME/groups
+elif [ -d $CRIBL_VOLUME_DIR/groups ]; then
+  CRIBL_GROUPS=$CRIBL_VOLUME_DIR/groups
+fi
+
+if [ -n "$CRIBL_GROUPS" ]; then
+  # call the cli-auth expect script to log into the cli
+  $CRIBL_HOME/bin/cribl auth login -u admin -p cribldemo
+
+    #$CRIBL_HOME/bin/cribl groups commit -g default -m "init"
+    #$CRIBL_HOME/bin/cribl groups deploy -g default
+  for grp in $(cd $CRIBL_GROUPS;  ls -1 ); do
+    # Run commit and deploy separately for each worker group (commit-deploy will fail if
+    # there is nothing to commit, but we want to push a deploy either way.
+    $CRIBL_HOME/bin/cribl groups commit -g $grp -m "init"
+    $CRIBL_HOME/bin/cribl groups deploy -g $grp
+  done
+
+else
+  echo "Not running in distributed mode - no need to deploy groups"
+fi

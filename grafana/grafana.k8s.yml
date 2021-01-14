@@ -1,0 +1,101 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: grafana
+    app.kubernetes.io/name: grafana
+  name: grafana
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: grafana
+    app.kubernetes.io/name: grafana
+  name: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: grafana
+      app.kubernetes.io/name: grafana
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana
+        app.kubernetes.io/name: grafana
+      annotations:
+        io.cribl.scope/disable: 'true'
+    spec:
+      containers:
+        - env:
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: cribldemo
+          image: grafana
+          name: grafana
+          ports:
+            - containerPort: 3000
+          resources: 
+            limits:
+              cpu: 2000m
+              memory: 4096Mi
+            requests:
+              cpu: 750m
+              memory: 1024Mi
+
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: grafana
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            failureThreshold: 3
+            initialDelaySeconds: 55
+      initContainers:
+        - name: grafana-setup
+          image: alpine:latest
+          command: ['sh', "-c", "chown 472 /var/lib/grafana"]
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: grafana
+        
+      restartPolicy: Always
+      volumes:
+        - name: grafana
+          persistentVolumeClaim:
+            claimName: grafana
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: grafana
+    app.kubernetes.io/name: grafana
+  name: grafana
+spec:
+  type: ClusterIP
+  ports:
+    - name: "3000"
+      port: 3000
+      targetPort: 3000
+  selector:
+    io.kompose.service: grafana
+status:
+  loadBalancer: {}
+

@@ -2,22 +2,30 @@ rulesets:
   default:
     conf:
       functions:
-        - filter: cribl.tags.includes('metrics')
+        - filter: cribl.tags.includes('dc1-logs')
           id: eval
-          description: Metrics
+          description: On Prem Log Workload
           final: true
           conf:
             add:
               - name: groupId
-                value: "'metrics'"
-        - filter: cribl.tags.includes('logs')
+                value: "'dc1-logs'"
+        - filter: cribl.tags.includes('dc1-metrics')
           id: eval
-          description: Logs
+          description: On Prem Metrics Workloads
           final: true
           conf:
             add:
               - name: groupId
-                value: "'logs'"
+                value: "'dc1-metrics'"
+        - filter: cribl.tags.includes('aws')
+          id: eval
+          description: AWS Workloads
+          final: true
+          conf:
+            add:
+              - name: groupId
+                value: "'aws'"
         - filter: "true"
           id: eval
           description: Default Mappings

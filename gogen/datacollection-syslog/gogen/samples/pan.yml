@@ -1,0 +1,54 @@
+name: pan
+generator: sample
+begin: -10d
+end: now
+tokens:
+- name: ts1
+  type: timestamp
+  format: template
+  replacement: '%b %d %H:%M:%S'
+- name: ts2
+  type: timestamp
+  format: template
+  replacement: '%Y/%m/%d %H:%M:%S'
+- name: source
+  type: fieldChoice
+  format: template
+  sample: panips.csv
+  srcField: source
+  group: 1
+- name: nat_source
+  type: fieldChoice
+  format: template
+  sample: panips.csv
+  srcField: source
+  group: 1
+- name: dest
+  type: fieldChoice
+  format: template
+  sample: panips.csv
+  srcField: destination
+  group: 1
+- name: nat_dest
+  type: fieldChoice
+  format: template
+  sample: panips.csv
+  srcField: destination
+  group: 1
+- name: src_zone
+  type: fieldChoice
+  format: template
+  sample: panips.csv
+  srcField: source_zone
+  group: 1
+- name: dest_zone
+  type: fieldChoice
+  format: template
+  sample: panips.csv
+  srcField: destination_zone
+  group: 1
+fromSample: pan.sample
+count: 60
+interval: 60
+earliest: -60s
+randomizeEvents: true

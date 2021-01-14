@@ -1,0 +1,78 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: splunk
+    app.kubernetes.io/name: splunk
+  name: splunk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: splunk
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: splunk
+        app.kubernetes.io/name: splunk
+      # annotations:
+      #   io.cribl.scope/disable: 'true'
+    spec:
+      containers:
+        - env:
+            - name: CRIBL_ROUTING_DEMO
+              value: "1"
+            - name: DONT_TIMEOUT
+              value: "1"
+          image: splunk
+          imagePullPolicy: Always
+          name: splunk
+          ports:
+            - containerPort: 8000
+            - containerPort: 8088
+            - containerPort: 8089
+            - containerPort: 9997
+            - containerPort: 9998
+          resources: 
+            limits:
+              cpu: 1000m
+              memory: 4096Mi
+            requests:
+              cpu: 500m
+              memory: 1024Mi
+
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: splunk
+    app.kubernetes.io/name: splunk
+  name: splunk
+spec:
+  ports:
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+    - name: "8088"
+      port: 8088
+      targetPort: 8088
+    - name: "8089"
+      port: 8089
+      targetPort: 8089
+    - name: "9997"
+      port: 9997
+      targetPort: 9997
+    - name: "9998"
+      port: 9998
+      targetPort: 9998
+  selector:
+    io.kompose.service: splunk
+status:
+  loadBalancer: {}
