@@ -15,12 +15,11 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         io.kompose.service: splunk
         app.kubernetes.io/name: splunk
-      annotations:
-        io.cribl.scope/disable: 'true'
+      # annotations:
+      #   io.cribl.scope/disable: 'true'
     spec:
       containers:
         - env:
@@ -29,6 +28,7 @@ spec:
             - name: DONT_TIMEOUT
               value: "1"
           image: splunk
+          imagePullPolicy: Always
           name: splunk
           ports:
             - containerPort: 8000
@@ -36,7 +36,14 @@ spec:
             - containerPort: 8089
             - containerPort: 9997
             - containerPort: 9998
-          resources: {}
+          resources: 
+            limits:
+              cpu: 1000m
+              memory: 4096Mi
+            requests:
+              cpu: 500m
+              memory: 1024Mi
+
       restartPolicy: Always
 status: {}
 ---

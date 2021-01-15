@@ -48,85 +48,20 @@ Now, you can access Cribl at http://localhost:9000 with username `admin` passwor
 # Running on EKS
 Running in "Production" mode on an EKS cluster requires a few additional steps.
 
-## Setup ECR
-Running in EKS requires that you push the docker images up into ECR. ECR's repository structure requires that you pre-create the repos for each image. The script "setup-ecr" can take care of that. You need to have an active AWS credential in the environment (or use aws2-wrap), as well as either AWS_DEFAULT_REGION or AWS_REGION set to your preferred region (otherwise, it will default to us-west-2). The command line is as follows:
+## Deploy-Eks
+Running in EKS requires that you push the docker images up into ECR. ECR's repository structure requires that you pre-create the repos for each image. The script `deploy-eks.py` will create the ECR repos and build and deploy to your EKS cluster. You will need to run pip on the requirements.txt file, like this:
 
 ```
-./setup-ecr <repo head>
+pip -r ./requirements.txt
+```
+additionally, you'll need to have active AWS credentials in the shell, and then you can run the `deploy-eks.py` script, as follows.
+```
+./deploy-eks.py -c <repo head> [-d <domain default:demo.cribl.io>] [-n <namespace default:default>] [-r <region default:us-west-2>] [-d <description default:Demo Environment>]
 ```
 
-The \<repo head> argument creates the top level of the repository structure, so `./setup-ecr cribl-demo-main` will have the following output:
-
+or if you're using V2 of the AWS CLI, invoke it as follows:
 ```
-host% ./setup-ecr cribl-demo-main
-Defaulting Region to us-west-2 - if you want a different region, set AWS_REGION or AWS_DEFAULT_REGION and rerun
-Login Succeeded
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/apiserver
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/cribl-master
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/cribl-sa
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/cribl-worker
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-accesscombined-forwarder
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-authfailed-filebeat
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-bigjson-webhook
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-businessevent-hec
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-datacollection-syslog
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-metrics-dogstatsd
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-pantraffic-syslog
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-statechange-syslog
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/grafana
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/redis
-Created: 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/splunk
-Use the --default-repo 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main option to skaffold deploy
-Or export SKAFFOLD_DEFAULT_REPO=536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main
+aws2-wrap --profile <AWS Profile> --exec "./deploy-eks.py -c <repo head> [-d <domain default:demo.cribl.io>] [-n <namespace default:default>] [-r <region default:us-west-2>] [-d <description default:Demo Environment>]"
 ```
 
-## Build the Images
-Now that the repo is setup, you'll need to build the images. You can either set the SKAFFOLD_DEFAULT_REPO environment variable, or provide the --default-repo argument to each command. To build the images, run the skaffold build command, with a --tag option that will define the tag we'll be deploying (next):
-
-```
-host% export SKAFFOLD_DEFAULT_REPO=536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main
-host% skaffold build --tag=demo1
-Generating tags...
- - apiserver -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/apiserver:demo1
- - cribl-master -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/cribl-master:demo1
- - cribl-worker -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/cribl-worker:demo1
- - cribl-sa -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/cribl-sa:demo1
- - gogen-bigjson-webhook -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-bigjson-webhook:demo1
- - gogen-businessevent-hec -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-businessevent-hec:demo1
- - gogen-metrics-dogstatsd -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-metrics-dogstatsd:demo1
- - gogen-pantraffic-syslog -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-pantraffic-syslog:demo1
- - gogen-statechange-syslog -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-statechange-syslog:demo1
- - gogen-accesscombined-forwarder -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-accesscombined-forwarder:demo1
- - gogen-authfailed-filebeat -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-authfailed-filebeat:demo1
- - gogen-datacollection-syslog -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-datacollection-syslog:demo1
- - grafana -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/grafana:demo1
- - redis -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/redis:demo1
- - splunk -> 536497934283.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/splunk:demo1
-
- ...
-```
-
-## Deploying the build
-We'll use `skaffold deploy` to deploy the environment, using the -n \<namespace> argument to deploy in a namespace. For example, to deploy the tag "demo1" to the "testing" namespace:
-
-```
-skaffold deploy --tag demo1 -n testing
-Tags used in deployment:
- - apiserver -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/apiserver:demo1
- - cribl-master -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/cribl-master:demo1
- - cribl-worker -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/cribl-worker:demo1
- - cribl-sa -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/cribl-sa:demo1
- - gogen-bigjson-webhook -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-bigjson-webhook:demo1
- - gogen-businessevent-hec -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-businessevent-hec:demo1
- - gogen-metrics-dogstatsd -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-metrics-dogstatsd:demo1
- - gogen-pantraffic-syslog -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-pantraffic-syslog:demo1
- - gogen-statechange-syslog -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-statechange-syslog:demo1
- - gogen-accesscombined-forwarder -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-accesscombined-forwarder:demo1
- - gogen-authfailed-filebeat -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-authfailed-filebeat:demo1
- - gogen-datacollection-syslog -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/gogen-datacollection-syslog:demo1
- - grafana -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/grafana:demo1
- - redis -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/redis:demo1
- - splunk -> 586997984287.dkr.ecr.us-west-2.amazonaws.com/cribl-demo-main/splunk:demo1
-Starting deploy...
-```
 

@@ -15,7 +15,7 @@ nameOverride: "cribl-w0"
 
 config: 
   host: cribl-internal
-  tag: logs
+  tag: dc1-logs
   token: criblmaster
 
 
@@ -72,8 +72,3 @@ autoscaling:
   targetCPUUtilizationPercentage: 50
   # targetMemoryUtilizationPercentage: 80
 
-rbac:
-  create: true
-
-serviceAccount:
-  create: true

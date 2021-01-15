@@ -35,7 +35,14 @@ spec:
           name: apiserver
           ports:
             - containerPort: 4000
-          resources: {}
+          resources: 
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
+
           securityContext:
             privileged: true
       restartPolicy: Always
@@ -92,7 +99,14 @@ spec:
           name: baddev
           ports:
             - containerPort: 4000
-          resources: {}
+          resources: 
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
+
           securityContext:
             privileged: true
       restartPolicy: Always
