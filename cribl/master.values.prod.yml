@@ -6,7 +6,7 @@ replicaCount: 1
 
 criblImage:
   repository: cribl/cribl
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "next"
 
@@ -24,8 +24,9 @@ config:
   healthPort: 9000
 
 env:
-  CRIBL_BEFORE_START_CMD_1: cp -R /var/opt/cribl /opt/
-  CRIBL_AFTER_START_CMD_1: sleep 60 && $CRIBL_HOME/scripts/cli-deploy > /tmp/deploy.log
+  CRIBL_BEFORE_START_CMD_1: if [ ! -d /opt/cribl/config-volume/groups ] ; then  cp -R /var/opt/cribl/* /opt/cribl/config-volume; fi
+  CRIBL_BEFORE_START_CMD_2: ls -al /opt/cribl/config-volume/groups
+  CRIBL_AFTER_START_CMD_1: sleep 300 && $CRIBL_HOME/config-volume/scripts/cli-deploy > /tmp/deploy.log
 
 service:
   type: LoadBalancer
@@ -60,7 +61,7 @@ resources:
     cpu: 2000m
     memory: 4096Mi
   requests:
-    cpu: 1250m
+    cpu: 750m
     memory: 1024Mi
 
 nodeSelector: {}

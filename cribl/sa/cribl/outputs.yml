@@ -1,13 +1,14 @@
 outputs:
   s3dc:
     type: s3
+    awsAuthenticationMethod: manual
     bucket: data_collection_demo
     destPath: ""
     stagePath: /tmp/cribl
     awsApiKey: ACCESSKEY
     awsSecretKey: SECRETKEY
     region: us-east-1
-    endpoint: http://minio:9010
+    endpoint: http://minio:9000
     signatureVersion: v4
     partitionExpr: "`${C.Time.strftime(_time ? _time : Date.now(), '%Y/%m/%d/%H')}/${sourcetype}/${src_zone}/${src_ip}/${dest_zone}/${dest_ip}`"
     format: json

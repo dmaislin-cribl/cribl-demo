@@ -29,14 +29,8 @@ spec:
           image: "{{ .Values.image }}"
           imagePullPolicy: {{ .Values.criblImage.pullPolicy }}
           volumeMounts:
-          - name: local-storage
-            mountPath: {{ .Values.config.criblHome }}/local
-          - name: data-storage
-            mountPath: {{ .Values.config.criblHome }}/data
-          - name: state-storage
-            mountPath: {{ .Values.config.criblHome }}/state
-          - name: groups-storage
-            mountPath: {{ .Values.config.criblHome }}/groups
+          - name: config-storage
+            mountPath: {{ .Values.config.criblHome }}/config-volume
           ports: 
             {{-  range .Values.service.ports }}
             - name: {{ .name }}
@@ -53,6 +47,9 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+            # Single Volume for persistents (CRIBL-3848)
+            - name: CRIBL_VOLUME_DIR
+              value: {{ .Values.config.criblHome }}/config-volume
             # Allow Self-Signed Certs
             - name: NODE_TLS_REJECT_UNAUTHORIZED
               value: "{{ .Values.config.rejectSelfSignedCerts }}"
@@ -64,18 +61,10 @@ spec:
             {{- end }}
 
       volumes:
-        - name: local-storage
+        - name: config-storage
           persistentVolumeClaim:
-            claimName: local-claim
-        - name: data-storage
-          persistentVolumeClaim:
-            claimName: data-claim
-        - name: state-storage
-          persistentVolumeClaim:
-            claimName: state-claim
-        - name: groups-storage
-          persistentVolumeClaim:
-            claimName: groups-claim
+            claimName: config-claim
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

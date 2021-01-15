@@ -8,16 +8,27 @@ build:
     context: apiserver
   - image: cribl-master
     context: cribl/master
+    docker:
+      buildArgs:
+        TAG: '{{.CRIBL_TAG}}'
   - image: cribl-worker
     context: cribl/worker
+    docker:
+      buildArgs:
+        TAG: '{{.CRIBL_TAG}}'
   - image: cribl-sa
     context: cribl/sa
+    docker:
+      buildArgs:
+        TAG: '{{.CRIBL_TAG}}'
   - image: gogen-bigjson-webhook
     context: gogen/bigjson-webhook
   - image: gogen-businessevent-hec
     context: gogen/businessevent-hec
   - image: gogen-metrics-dogstatsd
     context: gogen/metrics-dogstatsd
+  - image: gogen-flowlogs-syslog
+    context: gogen/flowlogs-syslog
   - image: gogen-pantraffic-syslog
     context: gogen/pantraffic-syslog
   - image: gogen-statechange-syslog
@@ -35,6 +46,7 @@ build:
   - image: splunk
     context: splunk
 deploy:
+  statusCheckDeadlineSeconds: 600
   kustomize: 
     paths: ["./grafana", "./splunk"]
   kubectl:
@@ -50,6 +62,11 @@ deploy:
     - redis/redis.k8s.yml
     - splunk/splunk.k8s.yml
   helm:
+    flags:
+      upgrade:
+        [--timeout=600s]                 # Helm upgrade timeout
+      install:
+        [--timeout=600s]   
     releases:
     - name: cribl
       chartPath: cribl/charts/logstream-master
@@ -63,12 +80,24 @@ deploy:
         image: cribl-worker
       valuesFiles:
       - cribl/logs-wg.values.yml
+    - name: cribl-w0-noscope
+      chartPath: cribl/charts/logstream-workergroup
+      artifactOverrides:
+        image: cribl-worker
+      valuesFiles:
+      - cribl/logs-wg-noscope.values.yml
     - name: cribl-w1
       chartPath: cribl/charts/logstream-workergroup
       artifactOverrides:
         image: cribl-worker
       valuesFiles:
       - cribl/metrics-wg.values.yml
+    - name: cribl-w2
+      chartPath: cribl/charts/logstream-workergroup
+      artifactOverrides:
+        image: cribl-worker
+      valuesFiles:
+      - cribl/aws-wg.values.yml
     - name: telegraf
       chartPath: telegraf
       valuesFiles:
@@ -97,4 +126,43 @@ profiles:
     patches:
     - op: remove
       path: /deploy/kustomize
+
+  - name: minimal
+    deploy:
+      helm:
+        releases:
+        - name: cribl
+          chartPath: cribl/charts/logstream-master
+          artifactOverrides:
+            image: cribl-master
+          valuesFiles:
+            - cribl/master-mini.values.yml
+        - name: cribl-w0
+          chartPath: cribl/charts/logstream-workergroup
+          artifactOverrides:
+            image: cribl-worker
+          valuesFiles:
+          - cribl/logs-wg-mini.values.yml
+        - name: cribl-w1
+          chartPath: cribl/charts/logstream-workergroup
+          artifactOverrides:
+            image: cribl-worker
+          valuesFiles:
+          - cribl/metrics-wg-mini.values.yml
+        - name: cribl-w2
+          chartPath: cribl/charts/logstream-workergroup
+          artifactOverrides:
+            image: cribl-worker
+          valuesFiles:
+          - cribl/aws-wg-mini.values.yml
+        #- name: influxdb2
+          #chartPath: influxdb2
+          #valuesFiles:
+          #- influxdb2/values.yaml
+
+    patches:
+    - op: remove
+      path: /deploy/kustomize
+    - op: remove
+      path: /deploy/kubectl/manifests/1
 

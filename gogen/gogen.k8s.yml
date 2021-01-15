@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
     app.kubernetes.io/name: gogen
     io.kompose.service: gogen
@@ -14,7 +13,6 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         io.kompose.service: gogen
         app.kubernetes.io/name: gogen
@@ -26,9 +24,16 @@ spec:
             - name: GOGEN_OUTPUTTEMPLATE
               value: json
             - name: GOGEN_URL
-              value: http://cribl-w0:10080/cribl/_bulk
+              value: http://cribl-w2:10080/cribl/_bulk
           image: gogen-bigjson-webhook
           name: gogen-bigjson-webhook
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
         - env:
             - name: GOGEN_OUT
               value: http
@@ -38,6 +43,13 @@ spec:
               value: http://cribl-w0:10088/services/collector/event
           image: gogen-businessevent-hec
           name: gogen-businessevent-hec
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
         - env:
             - name: GOGEN_OUT
               value: tcp
@@ -45,6 +57,13 @@ spec:
               value: cribl-w1:8125
           image: gogen-metrics-dogstatsd
           name: gogen-metrics-dogstatsd
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
         - env:
             - name: GOGEN_OUT
               value: tcp
@@ -54,6 +73,13 @@ spec:
               value: cribl-w0:5140
           image: gogen-pantraffic-syslog
           name: gogen-pantraffic-syslog
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
         - env:
             - name: GOGEN_OUT
               value: tcp
@@ -63,6 +89,13 @@ spec:
               value: cribl-w0:5140
           image: gogen-statechange-syslog
           name: gogen-statechange-syslog
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
         - env:
             - name: SPLUNK_CMD
               value: cmd mkdir -p /var/log/httpd
@@ -74,6 +107,13 @@ spec:
               value: add forward-server cribl-w0:9999 -auth admin:cribldemo -ssl-cert-path /opt/splunk/etc/auth/client.pem
           image: gogen-accesscombined-forwarder
           name: gogen-accesscombined-forwarder
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
         - env:
             - name: GOGEN_OUT
               value: http
@@ -83,6 +123,13 @@ spec:
               value: elasticsearch
           image: gogen-authfailed-filebeat
           name: gogen-authfailed-filebeat
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
         - env:
             - name: GOGEN_OUT
               value: tcp
@@ -92,5 +139,28 @@ spec:
               value: rfc5424
           image: gogen-datacollection-syslog
           name: gogen-datacollection-syslog
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
+        - env:
+            - name: GOGEN_OUT
+              value: tcp
+            - name: GOGEN_OUTPUTTEMPLATE
+              value: rfc5424
+            - name: GOGEN_URL
+              value: cribl-w2:5140
+          image: gogen-flowlogs-syslog
+          name: gogen-flowlogs-syslog
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 128Mi
       restartPolicy: Always
 status: {}
