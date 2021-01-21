@@ -13,7 +13,7 @@ outputs:
     partitionExpr: "`${C.Time.strftime(_time ? _time : Date.now(), '%Y/%m/%d/%H')}/${sourcetype}/${src_zone}/${src_ip}/${dest_zone}/${dest_ip}`"
     format: json
     baseFileName: CriblOut
-    compress: none
+    compress: gzip
     maxFileSizeMB: 32
     maxFileOpenTimeSec: 60
     maxFileIdleTimeSec: 30

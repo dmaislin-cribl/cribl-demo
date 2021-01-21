@@ -53,15 +53,6 @@ outputs:
     onBackpressure: block
     type: splunk
     host: splunk
-  localhost:
-    type: statsd_ext
-    protocol: udp
-    host: localhost
-    port: 9125
-    mtu: 512
-    flushPeriodSec: 1
-    connectionTimeout: 5000
-    writeTimeout: 10000
   influxdb2:
     timestampPrecision: ms
     dynamicValueFieldName: true
@@ -96,7 +87,7 @@ outputs:
       Date.now(), '%Y-%m-%d_%H')}/${host}/${sourcetype}`"
     format: json
     baseFileName: CriblOut
-    compress: none
+    compress: gzip
     maxFileSizeMB: 32
     maxFileOpenTimeSec: 60
     maxFileIdleTimeSec: 30
@@ -132,7 +123,7 @@ outputs:
     partitionExpr: "`${C.Time.strftime(_time ? _time : Date.now(), '%Y/%m/%d/%H')}/${sourcetype}/${src_zone}/${src_ip}/${dest_zone}/${dest_ip}`"
     format: json
     baseFileName: CriblOut
-    compress: none
+    compress: gzip
     maxFileSizeMB: 32
     maxFileOpenTimeSec: 60
     maxFileIdleTimeSec: 30

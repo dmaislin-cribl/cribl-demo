@@ -37,6 +37,8 @@ env:
     value: "/rootfs/proc"
   - name: "HOST_SYS"
     value: "/rootfs/sys"
+  - name: "CRIBL_STATSD"
+    value: "cribl-w1:8125"
 
 ## Tolerations for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/

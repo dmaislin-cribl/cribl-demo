@@ -1,0 +1,110 @@
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: demo
+  region: us-west-2
+vpc:
+  subnets:
+    private:
+      us-west-2a: { id: subnet-074c841d50c9c259b }
+      us-west-2b: { id: subnet-0e1b4f53dd6ecea8d }
+      us-west-2c: { id: subnet-01ff8c6b02d3235bb }
+    public:
+      us-west-2a: { id: subnet-03b56f4c4f899a7f4 }
+      us-west-2b: { id: subnet-0a5338fb4527900a3 }
+      us-west-2c: { id: subnet-0fa28d3aa2cac7689 }
+nodeGroups:
+  - name: demo-ng-a
+    minSize: 1
+    maxSize: 4
+    desiredCapacity: 1
+    privateNetworking: true
+    volumeSize: 200
+    availabilityZones: ["us-west-2a"]
+
+    ssh:
+      allow: true
+      publicKeyName: cribl-lab-eks
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+      withAddonPolicies:
+        autoScaler: true
+        imageBuilder: true
+        ebs: true
+    labels: {role: worker}
+    tags:
+      nodegroup-role: worker
+    instancesDistribution:
+      maxPrice: 0.45
+      onDemandBaseCapacity: 1
+      onDemandPercentageAboveBaseCapacity: 50
+      #spotInstancePools: 2
+      spotAllocationStrategy: "capacity-optimized"
+      instanceTypes: 
+        - m5.4xlarge
+  - name: demo-ng-b
+    minSize: 1
+    maxSize: 4
+    desiredCapacity: 1
+    privateNetworking: true
+    volumeSize: 200
+    availabilityZones: ["us-west-2b"]
+
+    ssh:
+      allow: true
+      publicKeyName: cribl-lab-eks
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+      withAddonPolicies:
+        autoScaler: true
+        imageBuilder: true
+        ebs: true
+    labels: {role: worker}
+    tags:
+      nodegroup-role: worker
+    instancesDistribution:
+      maxPrice: 0.45
+      onDemandBaseCapacity: 1
+      onDemandPercentageAboveBaseCapacity: 50
+      #spotInstancePools: 2
+      spotAllocationStrategy: "capacity-optimized"
+      instanceTypes: 
+        - m5.4xlarge
+  - name: demo-ng-c
+    minSize: 1
+    maxSize: 4
+    desiredCapacity: 1
+    privateNetworking: true
+    volumeSize: 200
+    availabilityZones: ["us-west-2c"]
+
+    ssh:
+      allow: true
+      publicKeyName: cribl-lab-eks
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+      withAddonPolicies:
+        autoScaler: true
+        imageBuilder: true
+        ebs: true
+    labels: {role: worker}
+    tags:
+      nodegroup-role: worker
+    instancesDistribution:
+      maxPrice: 0.45
+      onDemandBaseCapacity: 1
+      onDemandPercentageAboveBaseCapacity: 50
+      #spotInstancePools: 2
+      spotAllocationStrategy: "capacity-optimized"
+      instanceTypes: 
+        - m5.4xlarge

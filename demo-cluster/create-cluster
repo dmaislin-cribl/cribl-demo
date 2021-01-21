@@ -1,0 +1,47 @@
+#!/bin/bash -x
+export PAGER=cat
+
+eksctl create cluster -f demo-eks.yml 
+
+sleep 60
+eksctl get labels --cluster demo --nodegroup demo
+
+# Install the Metrics server (needed for autoscale)
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.4.1/components.yaml
+
+# Install the ebs CSI driver (for persistent storage)
+kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
+kubectl apply -f /Users/swl/GitClone/cribl-demo/demo-cluster/sclass.yml
+kubectl delete sc/gp2
+
+# Install and config the node group auto-scaler
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml
+kubectl -n kube-system annotate deployment.apps/cluster-autoscaler cluster-autoscaler.kubernetes.io/safe-to-evict="false"
+
+# Hack to use perl to inject the correct values into the autoscaler config
+EDITOR='perl -pi.bak -e "s/\<YOUR/demo/g;" -e "s/  CLUSTER NAME\>/- --balance-similar-node-groups\n        - --skip-nodes-with-system-pods=false/g;"' kubectl -n kube-system edit deployment.apps/cluster-autoscaler
+kubectl -n kube-system set image deployment.apps/cluster-autoscaler cluster-autoscaler=us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.17.4
+
+#eksctl utils update-cluster-logging --region=us-west-2 --cluster=demo --enable-types=all --approve
+
+# Interrogate the security groups, and add the corporate net to be able to access nodes.
+secgroup=$(aws ec2 describe-instances --filter Name=tag:Name,Values=demo-demo-ng-a-Node --query 'Reservations[].Instances[].SecurityGroups' | grep eksctl-demo-nodegroup-demo-ng | uniq | awk -F\" '{print $4}')
+groupid=$(aws ec2 describe-security-groups --filter Name=group-name,Values=$secgroup --query 'SecurityGroups[0].GroupId' --output text)
+aws ec2 authorize-security-group-ingress \
+    --group-id $groupid \
+    --ip-permissions IpProtocol=tcp,FromPort=1025,ToPort=65535,IpRanges=[{CidrIp=10.0.0.0/8}]
+
+# Interrogate the security groups, and add the corporate net to be able to access nodes.
+secgroup=$(aws ec2 describe-instances --filter Name=tag:Name,Values=demo-demo-ng-b-Node --query 'Reservations[].Instances[].SecurityGroups' | grep eksctl-demo-nodegroup-demo-ng | uniq | awk -F\" '{print $4}')
+groupid=$(aws ec2 describe-security-groups --filter Name=group-name,Values=$secgroup --query 'SecurityGroups[0].GroupId' --output text)
+aws ec2 authorize-security-group-ingress \
+    --group-id $groupid \
+    --ip-permissions IpProtocol=tcp,FromPort=1025,ToPort=65535,IpRanges=[{CidrIp=10.0.0.0/8}]
+
+# Interrogate the security groups, and add the corporate net to be able to access nodes.
+secgroup=$(aws ec2 describe-instances --filter Name=tag:Name,Values=demo-demo-ng-c-Node --query 'Reservations[].Instances[].SecurityGroups' | grep eksctl-demo-nodegroup-demo-ng | uniq | awk -F\" '{print $4}')
+groupid=$(aws ec2 describe-security-groups --filter Name=group-name,Values=$secgroup --query 'SecurityGroups[0].GroupId' --output text)
+aws ec2 authorize-security-group-ingress \
+    --group-id $groupid \
+    --ip-permissions IpProtocol=tcp,FromPort=1025,ToPort=65535,IpRanges=[{CidrIp=10.0.0.0/8}]
+

@@ -9,9 +9,12 @@ import json
 import botocore.exceptions
 import subprocess
 import os
+import re
 import time
 import docker
 import base64
+import urllib3
+from urllib.parse import quote_plus
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -19,8 +22,13 @@ except ImportError:
     from yaml import Loader, Dumper
 
 #config objects
-services = [ "cribl",  "grafana", "influxdb2", "splunk" ]
+services = { "cribl": "Cribl LogStream UI", "grafana": "Grafana Visualization Tool", "influxdb2": "InfluxData's InfluxDB v2", "splunk": "Splunk UI"}
 allowed_ports = [ 3000, 8000, 8086, 9000 ]
+
+def get_cluster_name():
+  kubectlout = subprocess.run(["kubectl", "config", "current-context"],capture_output=True)
+  cluster = kubectlout.stdout.decode()[:-1]
+  return cluster
 
 def docker_login(options, acct):
   client = docker.from_env()
@@ -29,8 +37,10 @@ def docker_login(options, acct):
 
   username, password = base64.b64decode(token['authorizationData'][0]['authorizationToken']).decode().split(':')
   registry = token['authorizationData'][0]['proxyEndpoint']
-  print("Token: %s - %s - %s" % (username,password,registry))
-  resp = client.login(username, password, registry=registry)
+  #print("Token: %s - %s - %s" % (username,password,registry))
+  resp = client.login(username, password, registry=registry, reauth=True)
+  logincmd = "aws ecr get-login-password | docker login --username AWS --password-stdin %s" % registry
+  subprocess.run(["docker", "login", "--username", "AWS", "--password-stdin", registry], input=password.encode('utf-8'))
   print(resp['Status'])
 
 
@@ -110,7 +120,8 @@ r53 = boto3.client("route53")
 
 # get acct id and hosted zone id
 acct = sts.get_caller_identity()
-options.description += "<br>Created by %s" % acct['UserId']
+(id,email) = acct['UserId'].split(':')
+options.description += "<br><font size=-1>(Created by <a href=mailto:%s>%s</a>)</font>" % (email, email)
 zoneid = get_hosted_zone(options)
 
 # Make sure the ECR repos are setup.
@@ -161,44 +172,83 @@ domrev.reverse()
 revhost = ".".join(domrev)
 
 print("Creating HTML Service View")
+
+style = '''
+<style>
+      img {
+        max-width: 15%;
+        height: auto;
+      }
+      body {
+        background-color: black;
+        color: white;
+      }
+      h1, h2, h3, h4, h5 {
+        color: white;
+      }
+      table {
+        width:90%;
+      }
+      table, th, td {
+        border: 1px solid #C9D0D4;
+        text-align: left;
+        padding: 10px;
+      }
+    </style>
+'''
 # Get the Service info, and generate an index.html to post for the namespace.
 htmlout = """
 <HTML>
   <HEAD>
     <TITLE>Services in %s</TITLE>
-    <link rel='stylesheet' href='https://cribl.io/wp-content/themes/cribl/assets/css/main.css?ver=1608242659'>
+    <link rel=stylesheet href=https://cribl.io/wp-content/themes/cribl/assets/css/main.css?ver=1608242659>
+    %s
+  
   </HEAD>
   <BODY>
-    <H2>Services in %s</H2>
+    <H2><img height=100 src=https://cribl.io/wp-content/themes/cribl/assets/images/logo-cribl-new.svg><br>Services in %s</H2>
     <p>%s</p>
-    <ul>
-""" % (options.ns, options.ns, options.description)
+    <table>
+    <tr><th>Service</th><th>Service Description</th></tr>
+""" % (options.ns, style, options.ns, options.description)
 
-for svc in services:
+for svc in services.keys():
   ret = kubeclient.read_namespaced_service(svc, options.ns)
   for host in ret.status.load_balancer.ingress:
     chg = { "Action": "UPSERT", "ResourceRecordSet": { "Name": "%s.%s.%s" % ( svc, options.ns, options.domain ), "Type": "CNAME", "TTL": 300, "ResourceRecords": [ { "Value": host.hostname } ] } }
     chgbatch['Changes'].append(chg)
     for port in ret.spec.ports:
       if port.port in allowed_ports:
-        htmlout += "<LI>Service: <A HREF=http://%s.%s.%s:%d/>%s</A></LI>" % ( svc, options.ns, options.domain, port.port, svc )
+        htmlout += "<tr><td><A HREF=http://%s.%s.%s:%d/>%s</A></td><td>%s</td></tr>" % ( svc, options.ns, options.domain, port.port, svc, services[svc])
 
-htmlout += "</ul></body></HTML>"
+htmlout += "</table></body></HTML>"
 
 htmlb = htmlout.encode("utf8")
 
+desc = options.description
+#desc=options.description.replace("@","-").replace("<br>"," - ")
+#desc = re.sub(r'Created by A[^:]+:', 'Created by', desc)
+#tagset=quote_plus({"namespace-description":  options.description})
+tdat = base64.urlsafe_b64encode(options.description.encode('utf-8')).decode()
+cluster_name = get_cluster_name()
+cname = base64.urlsafe_b64encode(cluster_name.encode('utf-8')).decode()
+tagset="cluster=%s&namespace-description=%s" % (cname, tdat)
+
+print("Tagset: %s" % tagset)
+
 # put the index.html file up.
-resp = s3.put_object(Bucket=revhost, Body=htmlb, Key="ns-%s/index.html" % options.ns, ACL='public-read', ContentType='text/html')
-tagset = {
-  'TagSet': [
-    {
-      'Key': 'namespace-description',
-      'Value': options.description
-    }
-  ]
-}
-print("Tagset: %s" % json.dumps(tagset))
+resp = s3.put_object(Bucket=revhost, Body=htmlb, Key="ns-%s/index.html" % options.ns, ACL='public-read', ContentType='text/html', Tagging=tagset)
+#tagset = {
+#  'TagSet': [
+#    {
+#      'Key': 'namespace-description',
+#      'Value': options.description
+#    }
+#  ]
+#}
+#print("Tagset: %s" % json.dumps(tagset))
 #tagresp = s3.put_object_tagging(Bucket=revhost, Key="ns-%s/index.html" % options.ns, Tagging=tagset)
+#print("TAGRESP: %s" % tagresp)
 print("Done")
 
 print ("Updating R53")

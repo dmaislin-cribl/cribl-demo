@@ -29,6 +29,8 @@ env:
 
 service:
   annotations: {}
+  internalType: NodePort
+  externalType: NodePort
 
   ports:
   - name: api

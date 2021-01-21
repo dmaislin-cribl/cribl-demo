@@ -2,7 +2,7 @@ id: default
 groups: {}
 routes:
   - id: kmxeJc
-    name: flowlog-preprocess
+    name: flowlog-setup
     final: true
     disabled: false
     pipeline: setup-flowlogs

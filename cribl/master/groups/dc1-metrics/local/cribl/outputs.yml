@@ -31,28 +31,6 @@ outputs:
   default:
     defaultId: influxdb
     type: default
-  localhost:
-    type: statsd_ext
-    protocol: udp
-    host: localhost
-    port: 9125
-    mtu: 512
-    flushPeriodSec: 1
-    connectionTimeout: 5000
-    writeTimeout: 10000
-  # influxdb:
-  #   timestampPrecision: ms
-  #   dynamicValueFieldName: true
-  #   valueFieldName: value
-  #   concurrency: 5
-  #   maxPayloadSizeKB: 4096
-  #   flushPeriodSec: 1
-  #   auth:
-  #     disabled: true
-  #   type: influxdb
-  #   url: http://influxdb:8086/write
-  #   database: cribl
-  #   onBackpressure: block
   influxdb2:
     timestampPrecision: ms
     dynamicValueFieldName: true
