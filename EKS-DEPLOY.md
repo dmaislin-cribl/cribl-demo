@@ -11,7 +11,7 @@ additionally, you'll need to have active AWS credentials in the shell.
 
 
 ## Deploy-Eks
-This script handles the deployment of the demo environment to EKS, and the steps to create route53 entries for all user facing services, as well as creating and posting an index.html with links to those services.
+This script handles the deployment of the demo environment to EKS, and the steps to create Route53 entries for all user facing services, as well as creating and posting an index.html with links to those services.
 
 ![EKS Deployment Flow](img/deploy-eks-flow.svg)
 
@@ -31,11 +31,11 @@ aws2-wrap --profile <AWS Profile> --exec "./deploy-eks.py -c <repo head> [-d <do
 ```
 
 ## Undeploy-EKS
-This script "undoes" the deployment of the demo environment resources, the route53 entries associated with it, and the index.html file for those services.
+This script "undeploys" the deployment of the demo environment resources, the Route53 entries associated with it, and the index.html file for those services.
 
 ![EKS Deployment Flow](img/undeploy-eks-flow.svg)
 
-This script is the comprehensive way to "undeploy" an environment deployed with deploy-eks.py - it will not only run skaffold delete, but will also remove the CNAME entries from the route53 domain, and remove the index file from s3.
+This script is the comprehensive way to "undeploy" an environment deployed with deploy-eks.py - it will not only run skaffold delete, but will also remove the CNAME entries from the Route53 hosted zone (domain), and remove the index file from s3.
 
 ### Running
 
