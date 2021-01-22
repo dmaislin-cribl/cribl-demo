@@ -48,6 +48,7 @@ Options for `undeploy-eks.py` are a subset of the options for `deploy-eks.py`
 or if you're using V2 of the AWS CLI, invoke it as follows:
 ```
 aws2-wrap --profile <AWS Profile> --exec "./undeploy-eks.py -c <repo head> [-d <domain default:demo.cribl.io>] [-n <namespace default:default>] [-r <region default:us-west-2>]"
+```
 
 ## Arguments
 * -c \<repo head\> - the name to use as the "directory" in the ECR repo structure - each image will end up as \<repo head\>/\<image name\>:\<tag\>
