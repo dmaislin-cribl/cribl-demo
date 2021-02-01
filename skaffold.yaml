@@ -10,17 +10,17 @@ build:
     context: cribl/master
     docker:
       buildArgs:
-        TAG: '{{.CRIBL_TAG}}'
+        TAG: '{{ if .CRIBL_TAG}}{{.CRIBL_TAG}}{{else}}latest{{end}}'
   - image: cribl-worker
     context: cribl/worker
     docker:
       buildArgs:
-        TAG: '{{.CRIBL_TAG}}'
+        TAG: '{{ if .CRIBL_TAG}}{{.CRIBL_TAG}}{{else}}latest{{end}}'
   - image: cribl-sa
     context: cribl/sa
     docker:
       buildArgs:
-        TAG: '{{.CRIBL_TAG}}'
+        TAG: '{{ if .CRIBL_TAG}}{{.CRIBL_TAG}}{{else}}latest{{end}}'
   - image: gogen-bigjson-webhook
     context: gogen/bigjson-webhook
   - image: gogen-businessevent-hec
