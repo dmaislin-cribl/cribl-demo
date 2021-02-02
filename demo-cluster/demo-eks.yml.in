@@ -3,17 +3,13 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
   name: demo
-  region: us-west-2
+  region: $AWS_REGION
 vpc:
   subnets:
     private:
-      us-west-2a: { id: subnet-074c841d50c9c259b }
-      us-west-2b: { id: subnet-0e1b4f53dd6ecea8d }
-      us-west-2c: { id: subnet-01ff8c6b02d3235bb }
+$PRIVATE_NETS
     public:
-      us-west-2a: { id: subnet-03b56f4c4f899a7f4 }
-      us-west-2b: { id: subnet-0a5338fb4527900a3 }
-      us-west-2c: { id: subnet-0fa28d3aa2cac7689 }
+$PUBLIC_NETS
 nodeGroups:
   - name: demo-ng-a
     minSize: 1
@@ -21,11 +17,11 @@ nodeGroups:
     desiredCapacity: 1
     privateNetworking: true
     volumeSize: 200
-    availabilityZones: ["us-west-2a"]
+    availabilityZones: ["$A"]
 
     ssh:
       allow: true
-      publicKeyName: cribl-lab-eks
+      publicKeyName: $KEYPAIR
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
@@ -52,11 +48,11 @@ nodeGroups:
     desiredCapacity: 1
     privateNetworking: true
     volumeSize: 200
-    availabilityZones: ["us-west-2b"]
+    availabilityZones: ["$B"]
 
     ssh:
       allow: true
-      publicKeyName: cribl-lab-eks
+      publicKeyName: $KEYPAIR
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
@@ -83,11 +79,11 @@ nodeGroups:
     desiredCapacity: 1
     privateNetworking: true
     volumeSize: 200
-    availabilityZones: ["us-west-2c"]
+    availabilityZones: ["$C"]
 
     ssh:
       allow: true
-      publicKeyName: cribl-lab-eks
+      publicKeyName: $KEYPAIR
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy

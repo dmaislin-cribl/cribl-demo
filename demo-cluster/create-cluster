@@ -1,5 +1,24 @@
-#!/bin/bash -x
+#!/bin/bash
 export PAGER=cat
+
+if [ -z "$KEYPAIR" ]; then
+  echo "No KEYPAIR environment variable set. Exiting"
+  exit 255
+fi
+
+if [ -z "$AWS_REGION" ]; then
+  export AWS_REGION="us-west-2"
+fi
+
+export PRIVATE_NETS=$(aws ec2 describe-subnets --filters "Name=tag:Network,Values=Private" --filters "Name=tag:Name,Values=*A" --query 'Subnets[].[AvailabilityZone,SubnetId]' --output text | awk '{printf ("      %s: { id: %s }\n", $1, $2)}')
+export PUBLIC_NETS=$(aws ec2 describe-subnets --filters "Name=tag:Network,Values=Public" --query 'Subnets[].[AvailabilityZone,SubnetId]' --output text | awk '{printf ("      %s: { id: %s }\n", $1, $2)}')
+
+ZONES=($(aws ec2 describe-availability-zones --query 'AvailabilityZones[].ZoneName'  | head -4 | tail -3 | perl -pe 's/\"|,| //g;'))
+export A=${ZONES[0]}
+export B=${ZONES[1]}
+export C=${ZONES[2]}
+
+envsubst < demo-eks.yml.in > demo-eks.yml
 
 eksctl create cluster -f demo-eks.yml 
 
