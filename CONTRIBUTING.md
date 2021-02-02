@@ -14,7 +14,7 @@ The cribl-demo repo is managed in Github, with Technical Marketing (Steve at the
 
 The cribl-demo repo is now mastered in github, so in order to contribute, you’ll need a github.com ID - go to [https://github.com/](https://github.com/), click on “sign up”, and create an account. Preferably, use your cribl email address for the account. Once you’ve created your account, associate an SSH key with it. See the [github docs](https://docs.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account) for details on doing that.
 
-Once you’ve got an account set up, and an ssh key added to it, send [@Steve Litras](mailto:steve@cribl.io)​ a note to add you to the repository. You’ll be added with write access to the repo.
+Once you’ve got an account set up, and an ssh key added to it, send [@Steve Litras](mailto:steve@cribl.io) a note to add you to the repository. You’ll be added with write access to the repo.
 
 ### Cloning to Local
 

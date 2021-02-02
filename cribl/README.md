@@ -34,6 +34,8 @@ This directory includes the Dockerfile for for building a customized image for t
 
 * local - this is the local configuration for the master node itself.
 
-* sa - this is the configuration for the standalone kubernetes job “cribl-sa”, which is used to see the data collection demo bucket with data. It also contains a Dockerfile used to build the image for that job. 
+## sa 
+This is the configuration for the standalone kubernetes job “cribl-sa”, which is used to see the data collection demo bucket with data. It also contains a Dockerfile used to build the image for that job. 
 
-* worker - this contains a Dockerfile that is used to build a special image to override the helm workergroup chart (mostly to pre-install tools that will be needed for the workers for the demo, like speedtest or python). 
+## worker 
+This contains a Dockerfile that is used to build a special image to override the helm workergroup chart (mostly to pre-install tools that will be needed for the workers for the demo, like speedtest or python). 
