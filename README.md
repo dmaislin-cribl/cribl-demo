@@ -46,3 +46,5 @@ If you already have minikube running, you can omit the "local" argument to `star
 Now, you can access Cribl at http://localhost:9000 with username `admin` password `cribldemo`. 
 
 If you want to deploy this on EKS, see the [EKS-DEPLOY.md](EKS-DEPLOY.md) file. 
+
+If you want to contribute to the repo, see the [CONTRIBUTING.md](CONTRIBUTING.md) file.
