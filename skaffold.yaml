@@ -136,7 +136,7 @@ profiles:
     patches:
     - op: add
       path: /deploy/kustomize/paths
-      value: ["./grafana", "./splunk", "./gogen", "./apiserver"]
+      value: ["./grafana", "./splunk", "./gogen", "./apiserver", "./minio", "./redis"]
     - op: remove
       path: /deploy/kubectl/manifests/1
     - op: replace
