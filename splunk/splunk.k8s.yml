@@ -56,6 +56,7 @@ metadata:
     app.kubernetes.io/name: splunk
   name: splunk
 spec:
+  type: LoadBalancer
   ports:
     - name: "8000"
       port: 8000

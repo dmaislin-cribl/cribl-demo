@@ -1,11 +1,31 @@
-This demo environment uses Kubernetes. To run this locally, we recommend minikube. Additionally, this environment uses `skaffold` to orchestrate building the requisite containers and deploying into Kubernetes. On a Mac with homebrew:
+This demo environment uses Kubernetes. To run this locally, we recommend minikube. Additionally, this environment uses `skaffold` to orchestrate building the requisite containers and deploying into Kubernetes. 
 
-    brew install minikube
-    brew install skaffold
-    brew install kubectl
-    brew install helm
+## Pre-Requisites
 
-On Linux:
+### On a Mac with homebrew
+
+```
+sudo brew install minikube
+sudo brew install skaffold
+sudo brew install kubectl
+sudo brew install helm
+```
+
+### On a Mac with MacPorts
+```
+sudo port install minikube skaffold kubectl-1.20 helm-3.5
+sudo port select --set helm helm3.5
+sudo port select --set kubectl kubectl1.20
+
+```
+
+If you don't have homebrew or MacPorts, check out the following links for install instructions:
+    * Minikube: https://minikube.sigs.k8s.io/docs/start/
+    * Skaffold: https://skaffold.dev/docs/install/
+
+
+
+### On Linux:
 
     curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && \
     sudo install skaffold /usr/local/bin/ && \
@@ -32,9 +52,7 @@ On Linux:
     && sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
 
 
-If you don't have homebrew, check out the following links for install instructions:
-    * Minikube: https://minikube.sigs.k8s.io/docs/start/
-    * Skaffold: https://skaffold.dev/docs/install/
+## Running
 
 To run the demo LOCALLY on minikube (again, on a Mac):
 

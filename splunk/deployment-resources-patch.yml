@@ -1,0 +1,15 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: splunk
+spec:
+  template:
+    spec:
+      containers:
+        - name: splunk
+          imagePullPolicy: Never     
+          resources:
+            limits:
+            requests:
+
