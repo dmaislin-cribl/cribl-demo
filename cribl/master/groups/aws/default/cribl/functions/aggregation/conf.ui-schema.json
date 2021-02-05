@@ -68,7 +68,7 @@
       "modeSettings": {
         "title": "Output Settings",
         "collapsed": true,
-        "properties": ["passthrough", "metricsMode", "sufficientStatsOnly", "prefix"]
+        "properties": ["passthrough", "metricsMode", "sufficientStatsOnly"]
       },
       "advanced": {
         "title": "Advanced Settings",

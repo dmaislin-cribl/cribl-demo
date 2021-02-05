@@ -108,7 +108,7 @@ exports.process = (event) => {
     }
     // now, convert clones to actual events, inherit all properties (except _raw from parent)
     return clones.map((c, idx) => {
-      const ce = event.__clone();
+      const ce = event.clone();
       const cr = c.root();
       // copy any matching elements from the parent node
       for (let i = copyElements.length - 1; i > -1; i--) {

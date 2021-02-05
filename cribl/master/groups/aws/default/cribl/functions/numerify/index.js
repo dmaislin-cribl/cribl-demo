@@ -2,6 +2,7 @@ exports.disabled = 0;
 exports.name = 'Numerify';
 exports.version = '0.2';
 exports.group = 'Standard';
+const { NestedPropertyAccessor } = C.expr;
 
 let conf = {};
 let WLIgnoreList = null;

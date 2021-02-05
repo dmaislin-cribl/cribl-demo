@@ -1,39 +1,19 @@
 {
-  "mode": {
-    "ui:options": { "inline": true, "width": "34%" }
-  },
-  "type": {
-    "ui:widget": "ParserSelect",
-    "ui:options": { "inline": true, "width": "66%" }
-  },
   "srcField": {
-    "ui:options": { "inline": true, "width": "40%", "inlineStyle": { "padding": "0" } },
+    "ui:options": { "inline": true, "width": "50%" },
     "ui:placeholder": "Source field name",
     "ui:emptyValue": ""
   },
   "dstField": {
-    "ui:options": "{ inline: true, width: conf.type === 'kvp' ? '40%' : '60%' }",
-    "ui:forceRender": true,
+    "ui:options": { "inline": true, "width": "50%" },
     "ui:placeholder": "Destination field name"
-  },
-  "cleanFields": {
-    "ui:options": { "inline": true, "width": "20%", "labelInline": false }
-  },
-  "delimChar": {
-    "ui:options": { "inline": true, "width": "25%", "inlineStyle": { "padding": "0" } }
-  },
-  "escapeChar": {
-    "ui:options": { "inline": true, "width": "25%" }
-  },
-  "quoteChar": {
-    "ui:options": { "inline": true, "width": "25%" }
-  },
-  "nullValue": {
-    "ui:options": { "inline": true, "width": "25%" }
   },
   "fieldFilterExpr": {
     "ui:widget": "JsInput",
     "ui:placeholder": "Enter field filter expression"
+  },
+  "type": {
+    "ui:widget": "ParserSelect"
   },
   "fields": {
     "ui:field": "Tags",

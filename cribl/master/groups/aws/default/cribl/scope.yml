@@ -1,8 +1,7 @@
 ---
 metric:
-  enable: true                      # true, false
   format:
-    type : metricstatsd             # metricstatsd
+    type : metricstatsd             # metricstatsd, metricjson
     #statsdprefix : 'cribl.scope'    # prepends each statsd metric
     statsdmaxlen : 512              # max size of a formatted statsd string
     verbosity : 4                   # 0-9 (0 is least verbose, 9 is most)
@@ -36,15 +35,14 @@ metric:
           #      9  turns off filesystem read/write summarization
           #      9  turns off network send/receive summarization
     tags:
-      #user: $USER
-      #feeling: elation
+    #- user: $USER
+    #- feeling: elation
   transport:                        # defines how scope output is sent
     type: udp                       # udp, tcp, unix, file, syslog
     host: 127.0.0.1
     port: 8125
 
 event:
-  enable: true                      # true, false
   format:
     type : ndjson                   # ndjson
   watch:
@@ -69,12 +67,6 @@ event:
 #    - type: metric
 #      name: .*                      # (net.*)|(.*err.*)
 #      field: ^[^h]+                 # whitelist ex regex describing field names
-#      value: .*
-
-    # Enable extraction of HTTP headers
-#    - type: http
-#      name: .*                      # .*-res | .*-req | .*-metrics
-#      field: ^[^h]+                 # ^[^h]+ whitelist ex regex describing field names
 #      value: .*
 
 libscope:

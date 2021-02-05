@@ -14,7 +14,6 @@ let _iterations = DEFAULT_ITERATIONS;
 let regExList = [];
 let srcField;
 let fieldNameExp;
-let overwrite = false;
 
 // If fieldNameExpression not specified, this RegEx is used to remove leading underscores and digits
 // then remove non alpha numeric and underscore chars from field names. i.e.: _0key_1_@!2_3 => key_1_2_3
@@ -108,7 +107,7 @@ function processRegex(conf, event, fieldStr) {
       const kv = conf.key2value[k];
       const gName = conf.regex.groups[k];
       if (kv === -1 && gName) { // simple capture group
-        if (!overwrite && event[gName] !== undefined) {
+        if (event[gName] !== undefined) {
           // Field exists on event which means we are dealing with an MV field extraction.
           if (Array.isArray(event[gName])) {
             // Field is already array, add the newly extracted value.
@@ -133,7 +132,6 @@ function processRegex(conf, event, fieldStr) {
 exports.init = (opts) => {
   const conf = opts.conf || {};
   srcField = new NestedPropertyAccessor(conf.source || DEFAULT_FIELD);
-  overwrite = conf.overwrite || false;
   regExList = [];
   _iterations = (conf.iterations) ? conf.iterations : DEFAULT_ITERATIONS;
   // Top level regex
@@ -178,4 +176,3 @@ exports.process = (event) => {
 // Unit test
 exports.getIterations = () => { return _iterations; };
 exports.getSrcField = () => { return srcField.path; };
-exports.getOverwrite = () => { return overwrite; };

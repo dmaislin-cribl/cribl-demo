@@ -1,22 +1,8 @@
 AWS Ruleset:
   lib: cribl
   description: Event breaking rules for common AWS data sources
-  tags: flowlogs,elb,alb,loadbalancer,cdn,cloudtrail
+  tags: flowlogs,elb,alb,loadbalancer,cdn
   rules:
-    - name: AWS CloudTrail
-      condition: /CloudTrail/.test(source)
-      type: json_array
-      timestampAnchorRegex: /^/
-      timestamp:
-        type: format
-        length: 150
-        format: "%Y-%m-%dT%H:%M:%SZ"
-      timestampTimezone: utc
-      maxEventBytes: 51200
-      jsonExtractAll: false
-      eventBreakerRegex: /[\n\r]+(?!\s)/
-      jsonArrayField: Records
-      jsonTimeField: eventTime
     - name: AWS VPC Flow
       condition: /^\d+\s+\d+\s+eni-\w+.*(OK|NODATA|SKIPDATA)?$/.test(_raw) || sourcetype=='aws:cloudwatchlogs:vpcflow'
       eventBreakerRegex: /[\n\r]+/
@@ -193,74 +179,3 @@ Bro Ruleset:
           %s.%f
       timestampTimezone: utc
       maxEventBytes: 4096
-Cribl:
-  lib: cribl
-  description: Event breaking rules for new line delimited json data
-  tags: cribl,ndjson
-  rules:
-    - condition: "true"
-      type: json
-      timestampAnchorRegex: /^/
-      timestamp:
-        type: auto
-        length: 150
-      timestampTimezone: local
-      maxEventBytes: 1024000
-      eventBreakerRegex: /[\n\r]+(?!\s)/
-      name: ndjson
-Office 365:
-  lib: cribl
-  rules:
-    - condition: source.endsWith('CurrentStatus') || source.endsWith('HistoricalStatus')
-      type: json_array
-      timestampAnchorRegex: /^/
-      timestamp:
-        type: auto
-        length: 150
-      timestampTimezone: local
-      maxEventBytes: 51200
-      jsonExtractAll: true
-      eventBreakerRegex: /[\n\r]+(?!\s)/
-      name: status
-      jsonArrayField: value
-      jsonTimeField: StatusTime
-    - condition: source.endsWith('Messages')
-      type: json_array
-      timestampAnchorRegex: /^/
-      timestamp:
-        type: auto
-        length: 150
-      timestampTimezone: local
-      maxEventBytes: 51200
-      jsonExtractAll: true
-      eventBreakerRegex: /[\n\r]+(?!\s)/
-      jsonArrayField: value
-      jsonTimeField: LastUpdatedTime
-      name: messages
-    - condition: source.includes('feed/audit')
-      type: json_array
-      timestampAnchorRegex: /^/
-      timestamp:
-        type: auto
-        length: 150
-        format: ""
-      timestampTimezone: Etc/GMT-0
-      maxEventBytes: 51200
-      jsonExtractAll: true
-      eventBreakerRegex: /[\n\r]+(?!\s)/
-      name: mgmt-activity
-      jsonTimeField: CreationTime
-Cribl - Do Not Break Ruleset:
-  lib: cribl
-  description: Special rule to NOT break streams into events (capped by Max Event Bytes)
-  rules:
-    - condition: "true"
-      type: regex
-      timestampAnchorRegex: /^/
-      timestamp:
-        type: auto
-        length: 150
-      timestampTimezone: local
-      maxEventBytes: 1048576
-      eventBreakerRegex: /^\b$/
-      name: noBreak1MB

@@ -2,7 +2,6 @@ api:
   host: 0.0.0.0
   port: 9000
   disabled: false
-  loginRateLimit: 2/second
 auth:
   type: local
 kms.local:
@@ -15,5 +14,5 @@ system:
   installType: standalone
   intercom: true 
 workers: 
-  count: -2
+  count: 2
   memory: 2048

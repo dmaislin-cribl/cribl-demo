@@ -11,7 +11,7 @@
     "name": {
       "type": "string",
       "title": "New Name",
-      "description": "Name of each exploded array element in each new event. Leave empty to expand the array element with its original name."
+      "description": "The name of each element in the new event. Leave empty to expand the array element."
     }
   }
 }

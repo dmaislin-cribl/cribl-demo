@@ -2,40 +2,27 @@ exports.name = 'Regex Filter';
 exports.version = '0.2';
 exports.group = 'Standard';
 
-const { NamedGroupRegExp } = C.util;
+const { NamedGroupRegExp } = C.util; 
 const { NestedPropertyAccessor } = C.expr;
 
-let regexList = [];
+let regex;
 let field = '_raw';
-
 exports.init = (opts) => {
   const conf = opts.conf || {};
-  regexList = [];
-
-  // Top level regex
+  regex = null;
+  
   if (conf.regex) {
-    regexList.push(new NamedGroupRegExp(conf.regex));
+    regex = new NamedGroupRegExp(conf.regex.trim());
   } else {
     throw new Error('missing required parameter: regex');
   }
-
-  // Additional Regex
-  if (conf.regexList && conf.regexList.length > 0) {
-    for (let i = 0; i < conf.regexList.length; i++) {
-      regexList.push(new NamedGroupRegExp(conf.regexList[i].regex));
-    }
-  }
-
   field = new NestedPropertyAccessor(conf.field || '_raw');
 };
 
 exports.process = (event) => {
-  const fieldValue = field.get(event);
-  for (let i = 0; i < regexList.length; i++) {
-    regexList[i].lastIndex = 0; // common trap of setting "global" flag
-    if (regexList[i].test(fieldValue)) {
-      return undefined;
-    }
+  if (regex) {
+    regex.lastIndex = 0; // common trap of setting "global" flag
+    return regex.test(field.get(event)) ? undefined : event;
   }
   return event;
 };

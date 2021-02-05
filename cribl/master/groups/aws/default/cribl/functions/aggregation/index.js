@@ -44,8 +44,7 @@ exports.init = (opts) => {
     lagToleranceSeconds: C.util.parseTimeStringToSeconds(conf.lagTolerance),
     idleTimeLimitSeconds: C.util.parseTimeStringToSeconds(conf.idleTimeLimit),
     flushMemLimit: Math.min(maxMem, C.util.parseMemoryStringToBytes(conf.flushMemLimit || `${maxMem}`, err => { throw err; })),
-    metricsMode: Boolean(conf.metricsMode),
-    prefix: conf.prefix
+    metricsMode: Boolean(conf.metricsMode)
   };
   aggregator = C.internal.Aggregation.aggregationMgr(aggOpts);
 
@@ -85,7 +84,7 @@ exports.process = (event) => {
           // might need to throw away the result
           if (key) key.set(flushedEvent, val);
         } else {
-          flushedEvent.__setCtrlField(key, val);
+          flushedEvent.setCtrlField(key, val);
         }
       }
     }

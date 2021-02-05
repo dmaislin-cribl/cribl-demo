@@ -21,11 +21,6 @@
       "description": "Determines whether or not to output the aggregates as metrics or events",
       "default": false
     },
-    "prefix": {
-      "type": "string",
-      "title": "Output Prefix",
-      "description": "A prefix that is prepended to all of the fields output by this aggregations function."
-    },
     "timeWindow": {
       "pattern": "\\d+[sm]$",
       "type": "string",

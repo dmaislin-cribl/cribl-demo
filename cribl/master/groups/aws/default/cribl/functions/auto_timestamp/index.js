@@ -21,14 +21,15 @@ exports.init = (opts) => {
   conf.srcField = new NestedPropertyAccessor(conf.srcField || '_raw'); // Field to search for timestamp
   conf.dstField = new NestedPropertyAccessor(conf.dstField || '_time'); // Field to store time value in
   const timeExpression = conf.timeExpression || 'time.getTime() / 1000'; // JS Expression to take time and format it
+  const useUTC = conf.defaultTimezone === 'utc';
   conf.timeExpression = new Expression(timeExpression, { disallowAssign: true });
   conf.timestamps = (conf.timestamps || []).map(t => {
     return {
       regex: new NamedGroupRegExp(t.regex),
-      parser: C.Time.getParserWithTzInfo(t.strptime, conf.defaultTimezone)
+      parser: useUTC ? C.Time.utcParse(t.strptime) : C.Time.timeParse(t.strptime)
     };
   });
-  parser = C.Time._timestampFinder(conf.defaultTimezone);
+  parser = C.Time.timestampFinder(useUTC);
   lastEventTime = undefined;
   conf.defaultTime = conf.defaultTime || 'now';
   srcOffset = conf.offset || 0;
@@ -43,7 +44,7 @@ exports.process = (e) => {
   for (let i = 0; raw && i < conf.timestamps.length; i++) {
     const m = conf.timestamps[i].regex.exec(raw);
     if (m && m[1]) {
-      parsedTS = conf.timestamps[i].parser(m[1]);
+      parsedTS = parser.setMissingDateInfo(conf.timestamps[i].parser(m[1]));
       // console.log(parsedTS);
       if (parsedTS) {
         break;
@@ -60,4 +61,4 @@ exports.process = (e) => {
     conf.dstField.set(e, conf.timeExpression.evalOn({ time: new Date()}));
   }
   return e;
-}; 
+};

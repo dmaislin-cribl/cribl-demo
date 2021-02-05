@@ -5,7 +5,7 @@
     "fields": {
       "type": "array",
       "title": "Fields to Publish",
-      "description": "Wildcard list of fields to publish to the Prometheus endpoint.",
+      "description": "Wildcard list of fields to pubish to the prometheus endpoint.",
       "items": {
         "type": "string"
       }
@@ -19,13 +19,13 @@
     "passthrough": {
       "type": "boolean",
       "title": "Passthrough Mode",
-      "description": "If No, suppresses output to downstream Functions' Destinations. (Overrides the Final slider's setting.)",
+      "description": "Determines whether or not the event should be consumed once published",
       "default": false
     },
     "update": {
       "type": "boolean",
       "title": "Update Mode",
-      "description": "Determines whether the publisher updates (versus overwrites) the published output.",
+      "description": "Determines whether or not the publisher overwrites or update the published output",
       "default": true
     }
   }

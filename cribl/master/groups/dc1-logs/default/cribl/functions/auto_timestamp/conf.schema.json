@@ -19,7 +19,9 @@
       "type": "string",
       "title": "Default Timezone",
       "description": "Timezone to assign to timestamps without timezone info.",
-      "default":"local"
+      "default":"local",
+      "enum": ["local", "utc"],
+      "enumNames": ["Local", "UTC"]
     },
     "timeExpression": {
       "title": "Time Expression",

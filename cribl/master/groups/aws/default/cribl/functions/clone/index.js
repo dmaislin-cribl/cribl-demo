@@ -25,7 +25,7 @@ exports.process = (event) => {
   for (let i = 0; i < clones.length; i++) {
     const keys = cloneKeys[i];
     const vals = cloneVals[i];
-    const copy = event.__clone(false, eventKeys);
+    const copy = event.clone(false, eventKeys);
     for (let k = 0; k < keys.length; k++) {
       keys[k].set(copy, vals[k]);
     }

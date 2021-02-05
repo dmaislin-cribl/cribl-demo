@@ -7,11 +7,3 @@ inputs:
     tcpPort: 8125
     maxBufferSize: 1000
     ipWhitelistRegex: /.*/
-  CriblMetrics:
-    disabled: false
-    prefix: cribl.logstream.
-    type: criblmetrics
-    pipeline: cribl_metrics_rollup
-    metadata:
-      - name: index
-        value: cribl-metrics

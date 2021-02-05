@@ -69,12 +69,12 @@ exports.process = (event) => {
       // might need to throw away the result
       if (key) key.set(event, val);
     } else {
-      event.__setCtrlField(key, val);
+      event.setCtrlField(key, val);
     }
   }
-  // remove some fields, here we simply set fields to undefined for performance reasons
+  // remove some fields
   for (let i = 0; i < fields2remove.length; i++) {
-    fields2remove[i].set(event, undefined);
+    fields2remove[i].delete(event);
   }
 
   // remove wildcard fields

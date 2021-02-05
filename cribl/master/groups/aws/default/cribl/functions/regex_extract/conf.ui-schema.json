@@ -29,7 +29,7 @@
         "title": "Advanced Settings",
         "collapsed": true,
         "properties": [
-          "iterations", "fieldNameExpression","overwrite"
+          "iterations", "fieldNameExpression"
         ]
       }
     }

@@ -28,7 +28,6 @@
           "columnWidth": "30%",
           "editable": true,
           "labelWidth": "220px",
-          "descriptionInline": true,
           "uiEnumOptions": [
             {"value":"act","description":"Device Action"},
             {"value":"app","description":"Application Protocol"},

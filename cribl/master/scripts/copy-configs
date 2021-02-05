@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# If directory is empty, copy over configs
-if [ "$(ls -A /opt/cribl/groups)" ]; then
-    cp -R /var/opt/cribl /opt/
-fi
