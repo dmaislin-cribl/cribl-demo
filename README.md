@@ -1,4 +1,9 @@
-This demo environment uses Kubernetes. If you still need to run the old docker-compose version, the `docker-legacy` branch will be available until April 1, 2021. To run this locally, we recommend minikube. Additionally, this environment uses `skaffold` to orchestrate building the requisite containers and deploying into Kubernetes. 
+
+**This demo environment now runs only on Kubernetes**. If you still need to run the old docker-compose version, the `docker-legacy` branch will be available until April 1, 2021. In your local repo, simply run `git checkout docker-legacy` and you can continue to run the docker-compose version. 
+
+## Running Locally
+
+To run this locally, we recommend minikube. Additionally, this environment uses `skaffold` to orchestrate building the requisite containers and deploying into Kubernetes. 
 
 _**NOTE**_ - due to some problems with different k8s engines, it's recommended that you use version 1.17.2 of skaffold - the directions below reflect that.  
 
@@ -74,7 +79,7 @@ We have two alternate profiles in the skaffold.yaml file:
 
 ## EKS Deployment
 
-If you want to deploy this on EKS, see the [EKS-DEPLOY.md](EKS-DEPLOY.md) file. 
+At Cribl, we run our standard demo environments on an AWS EKS cluster. If you would like to deploy this on EKS, see the [EKS-DEPLOY.md](EKS-DEPLOY.md) file. 
 
 ## Contributing to the cribl-demo project
 
