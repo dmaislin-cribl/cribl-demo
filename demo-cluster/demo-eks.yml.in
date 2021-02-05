@@ -2,7 +2,7 @@
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: demo
+  name: $CLUSTERNAME
   region: $AWS_REGION
 vpc:
   subnets:
@@ -11,13 +11,13 @@ $PRIVATE_NETS
     public:
 $PUBLIC_NETS
 nodeGroups:
-  - name: demo-ng-a
+  - name: a
     minSize: 1
     maxSize: 4
     desiredCapacity: 1
     privateNetworking: true
     volumeSize: 200
-    availabilityZones: ["$A"]
+    availabilityZones: ["$AZ_A"]
 
     ssh:
       allow: true
@@ -42,13 +42,13 @@ nodeGroups:
       spotAllocationStrategy: "capacity-optimized"
       instanceTypes: 
         - m5.4xlarge
-  - name: demo-ng-b
+  - name: b
     minSize: 1
     maxSize: 4
     desiredCapacity: 1
     privateNetworking: true
     volumeSize: 200
-    availabilityZones: ["$B"]
+    availabilityZones: ["$AZ_B"]
 
     ssh:
       allow: true
@@ -73,13 +73,13 @@ nodeGroups:
       spotAllocationStrategy: "capacity-optimized"
       instanceTypes: 
         - m5.4xlarge
-  - name: demo-ng-c
+  - name: c
     minSize: 1
     maxSize: 4
     desiredCapacity: 1
     privateNetworking: true
     volumeSize: 200
-    availabilityZones: ["$C"]
+    availabilityZones: ["$AZ_C"]
 
     ssh:
       allow: true

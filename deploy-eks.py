@@ -138,11 +138,11 @@ check_namespace(options, kubeclient)
 os.environ['SKAFFOLD_DEFAULT_REPO'] = "%s.dkr.ecr.%s.amazonaws.com/%s" % (acct['Account'], options.region, options.repohead)
 
 # Run skaffold build with the namespace as the tag (this allows us to have different images for different deployments/namespaces)
-skaffbuildcall = "/usr/local/bin/skaffold build --tag=%s" % options.ns
-skaffdeploycall = "/usr/local/bin/skaffold deploy --status-check --tag=%s -n %s" % (options.ns, options.ns)
+skaffbuildcall = "skaffold build --tag=%s" % options.ns
+skaffdeploycall = "skaffold deploy --status-check --tag=%s -n %s" % (options.ns, options.ns)
 if (options.profile):
-  skaffbuildcall = "/usr/local/bin/skaffold build --tag=%s --profile=%s" % (options.ns, options.profile)
-  skaffdeploycall = "/usr/local/bin/skaffold deploy --status-check --tag=%s --profile=%s -n %s" % (options.ns, options.profile, options.ns)
+  skaffbuildcall = "skaffold build --tag=%s --profile=%s" % (options.ns, options.profile)
+  skaffdeploycall = "skaffold deploy --status-check --tag=%s --profile=%s -n %s" % (options.ns, options.profile, options.ns)
 
 rval = subprocess.call(skaffbuildcall,  shell=True)
 if rval == 0:

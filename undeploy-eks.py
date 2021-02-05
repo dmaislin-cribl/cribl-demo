@@ -127,7 +127,7 @@ except Exception as e:
   pass
 
 
-skaffdeletecall = "/usr/local/bin/skaffold delete -n %s" % options.ns
+skaffdeletecall = "skaffold delete -n %s" % options.ns
 
 rval = subprocess.call(skaffdeletecall,  shell=True)
 if rval == 0:
