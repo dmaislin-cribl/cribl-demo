@@ -1,6 +1,10 @@
 
 **This demo environment now runs only on Kubernetes**. If you still need to run the old docker-compose version, the `docker-legacy` branch will be available until April 1, 2021. In your local repo, simply run `git checkout docker-legacy` and you can continue to run the docker-compose version. 
 
+## Changes
+
+To see what's changed in the current version, see [CHANGES.md](CHANGES.md)
+
 ## Running Locally
 
 To run this locally, we recommend minikube. Additionally, this environment uses `skaffold` to orchestrate building the requisite containers and deploying into Kubernetes. 
