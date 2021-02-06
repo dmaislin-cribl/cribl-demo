@@ -1,0 +1,27 @@
+asyncFuncTimeout: 1000
+output: default
+description: Set default fields
+functions:
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      add:
+        - name: index
+          value: "index ? index : 'cribl'"
+        - name: source
+          value: "source ? source : appname"
+        - name: sourcetype
+          value: "sourcetype ? sourcetype : 'nagios'"
+      remove: []
+  - id: eval
+    filter: _raw.match(',TRAFFIC,') && _raw.match('PA-VM')
+    disabled: null
+    conf:
+      add:
+        - name: sourcetype
+          value: "'pan:traffic'"
+        - name: index
+          value: cribl
+    description: Add sourcetype and index to PAN Firewall Traffic events.
+groups: {}

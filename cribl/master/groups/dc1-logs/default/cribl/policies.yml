@@ -1,0 +1,52 @@
+GroupFull:
+  args:
+    - groupName
+  template:
+    - '* /m/${groupName}'
+    - '* /m/${groupName}/*'
+    - '* /master/groups/${groupName}'
+    - PATCH /master/groups/${groupName}/deploy
+    - GET /system/info
+    - GET /system/settings
+    - GET /system/instance/distributed
+    - GET /master/workers
+    - GET /master/groups
+    - GET /m/*/system/info
+    - GET /version
+    - GET /version/info
+    - GET /version/status
+    - GET /mappings
+GroupEdit:
+  args:
+    - groupName
+  template:
+    - '* /m/${groupName}'
+    - '* /m/${groupName}/*'
+    - '* /master/groups/${groupName}'
+    - GET /system/info
+    - GET /system/settings
+    - GET /system/instance/distributed
+    - GET /master/workers
+    - GET /master/groups
+    - GET /m/*/system/info
+    - GET /version
+    - GET /version/info
+    - GET /version/status
+    - GET /mappings
+GroupRead:
+  args:
+    - groupName
+  template:
+    - GET /m/${groupName}
+    - GET /m/${groupName}/*
+    - GET /master/groups/${groupName}
+    - GET /system/info
+    - GET /system/settings
+    - GET /system/instance/distributed
+    - GET /master/workers
+    - GET /master/groups
+    - GET /m/*/system/info
+    - GET /version
+    - GET /version/info
+    - GET /version/status
+    - GET /mappings

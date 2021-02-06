@@ -1,0 +1,11 @@
+routes:
+  - id: ojhMN1
+    name: syslog_to_minio
+    final: true
+    disabled: false
+    pipeline: firewall_geoip_enrich
+    description: ""
+    clones:
+      - {}
+    filter: sourcetype=='pan:traffic'
+    output: s3dc

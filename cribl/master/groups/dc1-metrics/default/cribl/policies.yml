@@ -1,0 +1,54 @@
+GroupFull:
+  args:
+    - groupName
+  template:
+    - Basic ${groupName}
+    - '* /m/${groupName}'
+    - '* /m/${groupName}/*'
+    - PATCH /master/groups/${groupName}/deploy
+GroupEdit:
+  args:
+    - groupName
+  template:
+    - Basic ${groupName}
+    - '* /m/${groupName}'
+    - '* /m/${groupName}/*'
+GroupRead:
+  args:
+    - groupName
+  template:
+    - Basic ${groupName}
+    - GET /m/${groupName}
+    - GET /m/${groupName}/*
+
+Basic:
+  args:
+    - groupName
+  template:
+    - POST /m/${groupName}/preview
+    - POST /m/${groupName}/system/capture
+    - POST /m/${groupName}/lib/expression
+    - GET /master/groups/${groupName}
+    - GET /master/workers
+    - GET /master/workers/*
+    - GET /master/groups
+    - GET /system/info
+    - GET /system/info/*
+    - GET /system/settings
+    - GET /system/settings/*
+    - GET /system/instance/distributed
+    - GET /system/instance/distributed/*
+    - GET /version
+    - GET /version/*
+    - GET /version/info
+    - GET /version/info/*
+    - GET /version/status
+    - GET /version/status/*
+    - GET /mappings
+    - GET /mappings/*
+    - GET /system/messages
+    - GET /system/message/*
+    - GET /ui/*
+    - POST /system/metrics/query
+    - GET /clui
+    - POST /system/capture

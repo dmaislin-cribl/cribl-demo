@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "logstream-master.fullname" . }}
+  labels:
+    {{- include "logstream-master.labels" . | nindent 4 }}
+    appdomain: cribl-master
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "logstream-master.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "logstream-master.selectorLabels" . | nindent 8 }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: appdomain
+                  operator: In
+                  values:
+                  - cribl-master
+              topologyKey: kubernetes.io/hostname
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image }}"
+          imagePullPolicy: {{ .Values.criblImage.pullPolicy }}
+          volumeMounts:
+          - name: config-storage
+            mountPath: {{ .Values.config.criblHome }}/config-volume
+          ports: 
+            {{-  range .Values.service.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .port }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: {{ .Values.config.healthPort }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.config.healthPort }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            # Single Volume for persistents (CRIBL-3848)
+            - name: CRIBL_VOLUME_DIR
+              value: {{ .Values.config.criblHome }}/config-volume
+            # Allow Self-Signed Certs
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: "{{ .Values.config.rejectSelfSignedCerts }}"
+            - name: CRIBL_HOME
+              value: "{{ .Values.config.criblHome }}"
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value }}
+            {{- end }}
+
+      volumes:
+        - name: config-storage
+          persistentVolumeClaim:
+            claimName: config-claim
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+

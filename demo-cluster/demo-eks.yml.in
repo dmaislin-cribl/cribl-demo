@@ -1,0 +1,106 @@
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: $CLUSTERNAME
+  region: $AWS_REGION
+vpc:
+  subnets:
+    private:
+$PRIVATE_NETS
+    public:
+$PUBLIC_NETS
+nodeGroups:
+  - name: a
+    minSize: 1
+    maxSize: 4
+    desiredCapacity: 1
+    privateNetworking: true
+    volumeSize: 200
+    availabilityZones: ["$AZ_A"]
+
+    ssh:
+      allow: true
+      publicKeyName: $KEYPAIR
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+      withAddonPolicies:
+        autoScaler: true
+        imageBuilder: true
+        ebs: true
+    labels: {role: worker}
+    tags:
+      nodegroup-role: worker
+    instancesDistribution:
+      maxPrice: 0.45
+      onDemandBaseCapacity: 1
+      onDemandPercentageAboveBaseCapacity: 50
+      #spotInstancePools: 2
+      spotAllocationStrategy: "capacity-optimized"
+      instanceTypes: 
+        - m5.4xlarge
+  - name: b
+    minSize: 1
+    maxSize: 4
+    desiredCapacity: 1
+    privateNetworking: true
+    volumeSize: 200
+    availabilityZones: ["$AZ_B"]
+
+    ssh:
+      allow: true
+      publicKeyName: $KEYPAIR
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+      withAddonPolicies:
+        autoScaler: true
+        imageBuilder: true
+        ebs: true
+    labels: {role: worker}
+    tags:
+      nodegroup-role: worker
+    instancesDistribution:
+      maxPrice: 0.45
+      onDemandBaseCapacity: 1
+      onDemandPercentageAboveBaseCapacity: 50
+      #spotInstancePools: 2
+      spotAllocationStrategy: "capacity-optimized"
+      instanceTypes: 
+        - m5.4xlarge
+  - name: c
+    minSize: 1
+    maxSize: 4
+    desiredCapacity: 1
+    privateNetworking: true
+    volumeSize: 200
+    availabilityZones: ["$AZ_C"]
+
+    ssh:
+      allow: true
+      publicKeyName: $KEYPAIR
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+      withAddonPolicies:
+        autoScaler: true
+        imageBuilder: true
+        ebs: true
+    labels: {role: worker}
+    tags:
+      nodegroup-role: worker
+    instancesDistribution:
+      maxPrice: 0.45
+      onDemandBaseCapacity: 1
+      onDemandPercentageAboveBaseCapacity: 50
+      #spotInstancePools: 2
+      spotAllocationStrategy: "capacity-optimized"
+      instanceTypes: 
+        - m5.4xlarge

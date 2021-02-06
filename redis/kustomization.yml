@@ -1,0 +1,4 @@
+resources:
+  - redis.k8s.yml
+patches:
+  - deployment-resources-patch.yml

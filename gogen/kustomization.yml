@@ -1,0 +1,4 @@
+resources:
+  - gogen.k8s.yml
+patches:
+  - deployment-resources-patch.yml

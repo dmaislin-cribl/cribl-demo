@@ -1,0 +1,5 @@
+resources:
+  - grafana.k8s.yml
+patches:
+  - service-patch.yml
+  - deployment-resources-patch.yml

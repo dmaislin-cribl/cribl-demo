@@ -1,0 +1,4 @@
+#!/bin/bash
+
+
+jq -r '.info.version' $CRIBL_HOME/default/ui/static/swagger/openapi.json

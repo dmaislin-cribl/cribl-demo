@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gogen
+spec:
+  template:
+    spec:
+      containers:
+        - name: gogen-bigjson-webhook
+          resources:
+            limits:
+            requests:
+        - name: gogen-businessevent-hec
+          resources:
+            limits:
+            requests:
+        - name: gogen-metrics-dogstatsd
+          resources:
+            limits:
+            requests:
+        - name: gogen-pantraffic-syslog
+          resources:
+            limits:
+            requests:
+        - name: gogen-statechange-syslog
+          resources:
+            limits:
+            requests:
+        - name: gogen-accesscombined-forwarder
+          resources:
+            limits:
+            requests:
+        - name: gogen-authfailed-filebeat
+          resources:
+            limits:
+            requests:
+        - name: gogen-datacollection-syslog
+          resources:
+            limits:
+            requests:
+        - name: gogen-flowlogs-syslog
+          resources:
+            limits:
+            requests:

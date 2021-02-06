@@ -1,0 +1,5 @@
+resources:
+  - apiserver.k8s.yml
+patches:
+  - deployment1-resources-patch.yml
+  - deployment2-resources-patch.yml
