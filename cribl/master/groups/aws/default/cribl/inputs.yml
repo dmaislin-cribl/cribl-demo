@@ -12,3 +12,4 @@ inputs:
   CriblMetrics:
     type: criblmetrics
     disabled: true
+    pipeline: cribl_metrics_rollup

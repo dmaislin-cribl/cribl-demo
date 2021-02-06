@@ -1,6 +1,15 @@
 id: default
 groups: {}
 routes:
+  - id: SzBeGP
+    name: devnull
+    final: true
+    disabled: true
+    pipeline: passthru
+    description: ""
+    clones: []
+    filter: "true"
+    output: devnull
   - id: A8y30n
     name: speedtest
     final: true
@@ -9,7 +18,7 @@ routes:
     description: ""
     clones: []
     filter: client && server && download && upload
-    output: influxdb
+    output: influxdb2
   - id: M6yz8j
     name: mtr
     final: true
@@ -18,7 +27,7 @@ routes:
     description: ""
     clones: []
     filter: report.mtr
-    output: influxdb
+    output: influxdb2
   - id: A1JddJ
     name: statsd
     final: true
@@ -36,4 +45,12 @@ routes:
     description: Shellagent Output
     clones: []
     filter: _raw.startsWith('***CRIBL***')
+    output: statsd
+  - id: AvIq12
+    name: Internal Metrics
+    final: true
+    disabled: false
+    pipeline: passthru
+    description: Send internal metrics
+    filter: __inputId=='cribl:CriblMetrics'
     output: statsd

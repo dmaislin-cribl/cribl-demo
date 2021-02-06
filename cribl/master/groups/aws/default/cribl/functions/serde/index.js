@@ -71,8 +71,16 @@ exports.init = (opt) => {
     serde = C.Text._delimSerDe({
       fields: conf.fields || [],
     }, fieldFilter);
+  } else if (conf.type === 'delim') {
+    serde = C.Text._delimSerDe({
+      delimiter: conf.delimChar,
+      escapeChar: conf.escapeChar,
+      quoteChar: conf.quoteChar,
+      nullValue: conf.nullValue,
+      fields: conf.fields || [],
+    }, fieldFilter);
   } else if (conf.type === 'kvp') {
-    serde = C.Text._kvpSerDe(fieldFilter);
+    serde = C.Text._kvpSerDe(fieldFilter, conf.cleanFields);
   } else if (conf.type === 'json') {
     serde = C.Text._jsonSerDe(fieldFilter);
   } else {

@@ -4,8 +4,8 @@
   "properties": {
     "field": {
       "type": "string",
-      "title": "Index-time Field",
-      "description": "Name of index-time field to save the timestamp in (none, if empty)"
+      "title": "Field name",
+      "description": "Name of field in which to save the timestamp. (If empty, timestamp will not be saved to a field.)"
     }
   }
 }

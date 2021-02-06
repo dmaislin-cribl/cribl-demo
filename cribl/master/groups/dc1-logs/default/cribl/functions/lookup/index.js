@@ -2,12 +2,13 @@ exports.name = 'Lookup';
 exports.version = '0.2';
 exports.group = 'Standard';
 
-const { CSV, LookupSpec, LookupFactory } = C.internal.Lookup;
+const { CSV, LookupSpec } = C.internal.Lookup;
 const cLogger = C.util.getLogger('func:lookup');
 
 let table;
 let file;
 let addToEventFunc;
+let defaultValues;
 const QUOTE_REGEX = /(\\")/g;
 
 function quote(str) {
@@ -36,24 +37,29 @@ exports.init = (opts) => {
   addToEventFunc = undefined;
   const matchMode = conf.matchMode || 'exact';
   const matchType = conf.matchType || 'first';
+  const outFields = conf.outFields || [];
   const inEventFields = [];
   const inLookupFields = [];
   const outEventFields = [];
   const outLookupFields = [];
-
+  defaultValues = [];
   return Promise.resolve()
     .then(() => {
       conf.inFields.forEach(inF => {
         inEventFields.push(inF.eventField);
         inLookupFields.push(inF.lookupField);
       });
-
-      (conf.outFields || []).forEach(outF => {
+      defaultValues.fill(undefined, 0, outFields.length);
+      for (let i = 0; i < outFields.length; i++) {
+        const outF = outFields[i];
         outEventFields.push(outF.eventField);
         outLookupFields.push(outF.lookupField);
-      });
+        if (outF.defaultValue !== undefined) defaultValues[i] = outF.defaultValue;
+      }
+      defaultValues = defaultValues.find(x => x != null) != null ? defaultValues : undefined;
       addToEventFunc = conf.addToEvent ? addToRaw : undefined;
-      const ls = new LookupSpec(inEventFields, outLookupFields, inLookupFields, outEventFields);
+      const ignoreCase = conf.ignoreCase || false;
+      const ls = new LookupSpec(inEventFields, outLookupFields, inLookupFields, outEventFields, false, ignoreCase);
       cLogger.info('Creating Lookup: ', { matchMode, matchType, file });
       table = CSV.getReference(file, ls, (+conf.reloadPeriodSec) || -1, matchMode, matchType);
       return table.ready();
@@ -67,7 +73,7 @@ exports.unload = () => {
 
 exports.process = (event) => {
   if (table) {
-    table.lookup(event, addToEventFunc);
+    table.lookup(event, addToEventFunc, defaultValues);
   }
   return event;
 };

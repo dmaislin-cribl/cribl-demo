@@ -11,6 +11,18 @@
       "enumNames": ["Extract", "Reserialize"],
       "default": "extract"
     },
+    "type":{
+      "title": "Type",
+      "description": "Parser/Formatter type to use.",
+      "type": "string",
+      "enum": ["csv", "elff", "clf", "kvp", "json", "delim"],
+      "enumNames": ["CSV", "Extended Log File Format", "Common Log Format", "Key=Value Pairs", "JSON Object", "Delimited values"],
+      "default": "csv"
+    },
+    "delimChar": {},
+    "quoteChar": {},
+    "escapeChar": {},
+    "nullValue": {},
     "srcField": {
       "title": "Source Field",
       "description": "Field which contains text to be parsed",
@@ -22,14 +34,7 @@
       "description": "Field name where to add fields to. Extract Mode only.",
       "type": "string"
     },
-    "type":{
-      "title": "Type",
-      "description": "Parser/Formatter type to use.",
-      "type": "string",
-      "enum": ["csv", "elff", "clf", "kvp", "json"],
-      "enumNames": ["CSV", "Extended Log File Format", "Common Log Format", "Key=Value Pairs", "JSON Object"],
-      "default": "csv"
-    },
+    "cleanFields": {},
     "fields": {
       "title": "List of Fields",
       "description": "Fields expected to be extracted, in order. If not specified parser will auto-generate.",
@@ -54,5 +59,66 @@
       "type": "string",
       "jsExpression": true
     }
+  },
+  "dependencies": {
+    "type": {
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "enum":["kvp"]
+            },
+            "cleanFields": {
+              "type": "boolean",
+              "default": false,
+              "title": "Clean Fields",
+              "description": "Whether to clean field names by replacing non [a-zA-Z0-9] characters with _"
+            }
+          }
+        },
+        {
+          "properties": {
+            "type": {
+              "enum":["delim"]
+            },
+            "delimChar": {
+              "type": "string",
+              "default": ",",
+              "title": "Delimiter",
+              "minLength": 1,
+              "description": "Delimiter character to use to split values"
+            },
+            "quoteChar": {
+              "type": "string",
+              "default": "\"",
+              "title": "Quote Char",
+              "minLength": 1,
+              "description": "Character used to quote literal values"
+            },
+            "escapeChar": {
+              "type": "string",
+              "default": "\\",
+              "title": "Escape Char",
+              "minLength": 1,
+              "description": "Escape character used to escape delimiter or quote character"
+            },
+            "nullValue": {
+              "type": "string",
+              "default": "-",
+              "title": "Null Value",
+              "description": "Field value representing the null value. Null fields will be omitted."
+            }
+          }
+        },
+        {
+          "properties": {
+            "type": {
+              "enum":["csv", "elff", "clf", "json"]
+            }
+          }
+        }
+      ]
+    }
   }
+  
 }

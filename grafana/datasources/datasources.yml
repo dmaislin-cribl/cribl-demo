@@ -4,13 +4,16 @@ datasources:
   name: InfluxDB
   type: influxdb
   access: proxy
-  url: http://influxdb:8086
-  password: admin
-  user: admin
+  url: http://influxdb2:8086
+  # password: sKvQsRYB9OTwG53QszRyoEYd6t99Xp_HlG29GxDs1sfxep7XHkMPWrqKroMs8mSoGPokIvUlJuptcESe_X8uig==
+  # user: admin
   database: cribl
   basicAuth: false
   isDefault: true
   jsonData:
     httpMode: GET
     keepCookies: []
+    httpHeaderName1: Authorization
+  secureJsonData:
+    httpHeaderValue1: Token sKvQsRYB9OTwG53QszRyoEYd6t99Xp_HlG29GxDs1sfxep7XHkMPWrqKroMs8mSoGPokIvUlJuptcESe_X8uig==
   readOnly: false

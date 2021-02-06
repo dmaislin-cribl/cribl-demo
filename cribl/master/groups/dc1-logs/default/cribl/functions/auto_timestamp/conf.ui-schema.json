@@ -6,7 +6,16 @@
     "ui:options": { "inline": true, "width": "33%" }
   },
   "defaultTimezone": {
-    "ui:options": { "inline": true, "width": "33%" }
+    "ui:placeholder": "Select a timezone",
+    "ui:widget": "ApiLookup",
+    "ui:options": {
+      "url": "/timezoneInfo",
+      "valueProp": "value",
+      "labelProp": "label",
+      "editable": false,
+      "inline": true, 
+      "width": "33%"
+    }
   },
   "timeExpression": {
     "ui:widget": "JsInput"
