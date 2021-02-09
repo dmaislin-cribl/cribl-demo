@@ -23,3 +23,6 @@
 * Created a new branch `docker-legacy` to support people transitioning from the docker-compose based flow to the kubernetes flow, which will be present until 4/1/2021 as a "transition period"
 
 * Cleanup and bug fixes as requested by the SE team and others.
+
+# Topology
+![Cribl-Demo Topology](img/cribl-demo-topology.svg)
