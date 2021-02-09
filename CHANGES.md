@@ -25,4 +25,4 @@
 * Cleanup and bug fixes as requested by the SE team and others.
 
 # Topology
-![Cribl-Demo Topology](img/cribl-demo-topology.svg)
+![Cribl-Demo Topology](img/cribl-demo-topology.png)
