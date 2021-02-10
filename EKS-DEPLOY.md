@@ -5,7 +5,12 @@ If you want to run the cribl-demo on EKS, this document covers that. It is cumul
 ## Pre-Requisites for Deployment Scripts
 
 ```
-pip -r ./requirements.txt
+brew install python
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 get-pip.py
+pip install numpy
+pip install pybind11
+pip install -r requirements.txt
 ```
 additionally, you'll need to have active AWS credentials in the shell.
 
